@@ -55,12 +55,12 @@ entity SPI6502B is
            cs1 : in  STD_LOGIC;
            Ncs2 : in  STD_LOGIC;
            extclk : in  STD_LOGIC;
-           spi_miso: in std_logic_vector (3 downto 0);
+           spi_miso: in std_logic;
            spi_mosi : out  STD_LOGIC;
            spi_sclk : out  STD_LOGIC;
-           spi_Nsel : out  STD_LOGIC_VECTOR (3 downto 0);
-           spi_int : in  STD_LOGIC_VECTOR (3 downto 0);
-           diag : out std_logic
+           spi_Nsel : out  STD_LOGIC;
+		 spi_int : in  STD_LOGIC;
+           led : out std_logic
 		);
 			  
 	constant DIV_WIDTH		: integer := 3;
@@ -99,9 +99,9 @@ architecture Behavioral of SPI6502B is
 	
 	signal divisor: std_logic_vector(DIV_WIDTH-1 downto 0);
 	
-	signal slavesel: std_logic_vector(3 downto 0);		-- slave select output (0=selected)
-	signal slaveinten: std_logic_vector(3 downto 0);	-- slave interrupt enable (1=enabled)
-	signal slaveint: std_logic_vector (3 downto 0);		-- slave interrupt inputs
+	signal slavesel: std_logic;		-- slave select output (0=selected)
+	signal slaveinten: std_logic;	-- slave interrupt enable (1=enabled)
+	signal slaveint: std_logic;		-- slave interrupt inputs
 	
 	--------------------------
 	-- helper signals
@@ -120,7 +120,7 @@ architecture Behavioral of SPI6502B is
 	
 begin
 			
-	diag <= not (bsy or not slavesel(0)); --'0'; --shifting2; --shiftdone; --shiftcnt(2);
+	led <= not (bsy or not slavesel); --'0'; --shifting2; --shiftdone; --shiftcnt(2);
 	
 	--------------------------
 	
@@ -250,10 +250,7 @@ begin
 	--------------------------
 	-- interrupt generation
 	int_out <= spiint 
-			or (slaveint(0) and slaveinten(0)) 
-			or (slaveint(1) and slaveinten(1))
-			or (slaveint(2) and slaveinten(2))
-			or (slaveint(3) and slaveinten(3));
+			or (slaveint and slaveinten);
 
 	--------------------------
 	-- interface section
@@ -264,11 +261,7 @@ begin
 	int_din <= cpu_d;	
 	slaveint <= not(spi_int);		-- active low interrupt inputs
 
-	int_miso <= 
-			(spi_miso(0) and not(slavesel(0)))
-			or (spi_miso(1) and not(slavesel(1)))
-			or (spi_miso(2) and not(slavesel(2)))
-			or (spi_miso(3) and not(slavesel(3)));
+	int_miso <= (spi_miso and not slavesel);
 	
 	-- outputs
 	cpu_d <= int_dout when (is_read='1') else (others => 'Z');		-- data bus tristate
@@ -314,10 +307,13 @@ begin
 				when "10" =>		-- read sclk divisor
 					int_dout(DIV_WIDTH-1 downto 0) <= divisor;
 					int_dout(3) <= '0';
-					int_dout(7 downto 4) <= slaveint;
+					int_dout(4) <= slaveint;
+					int_dout(7 downto 5) <= (others => '0');
 				when "11" =>		-- read slave select / slave interrupt state
-					int_dout(3 downto 0) <= slavesel;
-					int_dout(7 downto 4) <= slaveinten;
+					int_dout(0) <= slavesel;
+					int_dout(3 downto 1) <= (others => '0');
+					int_dout(4) <= slaveinten;
+					int_dout(7 downto 5) <= (others => '0');
 				when others => 
 					int_dout <= (others => '0');
 			end case;
@@ -336,8 +332,8 @@ begin
 			tmo <= '0';
 			frx <= '0';
 			ier <= '0';
-			slavesel <= (others => '1');
-			slaveinten <= (others => '0');
+			slavesel <= '1';
+			slaveinten <= '0';
 			divisor <= (others => '0');
 		elsif (falling_edge(selected) and cpu_rnw = '0') then
 		--elsif (falling_edge(cpu_phi2) and selected='1' and cpu_rnw='0') then
@@ -356,8 +352,8 @@ begin
 				when "10" => 		-- write divisor
 					divisor <= int_din(DIV_WIDTH-1 downto 0);
 				when "11" =>		-- write slave select / slave interrupt enable
-					slavesel <= int_din(3 downto 0);
-					slaveinten <= int_din(7 downto 4);
+					slavesel <= int_din(0);
+					slaveinten <= int_din(4);
 				when others =>
 			end case;
 		end if;

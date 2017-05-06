@@ -18,22 +18,13 @@ NET "cpu_Nphi2"  LOC = "P5"  ;
 NET "cpu_Nres"  LOC = "P19"  ;
 NET "cpu_rnw"  LOC = "P7"  ;
 NET "cs1"  LOC = "P20"  ;
-NET "diag"  LOC = "P29"  ;
+NET "led"  LOC = "P29"  ;
 NET "extclk"  LOC = "P6"  ;
 NET "Ncs2"  LOC = "P18"  ;
-NET "spi_int<0>"  LOC = "P42"  ;
-NET "spi_int<1>"  LOC = "P40"  ;
-NET "spi_int<2>"  LOC = "P39"  ;
-NET "spi_int<3>"  LOC = "P1"  ;
-NET "spi_miso<0>"  LOC = "P44"  ;
-NET "spi_miso<1>"  LOC = "P43"  ;
-NET "spi_miso<2>"  LOC = "P38"  ;
-NET "spi_miso<3>"  LOC = "P37"  ;
+NET "spi_int"  LOC = "P42"  ;
+NET "spi_miso"  LOC = "P44"  ;
 NET "spi_mosi"  LOC = "P35"  ;
-NET "spi_Nsel<0>"  LOC = "P28"  ;
-NET "spi_Nsel<1>"  LOC = "P27"  ;
-NET "spi_Nsel<2>"  LOC = "P26"  ;
-NET "spi_Nsel<3>"  LOC = "P25"  ;
+NET "spi_Nsel"  LOC = "P28"  ;
 NET "spi_sclk"  LOC = "P34"  ;
 
 #PACE: Start of PACE Area Constraints

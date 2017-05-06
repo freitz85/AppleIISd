@@ -2,8 +2,8 @@ MDF Database:  version 1.0
 MDF_INFO | spi6502b | XC9572XL-10-PC44
 MACROCELL | 1 | 1 | int_mosi
 ATTRIBUTES | 8652706 | 0
-INPUTS | 12 | shiftcnt<3>  | shiftcnt<2>  | shiftcnt<1>  | shiftdone  | spidataout<5>  | shifting2  | spidataout<1>  | start_shifting/start_shifting_RSTF__$INT.EXP  | EXP6_.EXP  | $OpTx$INV$22__$INT  | cpu_Nres  | tmo
-INPUTMC | 11 | 2 | 15 | 2 | 16 | 3 | 9 | 2 | 2 | 3 | 6 | 2 | 0 | 0 | 2 | 1 | 0 | 1 | 2 | 2 | 3 | 0 | 6
+INPUTS | 12 | shiftcnt<3>  | shiftcnt<2>  | shiftcnt<1>  | shiftdone  | spidataout<5>  | shifting2  | spidataout<1>  | EXP6_.EXP  | shifting2.EXP  | $OpTx$INV$22__$INT  | cpu_Nres  | tmo
+INPUTMC | 11 | 1 | 14 | 1 | 15 | 1 | 16 | 1 | 3 | 3 | 5 | 1 | 2 | 0 | 2 | 1 | 0 | 1 | 2 | 1 | 5 | 0 | 6
 INPUTP | 1 | 49
 IMPORTS | 2 | 1 | 0 | 1 | 2
 EQ | 21 | 
@@ -12,82 +12,35 @@ EQ | 21 |
 	# !shiftcnt<3> & shiftcnt<2> & !shiftcnt<1> & 
 	!shiftdone & !spidataout<5> & shifting2
 ;Imported pterms FB2_1
-	# shiftcnt<3> & !shiftcnt<2> & !shiftcnt<1> & 
-	!shiftdone & !spidataout<3> & shifting2
-	# !shiftcnt<3> & !shiftcnt<2> & !shiftcnt<1> & 
-	!shiftdone & !spidataout<7> & shifting2
-;Imported pterms FB2_3
 	# shiftcnt<3> & shiftcnt<2> & shiftcnt<1> & 
 	!shiftdone & !spidataout<0> & shifting2
 	# shiftcnt<3> & !shiftcnt<2> & shiftcnt<1> & 
 	!shiftdone & !spidataout<2> & shifting2
+	# shiftcnt<3> & !shiftcnt<2> & !shiftcnt<1> & 
+	!shiftdone & !spidataout<3> & shifting2
 	# !shiftcnt<3> & shiftcnt<2> & shiftcnt<1> & 
 	!shiftdone & !spidataout<4> & shifting2
+	# !shiftcnt<3> & !shiftcnt<2> & !shiftcnt<1> & 
+	!shiftdone & !spidataout<7> & shifting2
+;Imported pterms FB2_3
 	# !shiftcnt<3> & !shiftcnt<2> & shiftcnt<1> & 
 	!shiftdone & !spidataout<6> & shifting2;
    spi_mosi.CLK = !$OpTx$INV$22__$INT;
    spi_mosi.AP = !cpu_Nres;
    spi_mosi.OE = !tmo;
 
-MACROCELL | 3 | 10 | slavesel<0>
+MACROCELL | 3 | 10 | slavesel
 ATTRIBUTES | 4588514 | 0
-OUTPUTMC | 4 | 3 | 10 | 3 | 0 | 0 | 4 | 3 | 13
-INPUTS | 8 | spi_Nsel<0>  | cpu_a<1>  | cpu_a<0>  | cpu_d<0>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
+OUTPUTMC | 4 | 3 | 10 | 1 | 13 | 0 | 4 | 3 | 13
+INPUTS | 8 | spi_Nsel  | cpu_a<1>  | cpu_a<0>  | cpu_d<0>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
 INPUTMC | 1 | 3 | 10
 INPUTP | 7 | 59 | 52 | 12 | 50 | 46 | 49 | 24
-EQ | 7 | 
-   spi_Nsel<0>.T = spi_Nsel<0> & cpu_a<1> & cpu_a<0> & 
-	!cpu_d<0>.PIN
-	# !spi_Nsel<0> & cpu_a<1> & cpu_a<0> & 
-	cpu_d<0>.PIN;
-   !spi_Nsel<0>.CLK = cs1 & !Ncs2;
-   spi_Nsel<0>.AP = !cpu_Nres;
-   spi_Nsel<0>.CE = !cpu_rnw;
-
-MACROCELL | 3 | 7 | slavesel<1>
-ATTRIBUTES | 4588514 | 0
-OUTPUTMC | 3 | 3 | 7 | 3 | 0 | 0 | 5
-INPUTS | 8 | spi_Nsel<1>  | cpu_a<1>  | cpu_a<0>  | cpu_d<1>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
-INPUTMC | 1 | 3 | 7
-INPUTP | 7 | 59 | 52 | 13 | 50 | 46 | 49 | 24
-EQ | 7 | 
-   spi_Nsel<1>.T = spi_Nsel<1> & cpu_a<1> & cpu_a<0> & 
-	!cpu_d<1>.PIN
-	# !spi_Nsel<1> & cpu_a<1> & cpu_a<0> & 
-	cpu_d<1>.PIN;
-   !spi_Nsel<1>.CLK = cs1 & !Ncs2;
-   spi_Nsel<1>.AP = !cpu_Nres;
-   spi_Nsel<1>.CE = !cpu_rnw;
-
-MACROCELL | 3 | 4 | slavesel<2>
-ATTRIBUTES | 4588514 | 0
-OUTPUTMC | 3 | 3 | 4 | 3 | 17 | 0 | 7
-INPUTS | 8 | spi_Nsel<2>  | cpu_a<1>  | cpu_a<0>  | cpu_d<2>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
-INPUTMC | 1 | 3 | 4
-INPUTP | 7 | 59 | 52 | 15 | 50 | 46 | 49 | 24
-EQ | 7 | 
-   spi_Nsel<2>.T = spi_Nsel<2> & cpu_a<1> & cpu_a<0> & 
-	!cpu_d<2>.PIN
-	# !spi_Nsel<2> & cpu_a<1> & cpu_a<0> & 
-	cpu_d<2>.PIN;
-   !spi_Nsel<2>.CLK = cs1 & !Ncs2;
-   spi_Nsel<2>.AP = !cpu_Nres;
-   spi_Nsel<2>.CE = !cpu_rnw;
-
-MACROCELL | 3 | 1 | slavesel<3>
-ATTRIBUTES | 4588514 | 0
-OUTPUTMC | 3 | 3 | 1 | 3 | 17 | 0 | 14
-INPUTS | 8 | spi_Nsel<3>  | cpu_a<1>  | cpu_a<0>  | cpu_d<3>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
-INPUTMC | 1 | 3 | 1
-INPUTP | 7 | 59 | 52 | 26 | 50 | 46 | 49 | 24
-EQ | 7 | 
-   spi_Nsel<3>.T = spi_Nsel<3> & cpu_a<1> & cpu_a<0> & 
-	!cpu_d<3>.PIN
-	# !spi_Nsel<3> & cpu_a<1> & cpu_a<0> & 
-	cpu_d<3>.PIN;
-   !spi_Nsel<3>.CLK = cs1 & !Ncs2;
-   spi_Nsel<3>.AP = !cpu_Nres;
-   spi_Nsel<3>.CE = !cpu_rnw;
+EQ | 5 | 
+   spi_Nsel.T = spi_Nsel & cpu_a<1> & cpu_a<0> & !cpu_d<0>.PIN
+	# !spi_Nsel & cpu_a<1> & cpu_a<0> & cpu_d<0>.PIN;
+   !spi_Nsel.CLK = cs1 & !Ncs2;
+   spi_Nsel.AP = !cpu_Nres;
+   spi_Nsel.CE = !cpu_rnw;
 
 MACROCELL | 0 | 15 | cpol
 ATTRIBUTES | 4326256 | 0
@@ -104,7 +57,7 @@ EQ | 5 |
 
 MACROCELL | 0 | 10 | ece
 ATTRIBUTES | 4326256 | 0
-OUTPUTMC | 3 | 0 | 10 | 0 | 7 | 2 | 3
+OUTPUTMC | 3 | 0 | 10 | 0 | 7 | 1 | 5
 INPUTS | 8 | ece  | cpu_a<1>  | cpu_a<0>  | cpu_d<2>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
 INPUTMC | 1 | 0 | 10
 INPUTP | 7 | 59 | 52 | 15 | 50 | 46 | 49 | 24
@@ -130,7 +83,7 @@ EQ | 5 |
 
 MACROCELL | 0 | 9 | frx
 ATTRIBUTES | 4326256 | 0
-OUTPUTMC | 3 | 0 | 9 | 2 | 5 | 0 | 16
+OUTPUTMC | 3 | 0 | 9 | 3 | 2 | 0 | 16
 INPUTS | 8 | frx  | cpu_a<1>  | cpu_a<0>  | cpu_d<4>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
 INPUTMC | 1 | 0 | 9
 INPUTP | 7 | 59 | 52 | 27 | 50 | 46 | 49 | 24
@@ -141,87 +94,31 @@ EQ | 5 |
    frx.AR = !cpu_Nres;
    frx.CE = !cpu_rnw;
 
-MACROCELL | 3 | 15 | ier
+MACROCELL | 3 | 8 | ier
 ATTRIBUTES | 4326256 | 0
-OUTPUTMC | 5 | 3 | 15 | 2 | 4 | 2 | 17 | 3 | 14 | 3 | 16
-INPUTS | 13 | ier  | cpu_a<1>  | cpu_a<0>  | cpu_d<6>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw  | cpha  | shiftcnt<0>  | shiftdone  | shifting2  | slaveinten<1>.EXP
-INPUTMC | 6 | 3 | 15 | 0 | 17 | 3 | 2 | 2 | 2 | 2 | 0 | 3 | 14
+OUTPUTMC | 3 | 3 | 8 | 2 | 4 | 3 | 0
+INPUTS | 8 | ier  | cpu_a<1>  | cpu_a<0>  | cpu_d<6>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
+INPUTMC | 1 | 3 | 8
 INPUTP | 7 | 59 | 52 | 31 | 50 | 46 | 49 | 24
-EXPORTS | 1 | 3 | 16
-IMPORTS | 1 | 3 | 14
-EQ | 8 | 
-   ier.T = !ier & !cpu_a<1> & cpu_a<0> & cpu_d<6>.PIN
-;Imported pterms FB4_15
-	# ier & !cpu_a<1> & cpu_a<0> & !cpu_d<6>.PIN;
+EQ | 5 | 
+   ier.T = ier & !cpu_a<1> & cpu_a<0> & !cpu_d<6>.PIN
+	# !ier & !cpu_a<1> & cpu_a<0> & cpu_d<6>.PIN;
    !ier.CLK = cs1 & !Ncs2;
    ier.AR = !cpu_Nres;
    ier.CE = !cpu_rnw;
-    ier.EXP  =  cpu_Nres & cpha & !shiftcnt<0> & !shiftdone & 
-	shifting2
 
-MACROCELL | 0 | 8 | slaveinten<0>
+MACROCELL | 0 | 8 | slaveinten
 ATTRIBUTES | 4326256 | 0
-OUTPUTMC | 3 | 0 | 8 | 0 | 16 | 2 | 17
-INPUTS | 8 | slaveinten<0>  | cpu_a<1>  | cpu_a<0>  | cpu_d<4>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
+OUTPUTMC | 3 | 0 | 8 | 0 | 16 | 3 | 0
+INPUTS | 8 | slaveinten  | cpu_a<1>  | cpu_a<0>  | cpu_d<4>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
 INPUTMC | 1 | 0 | 8
 INPUTP | 7 | 59 | 52 | 27 | 50 | 46 | 49 | 24
-EQ | 7 | 
-   slaveinten<0>.T = slaveinten<0> & cpu_a<1> & cpu_a<0> & 
-	!cpu_d<4>.PIN
-	# !slaveinten<0> & cpu_a<1> & cpu_a<0> & 
-	cpu_d<4>.PIN;
-   !slaveinten<0>.CLK = cs1 & !Ncs2;
-   slaveinten<0>.AR = !cpu_Nres;
-   slaveinten<0>.CE = !cpu_rnw;
-
-MACROCELL | 3 | 14 | slaveinten<1>
-ATTRIBUTES | 4326256 | 0
-OUTPUTMC | 5 | 3 | 14 | 2 | 1 | 2 | 17 | 3 | 13 | 3 | 15
-INPUTS | 11 | slaveinten<1>  | cpu_a<1>  | cpu_a<0>  | cpu_d<5>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw  | ier  | cpu_d<6>.PIN  | diag_OBUF.EXP
-INPUTMC | 3 | 3 | 14 | 3 | 15 | 3 | 13
-INPUTP | 8 | 59 | 52 | 29 | 50 | 46 | 49 | 24 | 31
-EXPORTS | 1 | 3 | 15
-IMPORTS | 1 | 3 | 13
-EQ | 9 | 
-   slaveinten<1>.T = !slaveinten<1> & cpu_a<1> & cpu_a<0> & 
-	cpu_d<5>.PIN
-;Imported pterms FB4_14
-	# slaveinten<1> & cpu_a<1> & cpu_a<0> & 
-	!cpu_d<5>.PIN;
-   !slaveinten<1>.CLK = cs1 & !Ncs2;
-   slaveinten<1>.AR = !cpu_Nres;
-   slaveinten<1>.CE = !cpu_rnw;
-    slaveinten<1>.EXP  =  ier & !cpu_a<1> & cpu_a<0> & !cpu_d<6>.PIN
-
-MACROCELL | 3 | 12 | slaveinten<2>
-ATTRIBUTES | 4326256 | 0
-OUTPUTMC | 3 | 3 | 12 | 2 | 4 | 2 | 17
-INPUTS | 8 | slaveinten<2>  | cpu_a<1>  | cpu_a<0>  | cpu_d<6>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
-INPUTMC | 1 | 3 | 12
-INPUTP | 7 | 59 | 52 | 31 | 50 | 46 | 49 | 24
-EQ | 7 | 
-   slaveinten<2>.T = slaveinten<2> & cpu_a<1> & cpu_a<0> & 
-	!cpu_d<6>.PIN
-	# !slaveinten<2> & cpu_a<1> & cpu_a<0> & 
-	cpu_d<6>.PIN;
-   !slaveinten<2>.CLK = cs1 & !Ncs2;
-   slaveinten<2>.AR = !cpu_Nres;
-   slaveinten<2>.CE = !cpu_rnw;
-
-MACROCELL | 3 | 11 | slaveinten<3>
-ATTRIBUTES | 4326256 | 0
-OUTPUTMC | 3 | 3 | 11 | 2 | 7 | 2 | 17
-INPUTS | 8 | slaveinten<3>  | cpu_a<1>  | cpu_a<0>  | cpu_d<7>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
-INPUTMC | 1 | 3 | 11
-INPUTP | 7 | 59 | 52 | 33 | 50 | 46 | 49 | 24
-EQ | 7 | 
-   slaveinten<3>.T = slaveinten<3> & cpu_a<1> & cpu_a<0> & 
-	!cpu_d<7>.PIN
-	# !slaveinten<3> & cpu_a<1> & cpu_a<0> & 
-	cpu_d<7>.PIN;
-   !slaveinten<3>.CLK = cs1 & !Ncs2;
-   slaveinten<3>.AR = !cpu_Nres;
-   slaveinten<3>.CE = !cpu_rnw;
+EQ | 5 | 
+   slaveinten.T = slaveinten & cpu_a<1> & cpu_a<0> & !cpu_d<4>.PIN
+	# !slaveinten & cpu_a<1> & cpu_a<0> & cpu_d<4>.PIN;
+   !slaveinten.CLK = cs1 & !Ncs2;
+   slaveinten.AR = !cpu_Nres;
+   slaveinten.CE = !cpu_rnw;
 
 MACROCELL | 0 | 6 | tmo
 ATTRIBUTES | 4326256 | 0
@@ -275,28 +172,23 @@ EQ | 5 |
    divisor<2>.AR = !cpu_Nres;
    divisor<2>.CE = !cpu_rnw;
 
-MACROCELL | 3 | 17 | spidatain<0>
+MACROCELL | 1 | 13 | spidatain<0>
 ATTRIBUTES | 8520560 | 0
-OUTPUTMC | 2 | 2 | 14 | 0 | 4
-INPUTS | 9 | spi_Nsel<3>  | spi_miso<3>  | spi_Nsel<2>  | spi_miso<2>  | tc.EXP  | $OpTx$INV$22__$INT  | cpu_Nres  | shiftcnt<0>  | shifting2
-INPUTMC | 6 | 3 | 1 | 3 | 4 | 3 | 0 | 2 | 3 | 3 | 2 | 2 | 0
-INPUTP | 3 | 89 | 90 | 49
-IMPORTS | 1 | 3 | 0
-EQ | 8 | 
-   spidatain<0>.D = !spi_Nsel<2> & spi_miso<2>
-	# !spi_Nsel<3> & spi_miso<3>
-;Imported pterms FB4_1
-	# !spi_Nsel<0> & spi_miso<0>
-	# !spi_Nsel<1> & spi_miso<1>;
+OUTPUTMC | 2 | 1 | 12 | 0 | 4
+INPUTS | 6 | spi_Nsel  | spi_miso  | $OpTx$INV$22__$INT  | cpu_Nres  | shiftcnt<0>  | shifting2
+INPUTMC | 4 | 3 | 10 | 1 | 5 | 1 | 4 | 1 | 2
+INPUTP | 2 | 10 | 49
+EQ | 4 | 
+   spidatain<0>.D = !spi_Nsel & spi_miso;
    spidatain<0>.CLK = !$OpTx$INV$22__$INT;
    spidatain<0>.AR = !cpu_Nres;
    spidatain<0>.CE = shiftcnt<0> & shifting2;
 
-MACROCELL | 2 | 14 | spidatain<1>
+MACROCELL | 1 | 12 | spidatain<1>
 ATTRIBUTES | 8520560 | 0
-OUTPUTMC | 2 | 2 | 13 | 0 | 5
+OUTPUTMC | 2 | 1 | 11 | 0 | 5
 INPUTS | 5 | spidatain<0>  | $OpTx$INV$22__$INT  | cpu_Nres  | shiftcnt<0>  | shifting2
-INPUTMC | 4 | 3 | 17 | 2 | 3 | 3 | 2 | 2 | 0
+INPUTMC | 4 | 1 | 13 | 1 | 5 | 1 | 4 | 1 | 2
 INPUTP | 1 | 49
 EQ | 4 | 
    spidatain<1>.D = spidatain<0>;
@@ -304,11 +196,11 @@ EQ | 4 |
    spidatain<1>.AR = !cpu_Nres;
    spidatain<1>.CE = shiftcnt<0> & shifting2;
 
-MACROCELL | 2 | 13 | spidatain<2>
+MACROCELL | 1 | 11 | spidatain<2>
 ATTRIBUTES | 8520560 | 0
-OUTPUTMC | 2 | 2 | 12 | 0 | 7
+OUTPUTMC | 2 | 1 | 10 | 0 | 7
 INPUTS | 5 | spidatain<1>  | $OpTx$INV$22__$INT  | cpu_Nres  | shiftcnt<0>  | shifting2
-INPUTMC | 4 | 2 | 14 | 2 | 3 | 3 | 2 | 2 | 0
+INPUTMC | 4 | 1 | 12 | 1 | 5 | 1 | 4 | 1 | 2
 INPUTP | 1 | 49
 EQ | 4 | 
    spidatain<2>.D = spidatain<1>;
@@ -316,11 +208,11 @@ EQ | 4 |
    spidatain<2>.AR = !cpu_Nres;
    spidatain<2>.CE = shiftcnt<0> & shifting2;
 
-MACROCELL | 2 | 12 | spidatain<3>
+MACROCELL | 1 | 10 | spidatain<3>
 ATTRIBUTES | 8520560 | 0
-OUTPUTMC | 2 | 2 | 11 | 0 | 14
+OUTPUTMC | 2 | 1 | 9 | 0 | 14
 INPUTS | 5 | spidatain<2>  | $OpTx$INV$22__$INT  | cpu_Nres  | shiftcnt<0>  | shifting2
-INPUTMC | 4 | 2 | 13 | 2 | 3 | 3 | 2 | 2 | 0
+INPUTMC | 4 | 1 | 11 | 1 | 5 | 1 | 4 | 1 | 2
 INPUTP | 1 | 49
 EQ | 4 | 
    spidatain<3>.D = spidatain<2>;
@@ -328,11 +220,11 @@ EQ | 4 |
    spidatain<3>.AR = !cpu_Nres;
    spidatain<3>.CE = shiftcnt<0> & shifting2;
 
-MACROCELL | 2 | 11 | spidatain<4>
+MACROCELL | 1 | 9 | spidatain<4>
 ATTRIBUTES | 8520560 | 0
-OUTPUTMC | 2 | 2 | 10 | 0 | 16
+OUTPUTMC | 2 | 1 | 8 | 0 | 16
 INPUTS | 5 | spidatain<3>  | $OpTx$INV$22__$INT  | cpu_Nres  | shiftcnt<0>  | shifting2
-INPUTMC | 4 | 2 | 12 | 2 | 3 | 3 | 2 | 2 | 0
+INPUTMC | 4 | 1 | 10 | 1 | 5 | 1 | 4 | 1 | 2
 INPUTP | 1 | 49
 EQ | 4 | 
    spidatain<4>.D = spidatain<3>;
@@ -340,11 +232,11 @@ EQ | 4 |
    spidatain<4>.AR = !cpu_Nres;
    spidatain<4>.CE = shiftcnt<0> & shifting2;
 
-MACROCELL | 2 | 10 | spidatain<5>
+MACROCELL | 1 | 8 | spidatain<5>
 ATTRIBUTES | 8520560 | 0
-OUTPUTMC | 2 | 2 | 9 | 2 | 1
+OUTPUTMC | 2 | 1 | 7 | 2 | 1
 INPUTS | 5 | spidatain<4>  | $OpTx$INV$22__$INT  | cpu_Nres  | shiftcnt<0>  | shifting2
-INPUTMC | 4 | 2 | 11 | 2 | 3 | 3 | 2 | 2 | 0
+INPUTMC | 4 | 1 | 9 | 1 | 5 | 1 | 4 | 1 | 2
 INPUTP | 1 | 49
 EQ | 4 | 
    spidatain<5>.D = spidatain<4>;
@@ -352,11 +244,11 @@ EQ | 4 |
    spidatain<5>.AR = !cpu_Nres;
    spidatain<5>.CE = shiftcnt<0> & shifting2;
 
-MACROCELL | 2 | 9 | spidatain<6>
+MACROCELL | 1 | 7 | spidatain<6>
 ATTRIBUTES | 8520560 | 0
-OUTPUTMC | 2 | 2 | 6 | 2 | 4
+OUTPUTMC | 2 | 1 | 6 | 2 | 4
 INPUTS | 5 | spidatain<5>  | $OpTx$INV$22__$INT  | cpu_Nres  | shiftcnt<0>  | shifting2
-INPUTMC | 4 | 2 | 10 | 2 | 3 | 3 | 2 | 2 | 0
+INPUTMC | 4 | 1 | 8 | 1 | 5 | 1 | 4 | 1 | 2
 INPUTP | 1 | 49
 EQ | 4 | 
    spidatain<6>.D = spidatain<5>;
@@ -364,11 +256,11 @@ EQ | 4 |
    spidatain<6>.AR = !cpu_Nres;
    spidatain<6>.CE = shiftcnt<0> & shifting2;
 
-MACROCELL | 2 | 6 | spidatain<7>
+MACROCELL | 1 | 6 | spidatain<7>
 ATTRIBUTES | 8520560 | 0
 OUTPUTMC | 1 | 2 | 7
 INPUTS | 5 | spidatain<6>  | $OpTx$INV$22__$INT  | cpu_Nres  | shiftcnt<0>  | shifting2
-INPUTMC | 4 | 2 | 9 | 2 | 3 | 3 | 2 | 2 | 0
+INPUTMC | 4 | 1 | 7 | 1 | 5 | 1 | 4 | 1 | 2
 INPUTP | 1 | 49
 EQ | 4 | 
    spidatain<7>.D = spidatain<6>;
@@ -378,8 +270,8 @@ EQ | 4 |
 
 MACROCELL | 3 | 16 | int_sclk
 ATTRIBUTES | 8651698 | 0
-INPUTS | 8 | cpol  | cpu_Nres  | cpha  | shiftcnt<0>  | shiftdone  | shifting2  | $OpTx$INV$22__$INT  | ier.EXP
-INPUTMC | 7 | 0 | 15 | 0 | 17 | 3 | 2 | 2 | 2 | 2 | 0 | 2 | 3 | 3 | 15
+INPUTS | 8 | cpol  | cpu_Nres  | cpha  | shiftcnt<0>  | shiftdone  | shifting2  | $OpTx$INV$22__$INT  | EXP7_.EXP
+INPUTMC | 7 | 0 | 15 | 0 | 17 | 1 | 4 | 1 | 3 | 1 | 2 | 1 | 5 | 3 | 15
 INPUTP | 1 | 49
 IMPORTS | 1 | 3 | 15
 EQ | 9 | 
@@ -393,11 +285,61 @@ EQ | 9 |
    spi_sclk.AP = !cpu_Nres & cpol;
    spi_sclk.AR = !cpu_Nres & !cpol;
 
-MACROCELL | 2 | 15 | shiftcnt<3>
+MACROCELL | 0 | 14 | int_dout<3>
+ATTRIBUTES | 265986 | 0
+INPUTS | 8 | cpu_rnw  | spidatain<3>  | cpu_a<1>  | cs1  | Ncs2  | cpu_a<0>  | cpu_Nphi2  | tmo
+INPUTMC | 2 | 1 | 10 | 0 | 6
+INPUTP | 6 | 24 | 59 | 50 | 46 | 52 | 20
+EQ | 5 | 
+   cpu_d<3> = cpu_rnw & tmo & !cpu_a<1> & cs1 & !Ncs2 & 
+	cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & spidatain<3> & !cpu_a<1> & cs1 & !Ncs2 & 
+	!cpu_a<0> & cpu_Nphi2;
+   cpu_d<3>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
+
+MACROCELL | 2 | 1 | int_dout<5>
+ATTRIBUTES | 265986 | 0
+INPUTS | 9 | cpu_rnw  | cpu_a<1>  | start_shifting  | cs1  | Ncs2  | cpu_a<0>  | cpu_Nphi2  | shifting2  | spidatain<5>
+INPUTMC | 3 | 3 | 2 | 1 | 2 | 1 | 8
+INPUTP | 6 | 24 | 59 | 50 | 46 | 52 | 20
+EQ | 7 | 
+   cpu_d<5> = cpu_rnw & spidatain<5> & !cpu_a<1> & cs1 & !Ncs2 & 
+	!cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & !cpu_a<1> & start_shifting & cs1 & 
+	!Ncs2 & cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & !cpu_a<1> & cs1 & !Ncs2 & cpu_a<0> & 
+	shifting2 & cpu_Nphi2;
+   cpu_d<5>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
+
+MACROCELL | 2 | 4 | int_dout<6>
+ATTRIBUTES | 265986 | 0
+INPUTS | 8 | cpu_rnw  | spidatain<6>  | cpu_a<1>  | cs1  | Ncs2  | cpu_a<0>  | cpu_Nphi2  | ier
+INPUTMC | 2 | 1 | 7 | 3 | 8
+INPUTP | 6 | 24 | 59 | 50 | 46 | 52 | 20
+EQ | 5 | 
+   cpu_d<6> = cpu_rnw & ier & !cpu_a<1> & cs1 & !Ncs2 & 
+	cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & spidatain<6> & !cpu_a<1> & cs1 & !Ncs2 & 
+	!cpu_a<0> & cpu_Nphi2;
+   cpu_d<6>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
+
+MACROCELL | 2 | 7 | int_dout<7>
+ATTRIBUTES | 265986 | 0
+INPUTS | 8 | cpu_rnw  | spidatain<7>  | cpu_a<1>  | cs1  | Ncs2  | cpu_a<0>  | cpu_Nphi2  | tc
+INPUTMC | 2 | 1 | 6 | 3 | 1
+INPUTP | 6 | 24 | 59 | 50 | 46 | 52 | 20
+EQ | 5 | 
+   cpu_d<7> = cpu_rnw & spidatain<7> & !cpu_a<1> & cs1 & !Ncs2 & 
+	!cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & !cpu_a<1> & tc & cs1 & !Ncs2 & 
+	cpu_a<0> & cpu_Nphi2;
+   cpu_d<7>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
+
+MACROCELL | 1 | 14 | shiftcnt<3>
 ATTRIBUTES | 4326192 | 0
-OUTPUTMC | 5 | 1 | 1 | 2 | 15 | 2 | 2 | 1 | 0 | 1 | 2
+OUTPUTMC | 5 | 1 | 1 | 1 | 14 | 1 | 3 | 1 | 0 | 1 | 2
 INPUTS | 7 | shiftcnt<2>  | shiftcnt<0>  | shiftcnt<1>  | shifting2  | shiftcnt<3>  | $OpTx$INV$22__$INT  | cpu_Nres
-INPUTMC | 6 | 2 | 16 | 3 | 2 | 3 | 9 | 2 | 0 | 2 | 15 | 2 | 3
+INPUTMC | 6 | 1 | 15 | 1 | 4 | 1 | 16 | 1 | 2 | 1 | 14 | 1 | 5
 INPUTP | 1 | 49
 EQ | 5 | 
    shiftcnt<3>.T = shiftcnt<3> & !shifting2
@@ -406,11 +348,11 @@ EQ | 5 |
    shiftcnt<3>.CLK = !$OpTx$INV$22__$INT;
    shiftcnt<3>.AR = !cpu_Nres;
 
-MACROCELL | 2 | 16 | shiftcnt<2>
+MACROCELL | 1 | 15 | shiftcnt<2>
 ATTRIBUTES | 4326192 | 0
-OUTPUTMC | 6 | 1 | 1 | 2 | 15 | 2 | 16 | 2 | 2 | 1 | 0 | 1 | 2
+OUTPUTMC | 6 | 1 | 1 | 1 | 14 | 1 | 15 | 1 | 3 | 1 | 0 | 1 | 2
 INPUTS | 6 | shiftcnt<0>  | shiftcnt<1>  | shifting2  | shiftcnt<2>  | $OpTx$INV$22__$INT  | cpu_Nres
-INPUTMC | 5 | 3 | 2 | 3 | 9 | 2 | 0 | 2 | 16 | 2 | 3
+INPUTMC | 5 | 1 | 4 | 1 | 16 | 1 | 2 | 1 | 15 | 1 | 5
 INPUTP | 1 | 49
 EQ | 4 | 
    shiftcnt<2>.T = shiftcnt<2> & !shifting2
@@ -418,22 +360,22 @@ EQ | 4 |
    shiftcnt<2>.CLK = !$OpTx$INV$22__$INT;
    shiftcnt<2>.AR = !cpu_Nres;
 
-MACROCELL | 3 | 2 | shiftcnt<0>
+MACROCELL | 1 | 4 | shiftcnt<0>
 ATTRIBUTES | 8520496 | 0
-OUTPUTMC | 15 | 3 | 17 | 2 | 14 | 2 | 13 | 2 | 12 | 2 | 11 | 2 | 10 | 2 | 9 | 2 | 6 | 3 | 16 | 2 | 15 | 2 | 16 | 3 | 2 | 3 | 9 | 2 | 2 | 3 | 15
+OUTPUTMC | 15 | 1 | 13 | 1 | 12 | 1 | 11 | 1 | 10 | 1 | 9 | 1 | 8 | 1 | 7 | 1 | 6 | 3 | 16 | 1 | 14 | 1 | 15 | 1 | 4 | 1 | 16 | 1 | 3 | 3 | 15
 INPUTS | 4 | shiftcnt<0>  | shifting2  | $OpTx$INV$22__$INT  | cpu_Nres
-INPUTMC | 3 | 3 | 2 | 2 | 0 | 2 | 3
+INPUTMC | 3 | 1 | 4 | 1 | 2 | 1 | 5
 INPUTP | 1 | 49
 EQ | 3 | 
    shiftcnt<0>.D = !shiftcnt<0> & shifting2;
    shiftcnt<0>.CLK = !$OpTx$INV$22__$INT;
    shiftcnt<0>.AR = !cpu_Nres;
 
-MACROCELL | 3 | 9 | shiftcnt<1>
+MACROCELL | 1 | 16 | shiftcnt<1>
 ATTRIBUTES | 8520496 | 0
-OUTPUTMC | 7 | 1 | 1 | 2 | 15 | 2 | 16 | 3 | 9 | 2 | 2 | 1 | 0 | 1 | 2
+OUTPUTMC | 7 | 1 | 1 | 1 | 14 | 1 | 15 | 1 | 16 | 1 | 3 | 1 | 0 | 1 | 2
 INPUTS | 5 | shiftcnt<0>  | shiftcnt<1>  | shifting2  | $OpTx$INV$22__$INT  | cpu_Nres
-INPUTMC | 4 | 3 | 2 | 3 | 9 | 2 | 0 | 2 | 3
+INPUTMC | 4 | 1 | 4 | 1 | 16 | 1 | 2 | 1 | 5
 INPUTP | 1 | 49
 EQ | 4 | 
    shiftcnt<1>.D = shiftcnt<0> & !shiftcnt<1> & shifting2
@@ -441,11 +383,11 @@ EQ | 4 |
    shiftcnt<1>.CLK = !$OpTx$INV$22__$INT;
    shiftcnt<1>.AR = !cpu_Nres;
 
-MACROCELL | 2 | 2 | shiftdone
+MACROCELL | 1 | 3 | shiftdone
 ATTRIBUTES | 8520496 | 0
-OUTPUTMC | 7 | 1 | 1 | 3 | 16 | 3 | 0 | 2 | 0 | 1 | 0 | 1 | 2 | 3 | 15
+OUTPUTMC | 7 | 1 | 1 | 3 | 16 | 3 | 1 | 1 | 2 | 1 | 17 | 1 | 0 | 3 | 15
 INPUTS | 6 | shiftcnt<3>  | shiftcnt<2>  | shiftcnt<0>  | shiftcnt<1>  | $OpTx$INV$22__$INT  | cpu_Nres
-INPUTMC | 5 | 2 | 15 | 2 | 16 | 3 | 2 | 3 | 9 | 2 | 3
+INPUTMC | 5 | 1 | 14 | 1 | 15 | 1 | 4 | 1 | 16 | 1 | 5
 INPUTP | 1 | 49
 EQ | 4 | 
    shiftdone.D = shiftcnt<3> & shiftcnt<2> & shiftcnt<0> & 
@@ -453,43 +395,40 @@ EQ | 4 |
    shiftdone.CLK = !$OpTx$INV$22__$INT;
    shiftdone.AR = !cpu_Nres;
 
-MACROCELL | 2 | 5 | start_shifting
+MACROCELL | 3 | 2 | start_shifting
 ATTRIBUTES | 4326192 | 0
-OUTPUTMC | 5 | 2 | 5 | 2 | 1 | 2 | 0 | 3 | 13 | 2 | 3
-INPUTS | 8 | frx  | start_shifting  | cpu_a<1>  | cpu_a<0>  | cpu_rnw  | cs1  | Ncs2  | start_shifting/start_shifting_RSTF__$INT
-INPUTMC | 3 | 0 | 9 | 2 | 5 | 1 | 0
+OUTPUTMC | 5 | 2 | 1 | 3 | 2 | 1 | 2 | 3 | 13 | 1 | 5
+INPUTS | 8 | frx  | cpu_a<1>  | start_shifting  | cpu_a<0>  | cpu_rnw  | cs1  | Ncs2  | start_shifting/start_shifting_RSTF__$INT
+INPUTMC | 3 | 0 | 9 | 3 | 2 | 1 | 17
 INPUTP | 5 | 59 | 52 | 24 | 50 | 46
 EQ | 4 | 
-   start_shifting.T = !cpu_rnw & !start_shifting & !cpu_a<1> & !cpu_a<0>
-	# frx & !start_shifting & !cpu_a<1> & !cpu_a<0>;
+   start_shifting.T = !cpu_rnw & !cpu_a<1> & !start_shifting & !cpu_a<0>
+	# frx & !cpu_a<1> & !start_shifting & !cpu_a<0>;
    !start_shifting.CLK = cs1 & !Ncs2;
    start_shifting.AR = !start_shifting/start_shifting_RSTF__$INT;
 
-MACROCELL | 3 | 0 | tc
+MACROCELL | 3 | 1 | tc
 ATTRIBUTES | 8520672 | 0
-OUTPUTMC | 3 | 2 | 7 | 2 | 17 | 3 | 17
-INPUTS | 9 | cs1  | Ncs2  | shiftdone  | cpu_a<1>  | cpu_a<0>  | spi_Nsel<0>  | spi_miso<0>  | spi_Nsel<1>  | spi_miso<1>
-INPUTMC | 3 | 2 | 2 | 3 | 10 | 3 | 7
-INPUTP | 6 | 50 | 46 | 59 | 52 | 10 | 9
-EXPORTS | 1 | 3 | 17
-EQ | 6 | 
+OUTPUTMC | 2 | 2 | 7 | 3 | 0
+INPUTS | 5 | cs1  | Ncs2  | shiftdone  | cpu_a<1>  | cpu_a<0>
+INPUTMC | 1 | 1 | 3
+INPUTP | 4 | 50 | 46 | 59 | 52
+EQ | 4 | 
    tc.D = Gnd;
    !tc.CLK = cs1 & !Ncs2;
    tc.AP = shiftdone;
    tc.CE = !cpu_a<1> & !cpu_a<0>;
-    tc.EXP  =  !spi_Nsel<0> & spi_miso<0>
-	# !spi_Nsel<1> & spi_miso<1>
 
 MACROCELL | 0 | 3 | spidataout<0>
 ATTRIBUTES | 4326240 | 0
-OUTPUTMC | 2 | 0 | 3 | 1 | 2
-INPUTS | 8 | spidataout<0>  | cpu_a<1>  | cpu_a<0>  | cpu_d<0>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
+OUTPUTMC | 2 | 1 | 0 | 0 | 3
+INPUTS | 8 | cpu_a<1>  | spidataout<0>  | cpu_a<0>  | cpu_d<0>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
 INPUTMC | 1 | 0 | 3
 INPUTP | 7 | 59 | 52 | 12 | 50 | 46 | 49 | 24
 EQ | 6 | 
-   spidataout<0>.T = spidataout<0> & !cpu_a<1> & !cpu_a<0> & 
+   spidataout<0>.T = !cpu_a<1> & spidataout<0> & !cpu_a<0> & 
 	!cpu_d<0>.PIN
-	# !spidataout<0> & !cpu_a<1> & !cpu_a<0> & 
+	# !cpu_a<1> & !spidataout<0> & !cpu_a<0> & 
 	cpu_d<0>.PIN;
    !spidataout<0>.CLK = cs1 & !Ncs2;
    spidataout<0>.CE = cpu_Nres & !cpu_rnw;
@@ -497,83 +436,83 @@ EQ | 6 |
 MACROCELL | 0 | 2 | spidataout<1>
 ATTRIBUTES | 4326240 | 0
 OUTPUTMC | 2 | 1 | 1 | 0 | 2
-INPUTS | 8 | spidataout<1>  | cpu_a<1>  | cpu_a<0>  | cpu_d<1>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
+INPUTS | 8 | cpu_a<1>  | spidataout<1>  | cpu_a<0>  | cpu_d<1>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
 INPUTMC | 1 | 0 | 2
 INPUTP | 7 | 59 | 52 | 13 | 50 | 46 | 49 | 24
 EQ | 6 | 
-   spidataout<1>.T = spidataout<1> & !cpu_a<1> & !cpu_a<0> & 
+   spidataout<1>.T = !cpu_a<1> & spidataout<1> & !cpu_a<0> & 
 	!cpu_d<1>.PIN
-	# !spidataout<1> & !cpu_a<1> & !cpu_a<0> & 
+	# !cpu_a<1> & !spidataout<1> & !cpu_a<0> & 
 	cpu_d<1>.PIN;
    !spidataout<1>.CLK = cs1 & !Ncs2;
    spidataout<1>.CE = cpu_Nres & !cpu_rnw;
 
 MACROCELL | 0 | 1 | spidataout<2>
 ATTRIBUTES | 4326240 | 0
-OUTPUTMC | 2 | 0 | 1 | 1 | 2
-INPUTS | 8 | spidataout<2>  | cpu_a<1>  | cpu_a<0>  | cpu_d<2>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
+OUTPUTMC | 2 | 1 | 0 | 0 | 1
+INPUTS | 8 | cpu_a<1>  | spidataout<2>  | cpu_a<0>  | cpu_d<2>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
 INPUTMC | 1 | 0 | 1
 INPUTP | 7 | 59 | 52 | 15 | 50 | 46 | 49 | 24
 EQ | 6 | 
-   spidataout<2>.T = spidataout<2> & !cpu_a<1> & !cpu_a<0> & 
+   spidataout<2>.T = !cpu_a<1> & spidataout<2> & !cpu_a<0> & 
 	!cpu_d<2>.PIN
-	# !spidataout<2> & !cpu_a<1> & !cpu_a<0> & 
+	# !cpu_a<1> & !spidataout<2> & !cpu_a<0> & 
 	cpu_d<2>.PIN;
    !spidataout<2>.CLK = cs1 & !Ncs2;
    spidataout<2>.CE = cpu_Nres & !cpu_rnw;
 
-MACROCELL | 0 | 0 | spidataout<3>
+MACROCELL | 3 | 7 | spidataout<3>
 ATTRIBUTES | 4326240 | 0
-OUTPUTMC | 2 | 1 | 0 | 0 | 0
-INPUTS | 8 | spidataout<3>  | cpu_a<1>  | cpu_a<0>  | cpu_d<3>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
-INPUTMC | 1 | 0 | 0
+OUTPUTMC | 2 | 1 | 0 | 3 | 7
+INPUTS | 8 | cpu_a<1>  | spidataout<3>  | cpu_a<0>  | cpu_d<3>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
+INPUTMC | 1 | 3 | 7
 INPUTP | 7 | 59 | 52 | 26 | 50 | 46 | 49 | 24
 EQ | 6 | 
-   spidataout<3>.T = spidataout<3> & !cpu_a<1> & !cpu_a<0> & 
+   spidataout<3>.T = !cpu_a<1> & spidataout<3> & !cpu_a<0> & 
 	!cpu_d<3>.PIN
-	# !spidataout<3> & !cpu_a<1> & !cpu_a<0> & 
+	# !cpu_a<1> & !spidataout<3> & !cpu_a<0> & 
 	cpu_d<3>.PIN;
    !spidataout<3>.CLK = cs1 & !Ncs2;
    spidataout<3>.CE = cpu_Nres & !cpu_rnw;
 
-MACROCELL | 3 | 8 | spidataout<4>
+MACROCELL | 3 | 6 | spidataout<4>
 ATTRIBUTES | 4326240 | 0
-OUTPUTMC | 2 | 3 | 8 | 1 | 2
-INPUTS | 8 | spidataout<4>  | cpu_a<1>  | cpu_a<0>  | cpu_d<4>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
-INPUTMC | 1 | 3 | 8
+OUTPUTMC | 2 | 1 | 0 | 3 | 6
+INPUTS | 8 | cpu_a<1>  | spidataout<4>  | cpu_a<0>  | cpu_d<4>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
+INPUTMC | 1 | 3 | 6
 INPUTP | 7 | 59 | 52 | 27 | 50 | 46 | 49 | 24
 EQ | 6 | 
-   spidataout<4>.T = spidataout<4> & !cpu_a<1> & !cpu_a<0> & 
+   spidataout<4>.T = !cpu_a<1> & spidataout<4> & !cpu_a<0> & 
 	!cpu_d<4>.PIN
-	# !spidataout<4> & !cpu_a<1> & !cpu_a<0> & 
+	# !cpu_a<1> & !spidataout<4> & !cpu_a<0> & 
 	cpu_d<4>.PIN;
    !spidataout<4>.CLK = cs1 & !Ncs2;
    spidataout<4>.CE = cpu_Nres & !cpu_rnw;
 
-MACROCELL | 3 | 6 | spidataout<5>
+MACROCELL | 3 | 5 | spidataout<5>
 ATTRIBUTES | 4326240 | 0
-OUTPUTMC | 2 | 1 | 1 | 3 | 6
-INPUTS | 8 | spidataout<5>  | cpu_a<1>  | cpu_a<0>  | cpu_d<5>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
-INPUTMC | 1 | 3 | 6
+OUTPUTMC | 2 | 1 | 1 | 3 | 5
+INPUTS | 8 | cpu_a<1>  | spidataout<5>  | cpu_a<0>  | cpu_d<5>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
+INPUTMC | 1 | 3 | 5
 INPUTP | 7 | 59 | 52 | 29 | 50 | 46 | 49 | 24
 EQ | 6 | 
-   spidataout<5>.T = spidataout<5> & !cpu_a<1> & !cpu_a<0> & 
+   spidataout<5>.T = !cpu_a<1> & spidataout<5> & !cpu_a<0> & 
 	!cpu_d<5>.PIN
-	# !spidataout<5> & !cpu_a<1> & !cpu_a<0> & 
+	# !cpu_a<1> & !spidataout<5> & !cpu_a<0> & 
 	cpu_d<5>.PIN;
    !spidataout<5>.CLK = cs1 & !Ncs2;
    spidataout<5>.CE = cpu_Nres & !cpu_rnw;
 
-MACROCELL | 3 | 5 | spidataout<6>
+MACROCELL | 3 | 4 | spidataout<6>
 ATTRIBUTES | 4326240 | 0
-OUTPUTMC | 2 | 3 | 5 | 1 | 2
-INPUTS | 8 | spidataout<6>  | cpu_a<1>  | cpu_a<0>  | cpu_d<6>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
-INPUTMC | 1 | 3 | 5
+OUTPUTMC | 2 | 3 | 4 | 1 | 2
+INPUTS | 8 | cpu_a<1>  | spidataout<6>  | cpu_a<0>  | cpu_d<6>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
+INPUTMC | 1 | 3 | 4
 INPUTP | 7 | 59 | 52 | 31 | 50 | 46 | 49 | 24
 EQ | 6 | 
-   spidataout<6>.T = spidataout<6> & !cpu_a<1> & !cpu_a<0> & 
+   spidataout<6>.T = !cpu_a<1> & spidataout<6> & !cpu_a<0> & 
 	!cpu_d<6>.PIN
-	# !spidataout<6> & !cpu_a<1> & !cpu_a<0> & 
+	# !cpu_a<1> & !spidataout<6> & !cpu_a<0> & 
 	cpu_d<6>.PIN;
    !spidataout<6>.CLK = cs1 & !Ncs2;
    spidataout<6>.CE = cpu_Nres & !cpu_rnw;
@@ -581,263 +520,183 @@ EQ | 6 |
 MACROCELL | 3 | 3 | spidataout<7>
 ATTRIBUTES | 4326240 | 0
 OUTPUTMC | 2 | 1 | 0 | 3 | 3
-INPUTS | 8 | spidataout<7>  | cpu_a<1>  | cpu_a<0>  | cpu_d<7>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
+INPUTS | 8 | cpu_a<1>  | spidataout<7>  | cpu_a<0>  | cpu_d<7>.PIN  | cs1  | Ncs2  | cpu_Nres  | cpu_rnw
 INPUTMC | 1 | 3 | 3
 INPUTP | 7 | 59 | 52 | 33 | 50 | 46 | 49 | 24
 EQ | 6 | 
-   spidataout<7>.T = spidataout<7> & !cpu_a<1> & !cpu_a<0> & 
+   spidataout<7>.T = !cpu_a<1> & spidataout<7> & !cpu_a<0> & 
 	!cpu_d<7>.PIN
-	# !spidataout<7> & !cpu_a<1> & !cpu_a<0> & 
+	# !cpu_a<1> & !spidataout<7> & !cpu_a<0> & 
 	cpu_d<7>.PIN;
    !spidataout<7>.CLK = cs1 & !Ncs2;
    spidataout<7>.CE = cpu_Nres & !cpu_rnw;
 
 MACROCELL | 0 | 4 | int_dout<0>
 ATTRIBUTES | 265986 | 0
-INPUTS | 10 | cpu_rnw  | spidatain<0>  | cpu_a<1>  | cpu_a<0>  | cs1  | Ncs2  | cpu_Nphi2  | divisor<0>  | cpha  | spi_Nsel<0>
-INPUTMC | 4 | 3 | 17 | 0 | 13 | 0 | 17 | 3 | 10
-INPUTP | 6 | 24 | 59 | 52 | 50 | 46 | 20
+INPUTS | 10 | cpu_rnw  | spidatain<0>  | cpu_a<1>  | cs1  | Ncs2  | cpu_a<0>  | cpu_Nphi2  | divisor<0>  | cpha  | spi_Nsel
+INPUTMC | 4 | 1 | 13 | 0 | 13 | 0 | 17 | 3 | 10
+INPUTP | 6 | 24 | 59 | 50 | 46 | 52 | 20
 EQ | 9 | 
-   cpu_d<0> = cpu_rnw & spi_Nsel<0> & cpu_a<1> & cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & cpha & !cpu_a<1> & cpu_a<0> & cs1 & 
-	!Ncs2 & cpu_Nphi2
-	# cpu_rnw & divisor<0> & cpu_a<1> & !cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & spidatain<0> & !cpu_a<1> & !cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2;
+   cpu_d<0> = cpu_rnw & spi_Nsel & cpu_a<1> & cs1 & !Ncs2 & 
+	cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & cpha & !cpu_a<1> & cs1 & !Ncs2 & 
+	cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & divisor<0> & cpu_a<1> & cs1 & !Ncs2 & 
+	!cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & spidatain<0> & !cpu_a<1> & cs1 & !Ncs2 & 
+	!cpu_a<0> & cpu_Nphi2;
    cpu_d<0>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
 
 MACROCELL | 0 | 5 | int_dout<1>
 ATTRIBUTES | 265986 | 0
-INPUTS | 10 | cpu_rnw  | spidatain<1>  | cpu_a<1>  | cpu_a<0>  | cs1  | Ncs2  | cpu_Nphi2  | divisor<1>  | cpol  | spi_Nsel<1>
-INPUTMC | 4 | 2 | 14 | 0 | 12 | 0 | 15 | 3 | 7
-INPUTP | 6 | 24 | 59 | 52 | 50 | 46 | 20
-EQ | 9 | 
-   cpu_d<1> = cpu_rnw & spi_Nsel<1> & cpu_a<1> & cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & cpol & !cpu_a<1> & cpu_a<0> & cs1 & 
-	!Ncs2 & cpu_Nphi2
-	# cpu_rnw & divisor<1> & cpu_a<1> & !cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & spidatain<1> & !cpu_a<1> & !cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2;
+INPUTS | 9 | cpu_rnw  | spidatain<1>  | cpu_a<1>  | cs1  | Ncs2  | cpu_a<0>  | cpu_Nphi2  | cpol  | divisor<1>
+INPUTMC | 3 | 1 | 12 | 0 | 15 | 0 | 12
+INPUTP | 6 | 24 | 59 | 50 | 46 | 52 | 20
+EQ | 7 | 
+   cpu_d<1> = cpu_rnw & cpol & !cpu_a<1> & cs1 & !Ncs2 & 
+	cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & divisor<1> & cpu_a<1> & cs1 & !Ncs2 & 
+	!cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & spidatain<1> & !cpu_a<1> & cs1 & !Ncs2 & 
+	!cpu_a<0> & cpu_Nphi2;
    cpu_d<1>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
 
 MACROCELL | 0 | 7 | int_dout<2>
 ATTRIBUTES | 265986 | 0
-INPUTS | 10 | cpu_rnw  | spidatain<2>  | cpu_a<1>  | cpu_a<0>  | cs1  | Ncs2  | cpu_Nphi2  | divisor<2>  | ece  | spi_Nsel<2>
-INPUTMC | 4 | 2 | 13 | 0 | 11 | 0 | 10 | 3 | 4
-INPUTP | 6 | 24 | 59 | 52 | 50 | 46 | 20
-EQ | 9 | 
-   cpu_d<2> = cpu_rnw & spi_Nsel<2> & cpu_a<1> & cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & ece & !cpu_a<1> & cpu_a<0> & cs1 & 
-	!Ncs2 & cpu_Nphi2
-	# cpu_rnw & divisor<2> & cpu_a<1> & !cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & spidatain<2> & !cpu_a<1> & !cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2;
-   cpu_d<2>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
-
-MACROCELL | 0 | 14 | int_dout<3>
-ATTRIBUTES | 265986 | 0
-INPUTS | 9 | cpu_rnw  | spidatain<3>  | cpu_a<1>  | cpu_a<0>  | cs1  | Ncs2  | cpu_Nphi2  | tmo  | spi_Nsel<3>
-INPUTMC | 3 | 2 | 12 | 0 | 6 | 3 | 1
-INPUTP | 6 | 24 | 59 | 52 | 50 | 46 | 20
+INPUTS | 9 | cpu_rnw  | spidatain<2>  | cpu_a<1>  | cs1  | Ncs2  | cpu_a<0>  | cpu_Nphi2  | ece  | divisor<2>
+INPUTMC | 3 | 1 | 11 | 0 | 10 | 0 | 11
+INPUTP | 6 | 24 | 59 | 50 | 46 | 52 | 20
 EQ | 7 | 
-   cpu_d<3> = cpu_rnw & spi_Nsel<3> & cpu_a<1> & cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & tmo & !cpu_a<1> & cpu_a<0> & cs1 & 
-	!Ncs2 & cpu_Nphi2
-	# cpu_rnw & spidatain<3> & !cpu_a<1> & !cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2;
-   cpu_d<3>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
+   cpu_d<2> = cpu_rnw & ece & !cpu_a<1> & cs1 & !Ncs2 & 
+	cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & divisor<2> & cpu_a<1> & cs1 & !Ncs2 & 
+	!cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & spidatain<2> & !cpu_a<1> & cs1 & !Ncs2 & 
+	!cpu_a<0> & cpu_Nphi2;
+   cpu_d<2>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
 
 MACROCELL | 0 | 16 | int_dout<4>
 ATTRIBUTES | 265986 | 0
-INPUTS | 10 | cpu_rnw  | spidatain<4>  | cpu_a<1>  | cpu_a<0>  | cs1  | Ncs2  | cpu_Nphi2  | spi_int<0>  | frx  | slaveinten<0>
-INPUTMC | 3 | 2 | 11 | 0 | 9 | 0 | 8
-INPUTP | 7 | 24 | 59 | 52 | 50 | 46 | 20 | 7
+INPUTS | 10 | cpu_rnw  | spidatain<4>  | cpu_a<1>  | cs1  | Ncs2  | cpu_a<0>  | cpu_Nphi2  | spi_int  | frx  | slaveinten
+INPUTMC | 3 | 1 | 9 | 0 | 9 | 0 | 8
+INPUTP | 7 | 24 | 59 | 50 | 46 | 52 | 20 | 7
 EQ | 9 | 
-   cpu_d<4> = cpu_rnw & frx & !cpu_a<1> & cpu_a<0> & cs1 & 
-	!Ncs2 & cpu_Nphi2
-	# cpu_rnw & slaveinten<0> & cpu_a<1> & cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & spidatain<4> & !cpu_a<1> & !cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & cpu_a<1> & !cpu_a<0> & cs1 & !Ncs2 & 
-	!spi_int<0> & cpu_Nphi2;
+   cpu_d<4> = cpu_rnw & frx & !cpu_a<1> & cs1 & !Ncs2 & 
+	cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & slaveinten & cpu_a<1> & cs1 & !Ncs2 & 
+	cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & spidatain<4> & !cpu_a<1> & cs1 & !Ncs2 & 
+	!cpu_a<0> & cpu_Nphi2
+	# cpu_rnw & cpu_a<1> & cs1 & !Ncs2 & !cpu_a<0> & 
+	!spi_int & cpu_Nphi2;
    cpu_d<4>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
 
-MACROCELL | 2 | 1 | int_dout<5>
-ATTRIBUTES | 265986 | 0
-INPUTS | 11 | cpu_rnw  | start_shifting  | cpu_a<1>  | cpu_a<0>  | cs1  | Ncs2  | cpu_Nphi2  | shifting2  | slaveinten<1>  | spidatain<5>  | shifting2.EXP
-INPUTMC | 5 | 2 | 5 | 2 | 0 | 3 | 14 | 2 | 10 | 2 | 0
-INPUTP | 6 | 24 | 59 | 52 | 50 | 46 | 20
-IMPORTS | 1 | 2 | 0
-EQ | 12 | 
-   cpu_d<5> = cpu_rnw & slaveinten<1> & cpu_a<1> & cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & spidatain<5> & !cpu_a<1> & !cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & start_shifting & !cpu_a<1> & cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & !cpu_a<1> & cpu_a<0> & cs1 & !Ncs2 & 
-	shifting2 & cpu_Nphi2
-;Imported pterms FB3_1
-	# cpu_rnw & cpu_a<1> & !cpu_a<0> & cs1 & !Ncs2 & 
-	!spi_int<1> & cpu_Nphi2;
-   cpu_d<5>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
-
-MACROCELL | 2 | 4 | int_dout<6>
-ATTRIBUTES | 265986 | 0
-INPUTS | 10 | cpu_rnw  | spidatain<6>  | cpu_a<1>  | cpu_a<0>  | cs1  | Ncs2  | cpu_Nphi2  | spi_int<2>  | ier  | slaveinten<2>
-INPUTMC | 3 | 2 | 9 | 3 | 15 | 3 | 12
-INPUTP | 7 | 24 | 59 | 52 | 50 | 46 | 20 | 92
-EQ | 9 | 
-   cpu_d<6> = cpu_rnw & ier & !cpu_a<1> & cpu_a<0> & cs1 & 
-	!Ncs2 & cpu_Nphi2
-	# cpu_rnw & slaveinten<2> & cpu_a<1> & cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & spidatain<6> & !cpu_a<1> & !cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & cpu_a<1> & !cpu_a<0> & cs1 & !Ncs2 & 
-	!spi_int<2> & cpu_Nphi2;
-   cpu_d<6>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
-
-MACROCELL | 2 | 7 | int_dout<7>
-ATTRIBUTES | 265986 | 0
-INPUTS | 10 | cpu_rnw  | spidatain<7>  | cpu_a<1>  | cpu_a<0>  | cs1  | Ncs2  | cpu_Nphi2  | spi_int<3>  | tc  | slaveinten<3>
-INPUTMC | 3 | 2 | 6 | 3 | 0 | 3 | 11
-INPUTP | 7 | 24 | 59 | 52 | 50 | 46 | 20 | 11
-EQ | 9 | 
-   cpu_d<7> = cpu_rnw & slaveinten<3> & cpu_a<1> & cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & spidatain<7> & !cpu_a<1> & !cpu_a<0> & 
-	cs1 & !Ncs2 & cpu_Nphi2
-	# cpu_rnw & tc & !cpu_a<1> & cpu_a<0> & cs1 & 
-	!Ncs2 & cpu_Nphi2
-	# cpu_rnw & cpu_a<1> & !cpu_a<0> & cs1 & !Ncs2 & 
-	!spi_int<3> & cpu_Nphi2;
-   cpu_d<7>.OE = cpu_rnw & cs1 & !Ncs2 & cpu_Nphi2;
-
-MACROCELL | 2 | 0 | shifting2
+MACROCELL | 1 | 2 | shifting2
 ATTRIBUTES | 8520480 | 0
-OUTPUTMC | 20 | 1 | 1 | 3 | 17 | 2 | 14 | 2 | 13 | 2 | 12 | 2 | 11 | 2 | 10 | 2 | 9 | 2 | 6 | 3 | 16 | 2 | 15 | 2 | 16 | 3 | 2 | 3 | 9 | 2 | 1 | 3 | 13 | 2 | 3 | 1 | 0 | 1 | 2 | 3 | 15
-INPUTS | 10 | shiftdone  | start_shifting  | $OpTx$INV$22__$INT  | cpu_rnw  | cpu_a<1>  | cpu_a<0>  | cs1  | Ncs2  | spi_int<1>  | cpu_Nphi2
-INPUTMC | 3 | 2 | 2 | 2 | 5 | 2 | 3
-INPUTP | 7 | 24 | 59 | 52 | 50 | 46 | 3 | 20
-EXPORTS | 1 | 2 | 1
+OUTPUTMC | 20 | 1 | 1 | 1 | 13 | 1 | 12 | 1 | 11 | 1 | 10 | 1 | 9 | 1 | 8 | 1 | 7 | 1 | 6 | 3 | 16 | 2 | 1 | 1 | 14 | 1 | 15 | 1 | 4 | 1 | 16 | 3 | 13 | 1 | 5 | 1 | 0 | 1 | 2 | 3 | 15
+INPUTS | 8 | shiftdone  | start_shifting  | $OpTx$INV$22__$INT  | shiftcnt<3>  | shiftcnt<2>  | shiftcnt<1>  | spidataout<6>  | shifting2
+INPUTMC | 8 | 1 | 3 | 3 | 2 | 1 | 5 | 1 | 14 | 1 | 15 | 1 | 16 | 3 | 4 | 1 | 2
+EXPORTS | 1 | 1 | 1
 EQ | 4 | 
    shifting2.D = !shiftdone & start_shifting;
    shifting2.CLK = !$OpTx$INV$22__$INT;
-    shifting2.EXP  =  cpu_rnw & cpu_a<1> & !cpu_a<0> & cs1 & !Ncs2 & 
-	!spi_int<1> & cpu_Nphi2
+    shifting2.EXP  =  !shiftcnt<3> & !shiftcnt<2> & shiftcnt<1> & 
+	!shiftdone & !spidataout<6> & shifting2
 
-MACROCELL | 3 | 13 | diag_OBUF
+MACROCELL | 3 | 13 | led_OBUF
 ATTRIBUTES | 264962 | 0
-OUTPUTMC | 1 | 3 | 14
-INPUTS | 7 | spi_Nsel<0>  | start_shifting  | shifting2  | slaveinten<1>  | cpu_a<1>  | cpu_a<0>  | cpu_d<5>.PIN
-INPUTMC | 4 | 3 | 10 | 2 | 5 | 2 | 0 | 3 | 14
-INPUTP | 3 | 59 | 52 | 29
-EXPORTS | 1 | 3 | 14
-EQ | 3 | 
-   diag = spi_Nsel<0> & !start_shifting & !shifting2;
-    diag_OBUF.EXP  =  slaveinten<1> & cpu_a<1> & cpu_a<0> & 
-	!cpu_d<5>.PIN
+INPUTS | 3 | spi_Nsel  | start_shifting  | shifting2
+INPUTMC | 3 | 3 | 10 | 3 | 2 | 1 | 2
+EQ | 1 | 
+   led = spi_Nsel & !start_shifting & !shifting2;
 
 MACROCELL | 2 | 8 | cpu_Nirq_OBUFE
 ATTRIBUTES | 265986 | 0
 INPUTS | 1 | cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST
-INPUTMC | 1 | 2 | 17
+INPUTMC | 1 | 3 | 0
 EQ | 2 | 
    cpu_Nirq = Gnd;
    cpu_Nirq.OE = cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST;
 
-MACROCELL | 2 | 3 | $OpTx$INV$22__$INT
+MACROCELL | 1 | 5 | $OpTx$INV$22__$INT
 ATTRIBUTES | 133888 | 0
-OUTPUTMC | 16 | 1 | 1 | 3 | 17 | 2 | 14 | 2 | 13 | 2 | 12 | 2 | 11 | 2 | 10 | 2 | 9 | 2 | 6 | 3 | 16 | 2 | 15 | 2 | 16 | 3 | 2 | 3 | 9 | 2 | 2 | 2 | 0
+OUTPUTMC | 16 | 1 | 1 | 1 | 13 | 1 | 12 | 1 | 11 | 1 | 10 | 1 | 9 | 1 | 8 | 1 | 7 | 1 | 6 | 3 | 16 | 1 | 14 | 1 | 15 | 1 | 4 | 1 | 16 | 1 | 3 | 1 | 2
 INPUTS | 5 | ece  | cpu_Nphi2  | extclk  | start_shifting  | shifting2
-INPUTMC | 3 | 0 | 10 | 2 | 5 | 2 | 0
+INPUTMC | 3 | 0 | 10 | 3 | 2 | 1 | 2
 INPUTP | 2 | 20 | 21
 EQ | 3 | 
    $OpTx$INV$22__$INT = ece & !extclk
 	# !ece & !cpu_Nphi2
 	# !start_shifting & !shifting2;
 
-MACROCELL | 1 | 0 | start_shifting/start_shifting_RSTF__$INT
+MACROCELL | 1 | 17 | start_shifting/start_shifting_RSTF__$INT
 ATTRIBUTES | 133888 | 0
-OUTPUTMC | 2 | 2 | 5 | 1 | 1
-INPUTS | 8 | cpu_Nres  | shiftdone  | shiftcnt<3>  | shiftcnt<2>  | shiftcnt<1>  | spidataout<3>  | shifting2  | spidataout<7>
-INPUTMC | 7 | 2 | 2 | 2 | 15 | 2 | 16 | 3 | 9 | 0 | 0 | 2 | 0 | 3 | 3
+OUTPUTMC | 1 | 3 | 2
+INPUTS | 2 | cpu_Nres  | shiftdone
+INPUTMC | 1 | 1 | 3
 INPUTP | 1 | 49
-EXPORTS | 1 | 1 | 1
-EQ | 5 | 
+EQ | 1 | 
    start_shifting/start_shifting_RSTF__$INT = cpu_Nres & !shiftdone;
-    start_shifting/start_shifting_RSTF__$INT.EXP  =  shiftcnt<3> & !shiftcnt<2> & !shiftcnt<1> & 
-	!shiftdone & !spidataout<3> & shifting2
-	# !shiftcnt<3> & !shiftcnt<2> & !shiftcnt<1> & 
-	!shiftdone & !spidataout<7> & shifting2
 
-MACROCELL | 2 | 17 | cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST
+MACROCELL | 3 | 0 | cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST
 ATTRIBUTES | 133888 | 0
 OUTPUTMC | 1 | 2 | 8
-INPUTS | 10 | ier  | tc  | slaveinten<3>  | spi_int<3>  | slaveinten<2>  | spi_int<2>  | slaveinten<0>  | spi_int<0>  | slaveinten<1>  | spi_int<1>
-INPUTMC | 6 | 3 | 15 | 3 | 0 | 3 | 11 | 3 | 12 | 0 | 8 | 3 | 14
-INPUTP | 4 | 11 | 92 | 7 | 3
-EQ | 5 | 
+INPUTS | 4 | ier  | tc  | slaveinten  | spi_int
+INPUTMC | 3 | 3 | 8 | 3 | 1 | 0 | 8
+INPUTP | 1 | 7
+EQ | 2 | 
    cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST = ier & tc
-	# slaveinten<0> & !spi_int<0>
-	# slaveinten<1> & !spi_int<1>
-	# slaveinten<2> & !spi_int<2>
-	# slaveinten<3> & !spi_int<3>;
+	# slaveinten & !spi_int;
 
-MACROCELL | 1 | 2 | EXP6_
+MACROCELL | 1 | 0 | EXP6_
 ATTRIBUTES | 2048 | 0
 OUTPUTMC | 1 | 1 | 1
-INPUTS | 9 | shiftcnt<3>  | shiftcnt<2>  | shiftcnt<1>  | shiftdone  | spidataout<0>  | shifting2  | spidataout<2>  | spidataout<4>  | spidataout<6>
-INPUTMC | 9 | 2 | 15 | 2 | 16 | 3 | 9 | 2 | 2 | 0 | 3 | 2 | 0 | 0 | 1 | 3 | 8 | 3 | 5
+INPUTS | 10 | shiftcnt<3>  | shiftcnt<2>  | shiftcnt<1>  | shiftdone  | spidataout<0>  | shifting2  | spidataout<2>  | spidataout<3>  | spidataout<4>  | spidataout<7>
+INPUTMC | 10 | 1 | 14 | 1 | 15 | 1 | 16 | 1 | 3 | 0 | 3 | 1 | 2 | 0 | 1 | 3 | 7 | 3 | 6 | 3 | 3
 EXPORTS | 1 | 1 | 1
-EQ | 8 | 
+EQ | 10 | 
        EXP6_.EXP  =  shiftcnt<3> & shiftcnt<2> & shiftcnt<1> & 
 	!shiftdone & !spidataout<0> & shifting2
 	# shiftcnt<3> & !shiftcnt<2> & shiftcnt<1> & 
 	!shiftdone & !spidataout<2> & shifting2
+	# shiftcnt<3> & !shiftcnt<2> & !shiftcnt<1> & 
+	!shiftdone & !spidataout<3> & shifting2
 	# !shiftcnt<3> & shiftcnt<2> & shiftcnt<1> & 
 	!shiftdone & !spidataout<4> & shifting2
-	# !shiftcnt<3> & !shiftcnt<2> & shiftcnt<1> & 
-	!shiftdone & !spidataout<6> & shifting2
+	# !shiftcnt<3> & !shiftcnt<2> & !shiftcnt<1> & 
+	!shiftdone & !spidataout<7> & shifting2
 
-PIN | cpu_Nres | 64 | 0 | N/A | 49 | 41 | 1 | 1 | 3 | 10 | 3 | 7 | 3 | 4 | 3 | 1 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 15 | 0 | 8 | 3 | 14 | 3 | 12 | 3 | 11 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 3 | 17 | 2 | 14 | 2 | 13 | 2 | 12 | 2 | 11 | 2 | 10 | 2 | 9 | 2 | 6 | 3 | 16 | 2 | 15 | 2 | 16 | 3 | 2 | 3 | 9 | 2 | 2 | 0 | 3 | 0 | 2 | 0 | 1 | 0 | 0 | 3 | 8 | 3 | 6 | 3 | 5 | 3 | 3 | 1 | 0
-PIN | cpu_rnw | 64 | 0 | N/A | 24 | 35 | 3 | 10 | 3 | 7 | 3 | 4 | 3 | 1 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 15 | 0 | 8 | 3 | 14 | 3 | 12 | 3 | 11 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 2 | 5 | 0 | 3 | 0 | 2 | 0 | 1 | 0 | 0 | 3 | 8 | 3 | 6 | 3 | 5 | 3 | 3 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 14 | 0 | 16 | 2 | 1 | 2 | 4 | 2 | 7 | 2 | 0
-PIN | Ncs2 | 64 | 0 | N/A | 46 | 36 | 3 | 10 | 3 | 7 | 3 | 4 | 3 | 1 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 15 | 0 | 8 | 3 | 14 | 3 | 12 | 3 | 11 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 2 | 5 | 3 | 0 | 0 | 3 | 0 | 2 | 0 | 1 | 0 | 0 | 3 | 8 | 3 | 6 | 3 | 5 | 3 | 3 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 14 | 0 | 16 | 2 | 1 | 2 | 4 | 2 | 7 | 2 | 0
-PIN | cs1 | 64 | 0 | N/A | 50 | 36 | 3 | 10 | 3 | 7 | 3 | 4 | 3 | 1 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 15 | 0 | 8 | 3 | 14 | 3 | 12 | 3 | 11 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 2 | 5 | 3 | 0 | 0 | 3 | 0 | 2 | 0 | 1 | 0 | 0 | 3 | 8 | 3 | 6 | 3 | 5 | 3 | 3 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 14 | 0 | 16 | 2 | 1 | 2 | 4 | 2 | 7 | 2 | 0
-PIN | cpu_a<1> | 64 | 0 | N/A | 59 | 37 | 3 | 10 | 3 | 7 | 3 | 4 | 3 | 1 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 15 | 0 | 8 | 3 | 14 | 3 | 12 | 3 | 11 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 2 | 5 | 3 | 0 | 0 | 3 | 0 | 2 | 0 | 1 | 0 | 0 | 3 | 8 | 3 | 6 | 3 | 5 | 3 | 3 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 14 | 0 | 16 | 2 | 1 | 2 | 4 | 2 | 7 | 2 | 0 | 3 | 13
-PIN | cpu_a<0> | 64 | 0 | N/A | 52 | 37 | 3 | 10 | 3 | 7 | 3 | 4 | 3 | 1 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 15 | 0 | 8 | 3 | 14 | 3 | 12 | 3 | 11 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 2 | 5 | 3 | 0 | 0 | 3 | 0 | 2 | 0 | 1 | 0 | 0 | 3 | 8 | 3 | 6 | 3 | 5 | 3 | 3 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 14 | 0 | 16 | 2 | 1 | 2 | 4 | 2 | 7 | 2 | 0 | 3 | 13
-PIN | spi_miso<3> | 64 | 0 | N/A | 89 | 1 | 3 | 17
-PIN | spi_miso<2> | 64 | 0 | N/A | 90 | 1 | 3 | 17
-PIN | spi_miso<1> | 64 | 0 | N/A | 9 | 1 | 3 | 0
-PIN | spi_miso<0> | 64 | 0 | N/A | 10 | 1 | 3 | 0
-PIN | cpu_Nphi2 | 64 | 0 | N/A | 20 | 10 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 14 | 0 | 16 | 2 | 1 | 2 | 4 | 2 | 7 | 2 | 3 | 2 | 0
-PIN | spi_int<0> | 64 | 0 | N/A | 7 | 2 | 0 | 16 | 2 | 17
-PIN | spi_int<1> | 64 | 0 | N/A | 3 | 2 | 2 | 0 | 2 | 17
-PIN | spi_int<2> | 64 | 0 | N/A | 92 | 2 | 2 | 4 | 2 | 17
-PIN | spi_int<3> | 64 | 0 | N/A | 11 | 2 | 2 | 7 | 2 | 17
-PIN | extclk | 64 | 0 | N/A | 21 | 1 | 2 | 3
+MACROCELL | 3 | 15 | EXP7_
+ATTRIBUTES | 2048 | 0
+OUTPUTMC | 1 | 3 | 16
+INPUTS | 5 | cpu_Nres  | cpha  | shiftcnt<0>  | shiftdone  | shifting2
+INPUTMC | 4 | 0 | 17 | 1 | 4 | 1 | 3 | 1 | 2
+INPUTP | 1 | 49
+EXPORTS | 1 | 3 | 16
+EQ | 2 | 
+       EXP7_.EXP  =  cpu_Nres & cpha & !shiftcnt<0> & !shiftdone & 
+	shifting2
+
+PIN | cpu_Nres | 64 | 0 | N/A | 49 | 36 | 1 | 1 | 3 | 10 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 8 | 0 | 8 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 1 | 13 | 1 | 12 | 1 | 11 | 1 | 10 | 1 | 9 | 1 | 8 | 1 | 7 | 1 | 6 | 3 | 16 | 1 | 14 | 1 | 15 | 1 | 4 | 1 | 16 | 1 | 3 | 0 | 3 | 0 | 2 | 0 | 1 | 3 | 7 | 3 | 6 | 3 | 5 | 3 | 4 | 3 | 3 | 1 | 17 | 3 | 15
+PIN | cpu_rnw | 64 | 0 | N/A | 24 | 28 | 3 | 10 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 8 | 0 | 8 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 0 | 14 | 2 | 1 | 2 | 4 | 2 | 7 | 3 | 2 | 0 | 3 | 0 | 2 | 0 | 1 | 3 | 7 | 3 | 6 | 3 | 5 | 3 | 4 | 3 | 3 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 16
+PIN | Ncs2 | 64 | 0 | N/A | 46 | 29 | 3 | 10 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 8 | 0 | 8 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 0 | 14 | 2 | 1 | 2 | 4 | 2 | 7 | 3 | 2 | 3 | 1 | 0 | 3 | 0 | 2 | 0 | 1 | 3 | 7 | 3 | 6 | 3 | 5 | 3 | 4 | 3 | 3 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 16
+PIN | cs1 | 64 | 0 | N/A | 50 | 29 | 3 | 10 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 8 | 0 | 8 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 0 | 14 | 2 | 1 | 2 | 4 | 2 | 7 | 3 | 2 | 3 | 1 | 0 | 3 | 0 | 2 | 0 | 1 | 3 | 7 | 3 | 6 | 3 | 5 | 3 | 4 | 3 | 3 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 16
+PIN | cpu_a<0> | 64 | 0 | N/A | 52 | 29 | 3 | 10 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 8 | 0 | 8 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 0 | 14 | 2 | 1 | 2 | 4 | 2 | 7 | 3 | 2 | 3 | 1 | 0 | 3 | 0 | 2 | 0 | 1 | 3 | 7 | 3 | 6 | 3 | 5 | 3 | 4 | 3 | 3 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 16
+PIN | cpu_a<1> | 64 | 0 | N/A | 59 | 29 | 3 | 10 | 0 | 15 | 0 | 10 | 0 | 17 | 0 | 9 | 3 | 8 | 0 | 8 | 0 | 6 | 0 | 13 | 0 | 12 | 0 | 11 | 0 | 14 | 2 | 1 | 2 | 4 | 2 | 7 | 3 | 2 | 3 | 1 | 0 | 3 | 0 | 2 | 0 | 1 | 3 | 7 | 3 | 6 | 3 | 5 | 3 | 4 | 3 | 3 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 16
+PIN | spi_miso | 64 | 0 | N/A | 10 | 1 | 1 | 13
+PIN | cpu_Nphi2 | 64 | 0 | N/A | 20 | 9 | 0 | 14 | 2 | 1 | 2 | 4 | 2 | 7 | 0 | 4 | 0 | 5 | 0 | 7 | 0 | 16 | 1 | 5
+PIN | spi_int | 64 | 0 | N/A | 7 | 2 | 0 | 16 | 3 | 0
+PIN | extclk | 64 | 0 | N/A | 21 | 1 | 1 | 5
 PIN | spi_mosi | 536871040 | 0 | N/A | 87
-PIN | spi_Nsel<0> | 536871040 | 0 | N/A | 68
-PIN | spi_Nsel<1> | 536871040 | 0 | N/A | 65
-PIN | spi_Nsel<2> | 536871040 | 0 | N/A | 63
-PIN | spi_Nsel<3> | 536871040 | 0 | N/A | 62
+PIN | spi_Nsel | 536871040 | 0 | N/A | 68
 PIN | spi_sclk | 536871040 | 0 | N/A | 83
-PIN | diag | 536871040 | 0 | N/A | 72
+PIN | led | 536871040 | 0 | N/A | 72
 PIN | cpu_Nirq | 536871040 | 0 | N/A | 38
+PIN | cpu_d<3> | 536870976 | 0 | N/A | 26 | 2 | 0 | 6 | 3 | 7
+PIN | cpu_d<5> | 536870976 | 0 | N/A | 29 | 1 | 3 | 5
+PIN | cpu_d<6> | 536870976 | 0 | N/A | 31 | 2 | 3 | 8 | 3 | 4
+PIN | cpu_d<7> | 536870976 | 0 | N/A | 33 | 1 | 3 | 3
 PIN | cpu_d<0> | 536870976 | 0 | N/A | 12 | 4 | 3 | 10 | 0 | 17 | 0 | 13 | 0 | 3
-PIN | cpu_d<1> | 536870976 | 0 | N/A | 13 | 4 | 3 | 7 | 0 | 15 | 0 | 12 | 0 | 2
-PIN | cpu_d<2> | 536870976 | 0 | N/A | 15 | 4 | 3 | 4 | 0 | 10 | 0 | 11 | 0 | 1
-PIN | cpu_d<3> | 536870976 | 0 | N/A | 26 | 3 | 3 | 1 | 0 | 6 | 0 | 0
-PIN | cpu_d<4> | 536870976 | 0 | N/A | 27 | 3 | 0 | 9 | 0 | 8 | 3 | 8
-PIN | cpu_d<5> | 536870976 | 0 | N/A | 29 | 3 | 3 | 14 | 3 | 6 | 3 | 13
-PIN | cpu_d<6> | 536870976 | 0 | N/A | 31 | 4 | 3 | 15 | 3 | 12 | 3 | 5 | 3 | 14
-PIN | cpu_d<7> | 536870976 | 0 | N/A | 33 | 2 | 3 | 11 | 3 | 3
+PIN | cpu_d<1> | 536870976 | 0 | N/A | 13 | 3 | 0 | 15 | 0 | 12 | 0 | 2
+PIN | cpu_d<2> | 536870976 | 0 | N/A | 15 | 3 | 0 | 10 | 0 | 11 | 0 | 1
+PIN | cpu_d<4> | 536870976 | 0 | N/A | 27 | 3 | 0 | 9 | 0 | 8 | 3 | 6
