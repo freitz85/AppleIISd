@@ -1,0 +1,58 @@
+Pin Freeze File:  version G.38
+
+9572XL44PC XC9572XL-10-PC44
+Ncs2 S:PIN18
+cpu_Nphi2 S:PIN5
+cpu_Nres S:PIN19
+cpu_a<0> S:PIN22
+cpu_a<1> S:PIN24
+cpu_rnw S:PIN7
+cs1 S:PIN20
+extclk S:PIN6
+spi_int<0> S:PIN42
+spi_int<1> S:PIN40
+spi_int<2> S:PIN39
+spi_int<3> S:PIN1
+spi_miso<0> S:PIN44
+spi_miso<1> S:PIN43
+spi_miso<2> S:PIN38
+spi_miso<3> S:PIN37
+cpu_Nirq S:PIN14
+diag S:PIN29
+cpu_d<0> S:PIN2
+cpu_d<1> S:PIN3
+cpu_d<2> S:PIN4
+cpu_d<3> S:PIN8
+cpu_d<4> S:PIN9
+cpu_d<5> S:PIN11
+cpu_d<6> S:PIN12
+cpu_d<7> S:PIN13
+spi_mosi S:PIN35
+spi_sclk S:PIN34
+spi_Nsel<0> S:PIN28
+spi_Nsel<1> S:PIN27
+spi_Nsel<2> S:PIN26
+spi_Nsel<3> S:PIN25
+
+
+;The remaining section of the .gyd file is for documentation purposes only.
+;It shows where your internal equations were placed in the last successful fit.
+
+PARTITION FB1_1 spidataout<3> spidataout<2> spidataout<1> spidataout<0>
+		 int_dout<0> int_dout<1> tmo int_dout<2>
+		 slaveinten<0> frx ece divisor<2>
+		 divisor<1> divisor<0> int_dout<3> cpol
+		 int_dout<4> cpha
+PARTITION FB2_1 start_shifting/start_shifting_RSTF__$INT int_mosi EXP6_
+
+PARTITION FB3_1 shifting2 int_dout<5> shiftdone $OpTx$INV$22__$INT
+		 int_dout<6> start_shifting spidatain<7> int_dout<7>
+		 cpu_Nirq_OBUFE spidatain<6> spidatain<5> spidatain<4>
+		 spidatain<3> spidatain<2> spidatain<1> shiftcnt<3>
+		 shiftcnt<2> cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST
+PARTITION FB4_1 tc slavesel<3> shiftcnt<0> spidataout<7>
+		 slavesel<2> spidataout<6> spidataout<5> slavesel<1>
+		 spidataout<4> shiftcnt<1> slavesel<0> slaveinten<3>
+		 slaveinten<2> diag_OBUF slaveinten<1> ier
+		 int_sclk spidatain<0>
+

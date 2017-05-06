@@ -1,0 +1,41 @@
+
+NET "cpu_Nphi2"			loc="P5";
+NET "extclk"			loc="P6";
+NET "cpu_rnw"			loc="P7";
+
+#net "diag"				loc="P29";
+
+NET "cpu_d<0>"			loc="P2";
+NET "cpu_d<1>"			loc="P3";
+NET "cpu_d<2>"			loc="P4";
+NET "cpu_d<3>"			loc="P8";
+NET "cpu_d<4>"			loc="P9";
+NET "cpu_d<5>"			loc="P11";
+NET "cpu_d<6>"			loc="P12";
+NET "cpu_d<7>"			loc="P13";
+
+NET "cpu_Nirq"			loc="P14";
+NET "Ncs2"				loc="P18";
+NET "cs1"				loc="P20";
+NET "cpu_Nres"			loc="P19";
+	
+NET "cpu_a<0>"			loc="P22";
+NET "cpu_a<1>"			loc="P24";
+
+NET "spi_int<0>"		loc="P42";
+NET "spi_int<1>"		loc="P40";
+NET "spi_int<2>"		loc="P39";
+NET "spi_int<3>"		loc="P1";
+
+NET "spi_Nsel<0>"		loc="P28";
+NET "spi_Nsel<1>"		loc="P27";
+NET "spi_Nsel<2>"		loc="P26";
+NET "spi_Nsel<3>"		loc="P25";
+
+NET "spi_sclk"			loc="P34";
+NET "spi_mosi"			loc="P35";
+
+NET "spi_miso<0>"		loc="P44";
+NET "spi_miso<1>"		loc="P43";
+NET "spi_miso<2>"		loc="P38";
+NET "spi_miso<3>"		loc="P37";
