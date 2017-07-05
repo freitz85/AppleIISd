@@ -155,8 +155,8 @@ xst/
 _ngo/
 _xmsgs/
 VHDL/appleiisd_html*
-*.vhf
-*.dhp
+VHDL/*.vhf
+VHDL/*.dhp
 VHDL/*.gyd
 VHDL/*.jed
 VHDL/*.mfd
