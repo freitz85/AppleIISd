@@ -46,8 +46,6 @@ use AddressDecoder.ALL;
 --use UNISIM.VComponents.all;
 
 entity AppleIISd is
-
-
     Port ( cpu_d : inout  STD_LOGIC_VECTOR (7 downto 0);
            cpu_rnw : in  STD_LOGIC;
            cpu_Nirq : out  STD_LOGIC;
@@ -137,9 +135,9 @@ architecture Behavioral of AppleIISd is
           CLK : in    std_logic; 
           NIO_SEL : in    std_logic; 
           NIO_STB : in    std_logic; 
-          A8_B   : out   std_logic; 
-          A9_B   : out   std_logic; 
-          A10_B  : out   std_logic; 
+          B8   : out   std_logic; 
+          B9   : out   std_logic; 
+          B10  : out   std_logic; 
           NOE     : out   std_logic);
 	end component;
 	
@@ -151,9 +149,9 @@ begin
 			 CLK=>extclk,
 			 NIO_SEL=>nio_sel,
 			 NIO_STB=>nio_stb,
-			 A8_B=>b8,
-			 A9_B=>b9,
-			 A10_B=>b10,
+			 B8=>b8,
+			 B9=>b9,
+			 B10=>b10,
 			 NOE=>noe);
 	
 			
