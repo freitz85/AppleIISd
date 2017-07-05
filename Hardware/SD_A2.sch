@@ -15708,6 +15708,7 @@ W = angled&lt;p&gt;
 <part name="SV1" library="con-lstb" library_urn="urn:adsk.eagle:library:162" deviceset="MA03-1" device=""/>
 <part name="R10" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="0204/7" value="10k"/>
 <part name="P+6" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
+<part name="GND4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -15810,6 +15811,7 @@ W = angled&lt;p&gt;
 <instance part="SV1" gate="G$1" x="233.68" y="101.6" rot="R270"/>
 <instance part="R10" gate="G$1" x="172.72" y="154.94"/>
 <instance part="P+6" gate="1" x="182.88" y="160.02"/>
+<instance part="GND4" gate="1" x="241.3" y="81.28" rot="R270"/>
 </instances>
 <busses>
 <bus name="DATA">
@@ -15893,6 +15895,11 @@ W = angled&lt;p&gt;
 <pinref part="JP1" gate="A" pin="2"/>
 <wire x1="256.54" y1="116.84" x2="279.4" y2="116.84" width="0.1524" layer="91"/>
 <junction x="279.4" y="116.84"/>
+</segment>
+<segment>
+<pinref part="IC3" gate="A" pin="!CE"/>
+<pinref part="GND4" gate="1" pin="GND"/>
+<wire x1="251.46" y1="81.28" x2="243.84" y2="81.28" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="+5V" class="0">
@@ -16639,11 +16646,7 @@ W = angled&lt;p&gt;
 <wire x1="231.14" y1="121.92" x2="243.84" y2="121.92" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="A" pin="!OE"/>
 <wire x1="251.46" y1="83.82" x2="243.84" y2="83.82" width="0.1524" layer="91"/>
-<pinref part="IC3" gate="A" pin="!CE"/>
-<wire x1="251.46" y1="81.28" x2="243.84" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="243.84" y1="81.28" x2="243.84" y2="83.82" width="0.1524" layer="91"/>
 <wire x1="243.84" y1="121.92" x2="243.84" y2="83.82" width="0.1524" layer="91"/>
-<junction x="243.84" y="83.82"/>
 </segment>
 </net>
 <net name="!IO_SEL" class="0">
