@@ -33,6 +33,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
+use address_decoder.ALL;
+
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 --use IEEE.NUMERIC_STD.ALL;
@@ -52,7 +54,6 @@ entity SPI6502B is
            cpu_Nres : in  STD_LOGIC;
            cpu_a : in  STD_LOGIC_VECTOR (1 downto 0);
            cpu_Nphi2 : in  STD_LOGIC;
-           cs1 : in  STD_LOGIC;
            Ncs2 : in  STD_LOGIC;
            extclk : in  STD_LOGIC;
            spi_miso: in std_logic;
@@ -60,7 +61,18 @@ entity SPI6502B is
            spi_sclk : out  STD_LOGIC;
            spi_Nsel : out  STD_LOGIC;
 		 spi_int : in  STD_LOGIC;
-           led : out std_logic
+           led : out std_logic;
+
+		a8     : in    std_logic; 
+          a9     : in    std_logic; 
+          a10    : in    std_logic; 
+          nio_sel : in    std_logic; 
+          nio_stb : in    std_logic; 
+          b8   : out   std_logic; 
+          b9   : out   std_logic; 
+          b10  : out   std_logic; 
+          noe     : out   std_logic;
+		ng	  : out 	std_logic
 		);
 			  
 	constant DIV_WIDTH		: integer := 3;
@@ -117,11 +129,36 @@ architecture Behavioral of SPI6502B is
 	signal divcnt: std_logic_vector(DIV_WIDTH-1 downto 0);			-- divisor counter
 	
 	signal shiftclk : std_logic;
+
+	component address_decoder
+   port ( A8     : in    std_logic; 
+          A9     : in    std_logic; 
+          A10    : in    std_logic; 
+          CLK : in    std_logic; 
+          NIO_SEL : in    std_logic; 
+          NIO_STB : in    std_logic; 
+          A8_B   : out   std_logic; 
+          A9_B   : out   std_logic; 
+          A10_B  : out   std_logic; 
+          NOE     : out   std_logic);
+	end component;
 	
 begin
+	add_dec : address_decoder
+      port map (A8=>a8,      
+                A9=>a9,
+			 A10=>a10,
+			 CLK=>extclk,
+			 NIO_SEL=>nio_sel,
+			 NIO_STB=>nio_stb,
+			 A8_B=>b8,
+			 A9_B=>b9,
+			 A10_B=>b10,
+			 NOE=>noe);
+	
 			
 	led <= not (bsy or not slavesel); --'0'; --shifting2; --shiftdone; --shiftcnt(2);
-	
+	ng <=  Ncs2 and nio_sel and nio_stb;
 	--------------------------
 	
 	bsy <= start_shifting or shifting2;
@@ -256,7 +293,7 @@ begin
 	-- interface section
 	-- inputs
 	reset <= not (cpu_Nres);
-	selected <= cs1 and not(Ncs2); -- and cpu_phi2;
+	selected <= not(Ncs2); -- and cpu_phi2;
 	is_read <= selected and cpu_Nphi2 and cpu_rnw;
 	int_din <= cpu_d;	
 	slaveint <= not(spi_int);		-- active low interrupt inputs

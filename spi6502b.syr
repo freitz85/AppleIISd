@@ -66,6 +66,10 @@ wysiwyg                            : NO
 =========================================================================
 *                          HDL Compilation                              *
 =========================================================================
+Compiling vhdl file C:/sources/AppleIISd/address_decoder.vhf in Library work.
+Architecture behavioral of Entity fd_mxilinx_address_decoder is up to date.
+Architecture behavioral of Entity fdrs_mxilinx_address_decoder is up to date.
+Architecture behavioral of Entity address_decoder is up to date.
 Compiling vhdl file C:/sources/AppleIISd/SPI6502B1.1.vhd in Library work.
 Entity <spi6502b> (Architecture <behavioral>) compiled.
 
@@ -73,22 +77,48 @@ Entity <spi6502b> (Architecture <behavioral>) compiled.
 *                            HDL Analysis                               *
 =========================================================================
 Analyzing Entity <spi6502b> (Architecture <behavioral>).
-INFO:Xst:1561 - C:/sources/AppleIISd/SPI6502B1.1.vhd line 203: Mux is complete : default of case is discarded
-INFO:Xst:1561 - C:/sources/AppleIISd/SPI6502B1.1.vhd line 316: Mux is complete : default of case is discarded
+INFO:Xst:1561 - C:/sources/AppleIISd/SPI6502B1.1.vhd line 240: Mux is complete : default of case is discarded
+INFO:Xst:1561 - C:/sources/AppleIISd/SPI6502B1.1.vhd line 353: Mux is complete : default of case is discarded
 Entity <spi6502b> analyzed. Unit <spi6502b> generated.
+
+Analyzing Entity <address_decoder> (Architecture <behavioral>).
+    Set user-defined property "HU_SET =  XLXI_16_1" for instance <XLXI_16> in unit <address_decoder>.
+Entity <address_decoder> analyzed. Unit <address_decoder> generated.
+
+Analyzing Entity <FDRS_MXILINX_address_decoder> (Architecture <behavioral>).
+    Set user-defined property "HU_SET =  U0_0" for instance <U0> in unit <FDRS_MXILINX_address_decoder>.
+Entity <FDRS_MXILINX_address_decoder> analyzed. Unit <FDRS_MXILINX_address_decoder> generated.
+
+Analyzing Entity <FD_MXILINX_address_decoder> (Architecture <behavioral>).
+Entity <FD_MXILINX_address_decoder> analyzed. Unit <FD_MXILINX_address_decoder> generated.
 
 
 =========================================================================
 *                           HDL Synthesis                               *
 =========================================================================
 
+Synthesizing Unit <FD_MXILINX_address_decoder>.
+    Related source file is C:/sources/AppleIISd/address_decoder.vhf.
+Unit <FD_MXILINX_address_decoder> synthesized.
+
+
+Synthesizing Unit <FDRS_MXILINX_address_decoder>.
+    Related source file is C:/sources/AppleIISd/address_decoder.vhf.
+Unit <FDRS_MXILINX_address_decoder> synthesized.
+
+
+Synthesizing Unit <address_decoder>.
+    Related source file is C:/sources/AppleIISd/address_decoder.vhf.
+Unit <address_decoder> synthesized.
+
+
 Synthesizing Unit <spi6502b>.
     Related source file is C:/sources/AppleIISd/SPI6502B1.1.vhd.
     Found 8-bit tristate buffer for signal <cpu_d>.
     Found 1-bit tristate buffer for signal <cpu_Nirq>.
     Found 1-bit tristate buffer for signal <spi_mosi>.
-    Found 1-bit xor3 for signal <$n0040> created at line 206.
-    Found 4-bit adder for signal <$n0047> created at line 160.
+    Found 1-bit xor3 for signal <$n0040> created at line 243.
+    Found 4-bit adder for signal <$n0047> created at line 197.
     Found 1-bit register for signal <cpha>.
     Found 1-bit register for signal <cpol>.
     Found 3-bit down counter for signal <divcnt>.
@@ -153,6 +183,12 @@ Macro Statistics
 
 Optimizing unit <spi6502b> ...
 
+Optimizing unit <FD_MXILINX_address_decoder> ...
+
+Optimizing unit <FDRS_MXILINX_address_decoder> ...
+
+Optimizing unit <address_decoder> ...
+
 =========================================================================
 *                            Final Report                               *
 =========================================================================
@@ -169,7 +205,7 @@ Clock Enable                       : YES
 wysiwyg                            : NO
 
 Design Statistics
-# IOs                              : 23
+# IOs                              : 32
 
 Macro Statistics :
 # Registers                        : 60
@@ -181,33 +217,37 @@ Macro Statistics :
 #      1-bit xor2                  : 5
 
 Cell Usage :
-# BELS                             : 252
-#      AND2                        : 119
-#      AND3                        : 5
+# BELS                             : 256
+#      AND2                        : 120
+#      AND3                        : 6
 #      AND4                        : 1
-#      GND                         : 1
-#      INV                         : 77
-#      OR2                         : 42
+#      GND                         : 2
+#      INV                         : 76
+#      OR2                         : 43
 #      OR3                         : 1
-#      VCC                         : 1
+#      VCC                         : 2
 #      XOR2                        : 5
-# FlipFlops/Latches                : 37
+# FlipFlops/Latches                : 38
 #      FD                          : 1
 #      FDC                         : 5
 #      FDCE                        : 27
-#      FDCP                        : 1
+#      FDCP                        : 2
 #      FDP                         : 1
 #      FDPE                        : 2
-# IO Buffers                       : 23
-#      IBUF                        : 10
+# IO Buffers                       : 32
+#      IBUF                        : 14
 #      IOBUFE                      : 8
-#      OBUF                        : 3
+#      OBUF                        : 8
 #      OBUFE                       : 2
+# Others                           : 5
+#      AND2B1                      : 2
+#      AND4B1                      : 1
+#      NAND2                       : 2
 =========================================================================
-CPU : 0.65 / 1.07 s | Elapsed : 0.00 / 1.00 s
+CPU : 1.05 / 1.48 s | Elapsed : 1.00 / 1.00 s
  
 --> 
 
-Total memory usage is 68376 kilobytes
+Total memory usage is 69656 kilobytes
 
 

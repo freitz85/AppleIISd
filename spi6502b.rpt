@@ -1,7 +1,7 @@
  
 cpldfit:  version G.38                              Xilinx Inc.
                                   Fitter Report
-Design Name: spi6502b                            Date:  5- 6-2017,  5:47PM
+Design Name: spi6502b                            Date:  5-11-2017,  2:09AM
 Device Used: XC9572XL-10-PC44
 Fitting Status: Successful
 
@@ -9,38 +9,38 @@ Fitting Status: Successful
 
 Macrocells     Product Terms    Registers      Pins           Function Block 
 Used           Used             Used           Used           Inputs Used    
-50 /72  ( 69%) 202 /360  ( 56%) 37 /72  ( 51%) 23 /34  ( 68%) 106/216 ( 49%)
+56 /72  ( 78%) 209 /360  ( 58%) 38 /72  ( 53%) 32 /34  ( 94%) 116/216 ( 54%)
 
 PIN RESOURCES:
 
 Signal Type    Required     Mapped  |  Pin Type            Used   Remaining 
 ------------------------------------|---------------------------------------
-Input         :   10          10    |  I/O              :    19        9
-Output        :    5           5    |  GCK/IO           :     3        0
-Bidirectional :    8           8    |  GTS/IO           :     1        1
-GCK           :    0           0    |  GSR/IO           :     0        1
+Input         :   13          13    |  I/O              :    26        2
+Output        :   10          10    |  GCK/IO           :     3        0
+Bidirectional :    8           8    |  GTS/IO           :     2        0
+GCK           :    1           1    |  GSR/IO           :     1        0
 GTS           :    0           0    |
 GSR           :    0           0    |
                  ----        ----
-        Total     23          23
+        Total     32          32
 
 MACROCELL RESOURCES:
 
 Total Macrocells Available                    72
-Registered Macrocells                         37
-Non-registered Macrocell driving I/O          10
+Registered Macrocells                         38
+Non-registered Macrocell driving I/O          15
 
 GLOBAL RESOURCES:
 
-Global clock net(s) unused.
+Signal 'extclk' mapped onto global clock net GCK2.
 Global output enable net(s) unused.
 Global set/reset net(s) unused.
 
 POWER DATA:
 
-There are 50 macrocells in high performance mode (MCHP).
+There are 56 macrocells in high performance mode (MCHP).
 There are 0 macrocells in low power mode (MCLP).
-There are a total of 50 macrocells used (MC).
+There are a total of 56 macrocells used (MC).
 
 End of Resource Summary
 *************** Summary of Required Resources ******************
@@ -48,68 +48,78 @@ End of Resource Summary
 ** LOGIC **
 Signal              Total   Signals Loc     Pwr  Slew Pin  Pin       Pin       Reg Init
 Name                Pt      Used            Mode Rate #    Type      Use       State
-$OpTx$INV$22__$INT  3       5       FB2_6   STD       37   I/O       (b)       
-cpha                5       8       FB1_18  STD            (b)       (b)       RESET
-cpol                5       8       FB1_16  STD            (b)       (b)       RESET
-cpu_Nirq            1       1       FB3_9   STD  FAST 14   I/O       O         
-cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST                    2       4       FB4_1   STD            (b)       (b)       
-cpu_d<0>            5       10      FB1_5   STD  FAST 2    I/O       I/O       
-cpu_d<1>            4       9       FB1_6   STD  FAST 3    I/O       I/O       
-cpu_d<2>            4       9       FB1_8   STD  FAST 4    I/O       I/O       
-cpu_d<3>            3       8       FB1_15  STD  FAST 8    I/O       I/O       
-cpu_d<4>            5       10      FB1_17  STD  FAST 9    I/O       I/O       
-cpu_d<5>            4       9       FB3_2   STD  FAST 11   I/O       I/O       
-cpu_d<6>            3       8       FB3_5   STD  FAST 12   I/O       I/O       
-cpu_d<7>            3       8       FB3_8   STD  FAST 13   I/O       I/O       
-divisor<0>          5       8       FB1_14  STD       7    GCK/I/O   I         RESET
-divisor<1>          5       8       FB1_13  STD            (b)       (b)       RESET
-divisor<2>          5       8       FB1_12  STD            (b)       (b)       RESET
-ece                 5       8       FB1_11  STD       6    GCK/I/O   I         RESET
-frx                 5       8       FB1_10  STD            (b)       (b)       RESET
-ier                 5       8       FB4_9   STD            (b)       (b)       RESET
+$OpTx$INV$24__$INT  3       5       FB2_6   STD       37   I/O       I         
+add_dec/XLXN_11     1       4       FB3_17  STD       22   I/O       I         RESET
+b10                 1       2       FB4_8   STD  FAST 27   I/O       O         
+b8                  1       2       FB4_2   STD  FAST 25   I/O       O         
+b9                  1       2       FB4_5   STD  FAST 26   I/O       O         
+cpha                5       7       FB1_18  STD            (b)       (b)       RESET
+cpol                5       7       FB1_16  STD            (b)       (b)       RESET
+cpu_Nirq            1       1       FB2_9   STD  FAST 39   GSR/I/O   O         
+cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST                    2       4       FB3_18  STD            (b)       (b)       
+cpu_d<0>            5       9       FB1_5   STD  FAST 2    I/O       I/O       
+cpu_d<1>            4       8       FB1_6   STD  FAST 3    I/O       I/O       
+cpu_d<2>            4       8       FB1_8   STD  FAST 4    I/O       I/O       
+cpu_d<3>            3       7       FB1_15  STD  FAST 8    I/O       I/O       
+cpu_d<4>            5       9       FB1_17  STD  FAST 9    I/O       I/O       
+cpu_d<5>            4       8       FB3_2   STD  FAST 11   I/O       I/O       
+cpu_d<6>            3       7       FB3_5   STD  FAST 12   I/O       I/O       
+cpu_d<7>            3       7       FB3_8   STD  FAST 13   I/O       I/O       
+divisor<0>          5       7       FB1_14  STD       7    GCK/I/O   I         RESET
+divisor<1>          5       7       FB1_13  STD            (b)       (b)       RESET
+divisor<2>          5       7       FB1_12  STD            (b)       (b)       RESET
+ece                 5       7       FB1_11  STD       6    GCK/I/O   GCK/I     RESET
+frx                 5       7       FB1_10  STD            (b)       (b)       RESET
+ier                 5       7       FB4_18  STD            (b)       (b)       RESET
 led                 1       3       FB4_14  STD  FAST 29   I/O       O         
-shiftcnt<0>         3       4       FB2_5   STD       36   I/O       (b)       RESET
-shiftcnt<1>         4       5       FB2_17  STD       44   I/O       I         RESET
-shiftcnt<2>         4       6       FB2_16  STD            (b)       (b)       RESET
-shiftcnt<3>         4       7       FB2_15  STD       43   I/O       (b)       RESET
-shiftdone           3       6       FB2_4   STD            (b)       (b)       RESET
+ng                  1       3       FB3_15  STD  FAST 20   I/O       O         
+noe                 2       3       FB3_9   STD  FAST 14   I/O       O         
+shiftcnt<0>         3       4       FB2_5   STD       36   I/O       I         RESET
+shiftcnt<1>         4       5       FB4_16  STD            (b)       (b)       RESET
+shiftcnt<2>         4       6       FB4_15  STD       33   I/O       (b)       RESET
+shiftcnt<3>         4       7       FB4_13  STD            (b)       (b)       RESET
+shiftdone           3       6       FB4_1   STD            (b)       (b)       RESET
 shifting2           2       3       FB2_3   STD            (b)       (b)       RESET
-slaveinten          5       8       FB1_9   STD       5    GCK/I/O   I         RESET
-spi_Nsel            5       8       FB4_11  STD  FAST 28   I/O       O         RESET
+slaveinten          5       7       FB1_9   STD       5    GCK/I/O   I         RESET
+spi_Nsel            5       7       FB4_11  STD  FAST 28   I/O       O         RESET
 spi_mosi            11      16      FB2_2   STD  FAST 35   I/O       O         RESET
 spi_sclk            6       7       FB4_17  STD  FAST 34   I/O       O         RESET
-spidatain<0>        4       6       FB2_14  STD       42   GTS/I/O   I         RESET
-spidatain<1>        4       5       FB2_13  STD            (b)       (b)       RESET
-spidatain<2>        4       5       FB2_12  STD            (b)       (b)       RESET
-spidatain<3>        4       5       FB2_11  STD       40   GTS/I/O   (b)       RESET
-spidatain<4>        4       5       FB2_10  STD            (b)       (b)       RESET
-spidatain<5>        4       5       FB2_9   STD       39   GSR/I/O   (b)       RESET
-spidatain<6>        4       5       FB2_8   STD       38   I/O       (b)       RESET
+spidatain<0>        4       6       FB4_12  STD            (b)       (b)       RESET
+spidatain<1>        4       5       FB4_10  STD            (b)       (b)       RESET
+spidatain<2>        4       5       FB2_13  STD            (b)       (b)       RESET
+spidatain<3>        4       5       FB2_12  STD            (b)       (b)       RESET
+spidatain<4>        4       5       FB2_11  STD       40   GTS/I/O   I         RESET
+spidatain<5>        4       5       FB2_10  STD            (b)       (b)       RESET
+spidatain<6>        4       5       FB2_8   STD       38   I/O       I         RESET
 spidatain<7>        4       5       FB2_7   STD            (b)       (b)       RESET
-spidataout<0>       4       8       FB1_4   STD            (b)       (b)       RESET
-spidataout<1>       4       8       FB1_3   STD            (b)       (b)       RESET
-spidataout<2>       4       8       FB1_2   STD       1    I/O       (b)       RESET
-spidataout<3>       4       8       FB4_8   STD       27   I/O       (b)       RESET
-spidataout<4>       4       8       FB4_7   STD            (b)       (b)       RESET
-spidataout<5>       4       8       FB4_6   STD            (b)       (b)       RESET
-spidataout<6>       4       8       FB4_5   STD       26   I/O       (b)       RESET
-spidataout<7>       4       8       FB4_4   STD            (b)       (b)       RESET
-start_shifting      4       8       FB4_3   STD            (b)       (b)       RESET
+spidataout<0>       4       7       FB1_4   STD            (b)       (b)       RESET
+spidataout<1>       4       7       FB1_3   STD            (b)       (b)       RESET
+spidataout<2>       4       7       FB1_2   STD       1    I/O       (b)       RESET
+spidataout<3>       4       7       FB1_1   STD            (b)       (b)       RESET
+spidataout<4>       4       7       FB4_9   STD            (b)       (b)       RESET
+spidataout<5>       4       7       FB4_7   STD            (b)       (b)       RESET
+spidataout<6>       4       7       FB4_6   STD            (b)       (b)       RESET
+spidataout<7>       4       7       FB4_4   STD            (b)       (b)       RESET
+start_shifting      4       7       FB4_3   STD            (b)       (b)       RESET
 start_shifting/start_shifting_RSTF__$INT                    1       2       FB2_18  STD            (b)       (b)       
-tc                  3       5       FB4_2   STD       25   I/O       (b)       RESET
-tmo                 5       8       FB1_7   STD            (b)       (b)       RESET
+tc                  3       4       FB2_4   STD            (b)       (b)       RESET
+tmo                 5       7       FB1_7   STD            (b)       (b)       RESET
 
 ** INPUTS **
 Signal                              Loc               Pin  Pin       Pin
 Name                                                  #    Type      Use
 Ncs2                                FB3_11            18   I/O       I
+a10                                 FB2_8             38   I/O       I
+a8                                  FB2_5             36   I/O       I
+a9                                  FB2_6             37   I/O       I
 cpu_Nphi2                           FB1_9             5    GCK/I/O   I
 cpu_Nres                            FB3_14            19   I/O       I
 cpu_a<0>                            FB3_17            22   I/O       I
 cpu_a<1>                            FB3_16            24   I/O       I
 cpu_rnw                             FB1_14            7    GCK/I/O   I
-cs1                                 FB3_15            20   I/O       I
-extclk                              FB1_11            6    GCK/I/O   I
+extclk                              FB1_11            6    GCK/I/O   GCK/I
+nio_sel                             FB2_11            40   GTS/I/O   I
+nio_stb                             FB2_15            43   I/O       I
 spi_int                             FB2_14            42   GTS/I/O   I
 spi_miso                            FB2_17            44   I/O       I
 
@@ -118,18 +128,18 @@ End of Resources
 *********************Function Block Resource Summary***********************
 Function    # of        FB Inputs   Signals     Total       O/IO      IO    
 Block       Macrocells  Used        Used        Pt Used     Req       Avail 
-FB1          17          31          31           78         0/5        9   
-FB2          17          30          30           67         1/0        9   
-FB3           4          14          14           11         1/3        9   
-FB4          12          31          31           46         3/0        7   
+FB1          18          31          31           82         0/5        9   
+FB2          13          31          31           48         2/0        9   
+FB3           7          20          20           16         2/3        9   
+FB4          18          34          34           63         6/0        7   
             ----                                -----       -----     ----- 
-             50                                  202         5/8       34   
+             56                                  209        10/8       34   
 *********************************** FB1 ***********************************
 Number of function block inputs used/remaining:               31/23
 Number of signals used by logic mapping into function block:  31
 Signal              Total   Imp   Exp Unused  Loc     Pwr   Pin   Pin     Pin
 Name                Pt      Pt    Pt  Pt              Mode   #    Type    Use
-(unused)              0       0     0   5     FB1_1               (b)     
+spidataout<3>         4       0     0   1     FB1_1   STD         (b)     (b)
 spidataout<2>         4       0     0   1     FB1_2   STD   1     I/O     (b)
 spidataout<1>         4       0     0   1     FB1_3   STD         (b)     (b)
 spidataout<0>         4       0     0   1     FB1_4   STD         (b)     (b)
@@ -139,7 +149,7 @@ tmo                   5       0     0   0     FB1_7   STD         (b)     (b)
 cpu_d<2>              4       0     0   1     FB1_8   STD   4     I/O     I/O
 slaveinten            5       0     0   0     FB1_9   STD   5     GCK/I/O I
 frx                   5       0     0   0     FB1_10  STD         (b)     (b)
-ece                   5       0     0   0     FB1_11  STD   6     GCK/I/O I
+ece                   5       0     0   0     FB1_11  STD   6     GCK/I/O GCK/I
 divisor<2>            5       0     0   0     FB1_12  STD         (b)     (b)
 divisor<1>            5       0     0   0     FB1_13  STD         (b)     (b)
 divisor<0>            5       0     0   0     FB1_14  STD   7     GCK/I/O I
@@ -149,37 +159,38 @@ cpu_d<4>              5       0     0   0     FB1_17  STD   9     I/O     I/O
 cpha                  5       0     0   0     FB1_18  STD         (b)     (b)
 
 Signals Used by Logic in Function Block
-  1: cpu_d<0>.PIN      12: cpu_a<1>          22: spi_int 
-  2: cpu_d<1>.PIN      13: cpu_rnw           23: spidatain<0> 
-  3: cpu_d<2>.PIN      14: cs1               24: spidatain<1> 
-  4: cpu_d<3>.PIN      15: divisor<0>        25: spidatain<2> 
-  5: cpu_d<4>.PIN      16: divisor<1>        26: spidatain<3> 
-  6: Ncs2              17: divisor<2>        27: spidatain<4> 
-  7: cpha              18: ece               28: spidataout<0> 
-  8: cpol              19: frx               29: spidataout<1> 
-  9: cpu_Nphi2         20: slaveinten        30: spidataout<2> 
- 10: cpu_Nres          21: spi_Nsel          31: tmo 
+  1: cpu_d<0>.PIN      12: cpu_a<1>          22: spidatain<0> 
+  2: cpu_d<1>.PIN      13: cpu_rnw           23: spidatain<1> 
+  3: cpu_d<2>.PIN      14: divisor<0>        24: spidatain<2> 
+  4: cpu_d<3>.PIN      15: divisor<1>        25: spidatain<3> 
+  5: cpu_d<4>.PIN      16: divisor<2>        26: spidatain<4> 
+  6: Ncs2              17: ece               27: spidataout<0> 
+  7: cpha              18: frx               28: spidataout<1> 
+  8: cpol              19: slaveinten        29: spidataout<2> 
+  9: cpu_Nphi2         20: spi_Nsel          30: spidataout<3> 
+ 10: cpu_Nres          21: spi_int           31: tmo 
  11: cpu_a<0>         
 
 Signal                        1         2         3         4 Signals FB
 Name                0----+----0----+----0----+----0----+----0 Used    Inputs
-spidataout<2>        ..X..X...XXXXX...............X.......... 8       8
-spidataout<1>        .X...X...XXXXX..............X........... 8       8
-spidataout<0>        X....X...XXXXX.............X............ 8       8
-cpu_d<0>             .....XX.X.XXXXX.....X.X................. 10      10
-cpu_d<1>             .....X.XX.XXXX.X.......X................ 9       9
-tmo                  ...X.X...XXXXX................X......... 8       8
-cpu_d<2>             .....X..X.XXXX..XX......X............... 9       9
-slaveinten           ....XX...XXXXX.....X.................... 8       8
-frx                  ....XX...XXXXX....X..................... 8       8
-ece                  ..X..X...XXXXX...X...................... 8       8
-divisor<2>           ..X..X...XXXXX..X....................... 8       8
-divisor<1>           .X...X...XXXXX.X........................ 8       8
-divisor<0>           X....X...XXXXXX......................... 8       8
-cpu_d<3>             .....X..X.XXXX...........X....X......... 8       8
-cpol                 .X...X.X.XXXXX.......................... 8       8
-cpu_d<4>             .....X..X.XXXX....XX.X....X............. 10      10
-cpha                 X....XX..XXXXX.......................... 8       8
+spidataout<3>        ...X.X...XXXX................X.......... 7       7
+spidataout<2>        ..X..X...XXXX...............X........... 7       7
+spidataout<1>        .X...X...XXXX..............X............ 7       7
+spidataout<0>        X....X...XXXX.............X............. 7       7
+cpu_d<0>             .....XX.X.XXXX.....X.X.................. 9       9
+cpu_d<1>             .....X.XX.XXX.X.......X................. 8       8
+tmo                  ...X.X...XXXX.................X......... 7       7
+cpu_d<2>             .....X..X.XXX..XX......X................ 8       8
+slaveinten           ....XX...XXXX.....X..................... 7       7
+frx                  ....XX...XXXX....X...................... 7       7
+ece                  ..X..X...XXXX...X....................... 7       7
+divisor<2>           ..X..X...XXXX..X........................ 7       7
+divisor<1>           .X...X...XXXX.X......................... 7       7
+divisor<0>           X....X...XXXXX.......................... 7       7
+cpu_d<3>             .....X..X.XXX...........X.....X......... 7       7
+cpol                 .X...X.X.XXXX........................... 7       7
+cpu_d<4>             .....X..X.XXX....XX.X....X.............. 9       9
+cpha                 X....XX..XXXX........................... 7       7
                     0----+----1----+----2----+----3----+----4
                               0         0         0         0
 Legend:
@@ -197,63 +208,61 @@ X(@) - Signal used as input (wire-AND input) to the macrocell logic.
     The number of Signals Used may exceed the number of FB Inputs Used due
     to wire-ANDing in the switch matrix.
 *********************************** FB2 ***********************************
-Number of function block inputs used/remaining:               30/24
-Number of signals used by logic mapping into function block:  30
+Number of function block inputs used/remaining:               31/23
+Number of signals used by logic mapping into function block:  31
 Signal              Total   Imp   Exp Unused  Loc     Pwr   Pin   Pin     Pin
 Name                Pt      Pt    Pt  Pt              Mode   #    Type    Use
 (unused)              0       0   \/5   0     FB2_1               (b)     (b)
 spi_mosi             11       6<-   0   0     FB2_2   STD   35    I/O     O
 shifting2             2       0   /\1   2     FB2_3   STD         (b)     (b)
-shiftdone             3       0     0   2     FB2_4   STD         (b)     (b)
-shiftcnt<0>           3       0     0   2     FB2_5   STD   36    I/O     (b)
-$OpTx$INV$22__$INT    3       0     0   2     FB2_6   STD   37    I/O     (b)
+tc                    3       0     0   2     FB2_4   STD         (b)     (b)
+shiftcnt<0>           3       0     0   2     FB2_5   STD   36    I/O     I
+$OpTx$INV$24__$INT    3       0     0   2     FB2_6   STD   37    I/O     I
 spidatain<7>          4       0     0   1     FB2_7   STD         (b)     (b)
-spidatain<6>          4       0     0   1     FB2_8   STD   38    I/O     (b)
-spidatain<5>          4       0     0   1     FB2_9   STD   39    GSR/I/O (b)
-spidatain<4>          4       0     0   1     FB2_10  STD         (b)     (b)
-spidatain<3>          4       0     0   1     FB2_11  STD   40    GTS/I/O (b)
-spidatain<2>          4       0     0   1     FB2_12  STD         (b)     (b)
-spidatain<1>          4       0     0   1     FB2_13  STD         (b)     (b)
-spidatain<0>          4       0     0   1     FB2_14  STD   42    GTS/I/O I
-shiftcnt<3>           4       0     0   1     FB2_15  STD   43    I/O     (b)
-shiftcnt<2>           4       0     0   1     FB2_16  STD         (b)     (b)
-shiftcnt<1>           4       0     0   1     FB2_17  STD   44    I/O     I
+spidatain<6>          4       0     0   1     FB2_8   STD   38    I/O     I
+cpu_Nirq              1       0     0   4     FB2_9   STD   39    GSR/I/O O
+spidatain<5>          4       0     0   1     FB2_10  STD         (b)     (b)
+spidatain<4>          4       0     0   1     FB2_11  STD   40    GTS/I/O I
+spidatain<3>          4       0     0   1     FB2_12  STD         (b)     (b)
+spidatain<2>          4       0     0   1     FB2_13  STD         (b)     (b)
+(unused)              0       0     0   5     FB2_14        42    GTS/I/O I
+(unused)              0       0     0   5     FB2_15        43    I/O     I
+(unused)              0       0     0   5     FB2_16              (b)     
+(unused)              0       0     0   5     FB2_17        44    I/O     I
 start_shifting/start_shifting_RSTF__$INT
                       1       0     0   4     FB2_18  STD         (b)     (b)
 
 Signals Used by Logic in Function Block
-  1: $OpTx$INV$22__$INT 
-                       11: shifting2         21: spidataout<0> 
-  2: cpu_Nphi2         12: spi_Nsel          22: spidataout<1> 
-  3: cpu_Nres          13: spi_miso          23: spidataout<2> 
-  4: ece               14: spidatain<0>      24: spidataout<3> 
-  5: extclk            15: spidatain<1>      25: spidataout<4> 
-  6: shiftcnt<0>       16: spidatain<2>      26: spidataout<5> 
-  7: shiftcnt<1>       17: spidatain<3>      27: spidataout<6> 
-  8: shiftcnt<2>       18: spidatain<4>      28: spidataout<7> 
-  9: shiftcnt<3>       19: spidatain<5>      29: start_shifting 
- 10: shiftdone         20: spidatain<6>      30: tmo 
+  1: $OpTx$INV$24__$INT 
+                       12: shiftcnt<2>       22: spidataout<0> 
+  2: Ncs2              13: shiftcnt<3>       23: spidataout<1> 
+  3: cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST 
+                       14: shiftdone         24: spidataout<2> 
+  4: cpu_Nphi2         15: shifting2         25: spidataout<3> 
+  5: cpu_Nres          16: spidatain<1>      26: spidataout<4> 
+  6: cpu_a<0>          17: spidatain<2>      27: spidataout<5> 
+  7: cpu_a<1>          18: spidatain<3>      28: spidataout<6> 
+  8: ece               19: spidatain<4>      29: spidataout<7> 
+  9: extclk            20: spidatain<5>      30: start_shifting 
+ 10: shiftcnt<0>       21: spidatain<6>      31: tmo 
+ 11: shiftcnt<1>      
 
 Signal                        1         2         3         4 Signals FB
 Name                0----+----0----+----0----+----0----+----0 Used    Inputs
-spi_mosi             X.X...XXXXX.........XXXXXXXX.X.......... 16      16
-shifting2            X........X..................X........... 3       3
-shiftdone            X.X..XXXX............................... 6       6
-shiftcnt<0>          X.X..X....X............................. 4       4
-$OpTx$INV$22__$INT   .X.XX.....X.................X........... 5       5
-spidatain<7>         X.X..X....X........X.................... 5       5
-spidatain<6>         X.X..X....X.......X..................... 5       5
-spidatain<5>         X.X..X....X......X...................... 5       5
-spidatain<4>         X.X..X....X.....X....................... 5       5
-spidatain<3>         X.X..X....X....X........................ 5       5
-spidatain<2>         X.X..X....X...X......................... 5       5
-spidatain<1>         X.X..X....X..X.......................... 5       5
-spidatain<0>         X.X..X....XXX........................... 6       6
-shiftcnt<3>          X.X..XXXX.X............................. 7       7
-shiftcnt<2>          X.X..XXX..X............................. 6       6
-shiftcnt<1>          X.X..XX...X............................. 5       5
+spi_mosi             X...X.....XXXXX......XXXXXXXX.X......... 16      16
+shifting2            X............X...............X.......... 3       3
+tc                   .X...XX......X.......................... 4       4
+shiftcnt<0>          X...X....X....X......................... 4       4
+$OpTx$INV$24__$INT   ...X...XX.....X..............X.......... 5       5
+spidatain<7>         X...X....X....X.....X................... 5       5
+spidatain<6>         X...X....X....X....X.................... 5       5
+cpu_Nirq             ..X..................................... 1       1
+spidatain<5>         X...X....X....X...X..................... 5       5
+spidatain<4>         X...X....X....X..X...................... 5       5
+spidatain<3>         X...X....X....X.X....................... 5       5
+spidatain<2>         X...X....X....XX........................ 5       5
 start_shifting/start_shifting_RSTF__$INT 
-                     ..X......X.............................. 2       2
+                     ....X........X.......................... 2       2
                     0----+----1----+----2----+----3----+----4
                               0         0         0         0
 Legend:
@@ -271,8 +280,8 @@ X(@) - Signal used as input (wire-AND input) to the macrocell logic.
     The number of Signals Used may exceed the number of FB Inputs Used due
     to wire-ANDing in the switch matrix.
 *********************************** FB3 ***********************************
-Number of function block inputs used/remaining:               14/40
-Number of signals used by logic mapping into function block:  14
+Number of function block inputs used/remaining:               20/34
+Number of signals used by logic mapping into function block:  20
 Signal              Total   Imp   Exp Unused  Loc     Pwr   Pin   Pin     Pin
 Name                Pt      Pt    Pt  Pt              Mode   #    Type    Use
 (unused)              0       0     0   5     FB3_1               (b)     
@@ -283,31 +292,37 @@ cpu_d<6>              3       0     0   2     FB3_5   STD   12    I/O     I/O
 (unused)              0       0     0   5     FB3_6               (b)     
 (unused)              0       0     0   5     FB3_7               (b)     
 cpu_d<7>              3       0     0   2     FB3_8   STD   13    I/O     I/O
-cpu_Nirq              1       0     0   4     FB3_9   STD   14    I/O     O
+noe                   2       0     0   3     FB3_9   STD   14    I/O     O
 (unused)              0       0     0   5     FB3_10              (b)     
 (unused)              0       0     0   5     FB3_11        18    I/O     I
 (unused)              0       0     0   5     FB3_12              (b)     
 (unused)              0       0     0   5     FB3_13              (b)     
 (unused)              0       0     0   5     FB3_14        19    I/O     I
-(unused)              0       0     0   5     FB3_15        20    I/O     I
+ng                    1       0     0   4     FB3_15  STD   20    I/O     O
 (unused)              0       0     0   5     FB3_16        24    I/O     I
-(unused)              0       0     0   5     FB3_17        22    I/O     I
-(unused)              0       0     0   5     FB3_18              (b)     
+add_dec/XLXN_11       1       0     0   4     FB3_17  STD   22    I/O     I
+cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST
+                      2       0     0   3     FB3_18  STD         (b)     (b)
 
 Signals Used by Logic in Function Block
-  1: Ncs2               6: cpu_rnw           11: spidatain<6> 
-  2: cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST 
-                        7: cs1               12: spidatain<7> 
-  3: cpu_Nphi2          8: ier               13: start_shifting 
-  4: cpu_a<0>           9: shifting2         14: tc 
-  5: cpu_a<1>          10: spidatain<5>     
+  1: Ncs2               8: cpu_a<1>          15: spi_int 
+  2: a10                9: cpu_rnw           16: spidatain<5> 
+  3: a8                10: ier               17: spidatain<6> 
+  4: a9                11: nio_sel           18: spidatain<7> 
+  5: add_dec/XLXN_11   12: nio_stb           19: start_shifting 
+  6: cpu_Nphi2         13: shifting2         20: tc 
+  7: cpu_a<0>          14: slaveinten       
 
 Signal                        1         2         3         4 Signals FB
 Name                0----+----0----+----0----+----0----+----0 Used    Inputs
-cpu_d<5>             X.XXXXX.XX..X........................... 9       9
-cpu_d<6>             X.XXXXXX..X............................. 8       8
-cpu_d<7>             X.XXXXX....X.X.......................... 8       8
-cpu_Nirq             .X...................................... 1       1
+cpu_d<5>             X....XXXX...X..X..X..................... 8       8
+cpu_d<6>             X....XXXXX......X....................... 7       7
+cpu_d<7>             X....XXXX........X.X.................... 7       7
+noe                  ....X.....XX............................ 3       3
+ng                   X.........XX............................ 3       3
+add_dec/XLXN_11      .XXX.......X............................ 4       4
+cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST 
+                     .........X...XX....X.................... 4       4
                     0----+----1----+----2----+----3----+----4
                               0         0         0         0
 Legend:
@@ -325,59 +340,64 @@ X(@) - Signal used as input (wire-AND input) to the macrocell logic.
     The number of Signals Used may exceed the number of FB Inputs Used due
     to wire-ANDing in the switch matrix.
 *********************************** FB4 ***********************************
-Number of function block inputs used/remaining:               31/23
-Number of signals used by logic mapping into function block:  31
+Number of function block inputs used/remaining:               34/20
+Number of signals used by logic mapping into function block:  34
 Signal              Total   Imp   Exp Unused  Loc     Pwr   Pin   Pin     Pin
 Name                Pt      Pt    Pt  Pt              Mode   #    Type    Use
-cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST
-                      2       0     0   3     FB4_1   STD         (b)     (b)
-tc                    3       0     0   2     FB4_2   STD   25    I/O     (b)
+shiftdone             3       0     0   2     FB4_1   STD         (b)     (b)
+b8                    1       0     0   4     FB4_2   STD   25    I/O     O
 start_shifting        4       0     0   1     FB4_3   STD         (b)     (b)
 spidataout<7>         4       0     0   1     FB4_4   STD         (b)     (b)
-spidataout<6>         4       0     0   1     FB4_5   STD   26    I/O     (b)
-spidataout<5>         4       0     0   1     FB4_6   STD         (b)     (b)
-spidataout<4>         4       0     0   1     FB4_7   STD         (b)     (b)
-spidataout<3>         4       0     0   1     FB4_8   STD   27    I/O     (b)
-ier                   5       0     0   0     FB4_9   STD         (b)     (b)
-(unused)              0       0     0   5     FB4_10              (b)     
+b9                    1       0     0   4     FB4_5   STD   26    I/O     O
+spidataout<6>         4       0     0   1     FB4_6   STD         (b)     (b)
+spidataout<5>         4       0     0   1     FB4_7   STD         (b)     (b)
+b10                   1       0     0   4     FB4_8   STD   27    I/O     O
+spidataout<4>         4       0     0   1     FB4_9   STD         (b)     (b)
+spidatain<1>          4       0     0   1     FB4_10  STD         (b)     (b)
 spi_Nsel              5       0     0   0     FB4_11  STD   28    I/O     O
-(unused)              0       0     0   5     FB4_12              (b)     
-(unused)              0       0     0   5     FB4_13              (b)     
+spidatain<0>          4       0     0   1     FB4_12  STD         (b)     (b)
+shiftcnt<3>           4       0     0   1     FB4_13  STD         (b)     (b)
 led                   1       0     0   4     FB4_14  STD   29    I/O     O
-(unused)              0       0     0   5     FB4_15        33    I/O     
-(unused)              0       0   \/1   4     FB4_16              (b)     (b)
+shiftcnt<2>           4       0     0   1     FB4_15  STD   33    I/O     (b)
+shiftcnt<1>           4       0   \/1   0     FB4_16  STD         (b)     (b)
 spi_sclk              6       1<-   0   0     FB4_17  STD   34    I/O     O
-(unused)              0       0     0   5     FB4_18              (b)     
+ier                   5       0     0   0     FB4_18  STD         (b)     (b)
 
 Signals Used by Logic in Function Block
-  1: $OpTx$INV$22__$INT 
-                       12: cpu_a<0>          22: spi_Nsel 
-  2: cpu_d<0>.PIN      13: cpu_a<1>          23: spi_int 
-  3: cpu_d<3>.PIN      14: cpu_rnw           24: spidataout<3> 
-  4: cpu_d<4>.PIN      15: cs1               25: spidataout<4> 
-  5: cpu_d<5>.PIN      16: frx               26: spidataout<5> 
-  6: cpu_d<6>.PIN      17: ier               27: spidataout<6> 
-  7: cpu_d<7>.PIN      18: shiftcnt<0>       28: spidataout<7> 
-  8: Ncs2              19: shiftdone         29: start_shifting 
-  9: cpha              20: shifting2         30: start_shifting/start_shifting_RSTF__$INT 
- 10: cpol              21: slaveinten        31: tc 
- 11: cpu_Nres         
+  1: $OpTx$INV$24__$INT 
+                       13: cpu_Nres          24: shiftdone 
+  2: cpu_d<0>.PIN      14: cpu_a<0>          25: shifting2 
+  3: cpu_d<4>.PIN      15: cpu_a<1>          26: spi_Nsel 
+  4: cpu_d<5>.PIN      16: cpu_rnw           27: spi_miso 
+  5: cpu_d<6>.PIN      17: frx               28: spidatain<0> 
+  6: cpu_d<7>.PIN      18: ier               29: spidataout<4> 
+  7: Ncs2              19: nio_sel           30: spidataout<5> 
+  8: a10               20: shiftcnt<0>       31: spidataout<6> 
+  9: a8                21: shiftcnt<1>       32: spidataout<7> 
+ 10: a9                22: shiftcnt<2>       33: start_shifting 
+ 11: cpha              23: shiftcnt<3>       34: start_shifting/start_shifting_RSTF__$INT 
+ 12: cpol             
 
 Signal                        1         2         3         4 Signals FB
 Name                0----+----0----+----0----+----0----+----0 Used    Inputs
-cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST 
-                     ................X...X.X.......X......... 4       4
-tc                   .......X...XX.X...X..................... 5       5
-start_shifting       .......X...XXXXX............XX.......... 8       8
-spidataout<7>        ......XX..XXXXX............X............ 8       8
-spidataout<6>        .....X.X..XXXXX...........X............. 8       8
-spidataout<5>        ....X..X..XXXXX..........X.............. 8       8
-spidataout<4>        ...X...X..XXXXX.........X............... 8       8
-spidataout<3>        ..X....X..XXXXX........X................ 8       8
-ier                  .....X.X..XXXXX.X....................... 8       8
-spi_Nsel             .X.....X..XXXXX......X.................. 8       8
-led                  ...................X.X......X........... 3       3
-spi_sclk             X.......XXX......XXX.................... 7       7
+shiftdone            X...........X......XXXX................. 6       6
+b8                   ........X.........X..................... 2       2
+start_shifting       ......X......XXXX...............XX...... 7       7
+spidataout<7>        .....XX.....XXXX...............X........ 7       7
+b9                   .........X........X..................... 2       2
+spidataout<6>        ....X.X.....XXXX..............X......... 7       7
+spidataout<5>        ...X..X.....XXXX.............X.......... 7       7
+b10                  .......X..........X..................... 2       2
+spidataout<4>        ..X...X.....XXXX............X........... 7       7
+spidatain<1>         X...........X......X....X..X............ 5       5
+spi_Nsel             .X....X.....XXXX.........X.............. 7       7
+spidatain<0>         X...........X......X....XXX............. 6       6
+shiftcnt<3>          X...........X......XXXX.X............... 7       7
+led                  ........................XX......X....... 3       3
+shiftcnt<2>          X...........X......XXX..X............... 6       6
+shiftcnt<1>          X...........X......XX...X............... 5       5
+spi_sclk             X.........XXX......X...XX............... 7       7
+ier                  ....X.X.....XXXX.X...................... 7       7
                     0----+----1----+----2----+----3----+----4
                               0         0         0         0
 Legend:
@@ -398,23 +418,31 @@ X(@) - Signal used as input (wire-AND input) to the macrocell logic.
 ; Implemented Equations.
 
 
-$OpTx$INV$22__$INT <= ((ece AND NOT extclk)
+$OpTx$INV$24__$INT <= ((ece AND NOT extclk)
 	OR (NOT ece AND NOT cpu_Nphi2)
 	OR (NOT start_shifting AND NOT shifting2));
 
 
 
+FDCPE_add_dec/XLXN_11: FDCPE port map (add_dec/XLXN_11,add_dec/XLXN_11_D,extclk,'0','0');
+add_dec/XLXN_11_D <= (NOT nio_stb AND a9 AND a8 AND a10);
 
 
-FTCPE_cpha: FTCPE port map (cpha,cpha_T,cpha_C,NOT cpu_Nres,'0',NOT cpu_rnw);
+b10 <= (a10 AND nio_sel);
+
+
+b8 <= (a8 AND nio_sel);
+
+
+b9 <= (a9 AND nio_sel);
+
+FTCPE_cpha: FTCPE port map (cpha,cpha_T,Ncs2,NOT cpu_Nres,'0',NOT cpu_rnw);
 cpha_T <= ((cpha AND NOT cpu_a(1) AND cpu_a(0) AND NOT cpu_d(0).PIN)
 	OR (NOT cpha AND NOT cpu_a(1) AND cpu_a(0) AND cpu_d(0).PIN));
-cpha_C <= NOT ((cs1 AND NOT Ncs2));
 
-FTCPE_cpol: FTCPE port map (cpol,cpol_T,cpol_C,NOT cpu_Nres,'0',NOT cpu_rnw);
+FTCPE_cpol: FTCPE port map (cpol,cpol_T,Ncs2,NOT cpu_Nres,'0',NOT cpu_rnw);
 cpol_T <= ((cpol AND NOT cpu_a(1) AND cpu_a(0) AND NOT cpu_d(1).PIN)
 	OR (NOT cpol AND NOT cpu_a(1) AND cpu_a(0) AND cpu_d(1).PIN));
-cpol_C <= NOT ((cs1 AND NOT Ncs2));
 
 
 cpu_Nirq_I <= '0';
@@ -425,128 +453,122 @@ cpu_Nirq_OE <= cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST;
 cpu_Nirq_OBUFE/cpu_Nirq_OBUFE_TRST <= ((ier AND tc)
 	OR (slaveinten AND NOT spi_int));
 
-FTCPE_divisor0: FTCPE port map (divisor(0),divisor_T(0),divisor_C(0),NOT cpu_Nres,'0',NOT cpu_rnw);
+FTCPE_divisor0: FTCPE port map (divisor(0),divisor_T(0),Ncs2,NOT cpu_Nres,'0',NOT cpu_rnw);
 divisor_T(0) <= ((divisor(0) AND cpu_a(1) AND NOT cpu_a(0) AND NOT cpu_d(0).PIN)
 	OR (NOT divisor(0) AND cpu_a(1) AND NOT cpu_a(0) AND cpu_d(0).PIN));
-divisor_C(0) <= NOT ((cs1 AND NOT Ncs2));
 
-FTCPE_divisor1: FTCPE port map (divisor(1),divisor_T(1),divisor_C(1),NOT cpu_Nres,'0',NOT cpu_rnw);
+FTCPE_divisor1: FTCPE port map (divisor(1),divisor_T(1),Ncs2,NOT cpu_Nres,'0',NOT cpu_rnw);
 divisor_T(1) <= ((divisor(1) AND cpu_a(1) AND NOT cpu_a(0) AND NOT cpu_d(1).PIN)
 	OR (NOT divisor(1) AND cpu_a(1) AND NOT cpu_a(0) AND cpu_d(1).PIN));
-divisor_C(1) <= NOT ((cs1 AND NOT Ncs2));
 
-FTCPE_divisor2: FTCPE port map (divisor(2),divisor_T(2),divisor_C(2),NOT cpu_Nres,'0',NOT cpu_rnw);
+FTCPE_divisor2: FTCPE port map (divisor(2),divisor_T(2),Ncs2,NOT cpu_Nres,'0',NOT cpu_rnw);
 divisor_T(2) <= ((divisor(2) AND cpu_a(1) AND NOT cpu_a(0) AND NOT cpu_d(2).PIN)
 	OR (NOT divisor(2) AND cpu_a(1) AND NOT cpu_a(0) AND cpu_d(2).PIN));
-divisor_C(2) <= NOT ((cs1 AND NOT Ncs2));
 
-FTCPE_ece: FTCPE port map (ece,ece_T,ece_C,NOT cpu_Nres,'0',NOT cpu_rnw);
+FTCPE_ece: FTCPE port map (ece,ece_T,Ncs2,NOT cpu_Nres,'0',NOT cpu_rnw);
 ece_T <= ((ece AND NOT cpu_a(1) AND cpu_a(0) AND NOT cpu_d(2).PIN)
 	OR (NOT ece AND NOT cpu_a(1) AND cpu_a(0) AND cpu_d(2).PIN));
-ece_C <= NOT ((cs1 AND NOT Ncs2));
 
-FTCPE_frx: FTCPE port map (frx,frx_T,frx_C,NOT cpu_Nres,'0',NOT cpu_rnw);
+FTCPE_frx: FTCPE port map (frx,frx_T,Ncs2,NOT cpu_Nres,'0',NOT cpu_rnw);
 frx_T <= ((frx AND NOT cpu_a(1) AND cpu_a(0) AND NOT cpu_d(4).PIN)
 	OR (NOT frx AND NOT cpu_a(1) AND cpu_a(0) AND cpu_d(4).PIN));
-frx_C <= NOT ((cs1 AND NOT Ncs2));
 
-FTCPE_ier: FTCPE port map (ier,ier_T,ier_C,NOT cpu_Nres,'0',NOT cpu_rnw);
+FTCPE_ier: FTCPE port map (ier,ier_T,Ncs2,NOT cpu_Nres,'0',NOT cpu_rnw);
 ier_T <= ((ier AND NOT cpu_a(1) AND cpu_a(0) AND NOT cpu_d(6).PIN)
 	OR (NOT ier AND NOT cpu_a(1) AND cpu_a(0) AND cpu_d(6).PIN));
-ier_C <= NOT ((cs1 AND NOT Ncs2));
 
 
-cpu_d_I(0) <= ((cpu_rnw AND spi_Nsel AND cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+cpu_d_I(0) <= ((NOT Ncs2 AND cpu_rnw AND spi_Nsel AND cpu_a(1) AND 
 	cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND cpha AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
-	cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND divisor(0) AND cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+	OR (NOT Ncs2 AND cpu_rnw AND cpha AND NOT cpu_a(1) AND cpu_a(0) AND 
+	cpu_Nphi2)
+	OR (NOT Ncs2 AND cpu_rnw AND divisor(0) AND cpu_a(1) AND 
 	NOT cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND spidatain(0) AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+	OR (NOT Ncs2 AND cpu_rnw AND spidatain(0) AND NOT cpu_a(1) AND 
 	NOT cpu_a(0) AND cpu_Nphi2));
 cpu_d(0) <= cpu_d_I(0) when cpu_d_OE(0) = '1' else 'Z';
-cpu_d_OE(0) <= (cpu_rnw AND cs1 AND NOT Ncs2 AND cpu_Nphi2);
+cpu_d_OE(0) <= (NOT Ncs2 AND cpu_rnw AND cpu_Nphi2);
 
 
-cpu_d_I(1) <= ((cpu_rnw AND cpol AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
-	cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND divisor(1) AND cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+cpu_d_I(1) <= ((NOT Ncs2 AND cpu_rnw AND cpol AND NOT cpu_a(1) AND cpu_a(0) AND 
+	cpu_Nphi2)
+	OR (NOT Ncs2 AND cpu_rnw AND divisor(1) AND cpu_a(1) AND 
 	NOT cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND spidatain(1) AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+	OR (NOT Ncs2 AND cpu_rnw AND spidatain(1) AND NOT cpu_a(1) AND 
 	NOT cpu_a(0) AND cpu_Nphi2));
 cpu_d(1) <= cpu_d_I(1) when cpu_d_OE(1) = '1' else 'Z';
-cpu_d_OE(1) <= (cpu_rnw AND cs1 AND NOT Ncs2 AND cpu_Nphi2);
+cpu_d_OE(1) <= (NOT Ncs2 AND cpu_rnw AND cpu_Nphi2);
 
 
-cpu_d_I(2) <= ((cpu_rnw AND ece AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
-	cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND divisor(2) AND cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+cpu_d_I(2) <= ((NOT Ncs2 AND cpu_rnw AND ece AND NOT cpu_a(1) AND cpu_a(0) AND 
+	cpu_Nphi2)
+	OR (NOT Ncs2 AND cpu_rnw AND divisor(2) AND cpu_a(1) AND 
 	NOT cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND spidatain(2) AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+	OR (NOT Ncs2 AND cpu_rnw AND spidatain(2) AND NOT cpu_a(1) AND 
 	NOT cpu_a(0) AND cpu_Nphi2));
 cpu_d(2) <= cpu_d_I(2) when cpu_d_OE(2) = '1' else 'Z';
-cpu_d_OE(2) <= (cpu_rnw AND cs1 AND NOT Ncs2 AND cpu_Nphi2);
+cpu_d_OE(2) <= (NOT Ncs2 AND cpu_rnw AND cpu_Nphi2);
 
 
-cpu_d_I(3) <= ((cpu_rnw AND tmo AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
-	cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND spidatain(3) AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+cpu_d_I(3) <= ((NOT Ncs2 AND cpu_rnw AND tmo AND NOT cpu_a(1) AND cpu_a(0) AND 
+	cpu_Nphi2)
+	OR (NOT Ncs2 AND cpu_rnw AND spidatain(3) AND NOT cpu_a(1) AND 
 	NOT cpu_a(0) AND cpu_Nphi2));
 cpu_d(3) <= cpu_d_I(3) when cpu_d_OE(3) = '1' else 'Z';
-cpu_d_OE(3) <= (cpu_rnw AND cs1 AND NOT Ncs2 AND cpu_Nphi2);
+cpu_d_OE(3) <= (NOT Ncs2 AND cpu_rnw AND cpu_Nphi2);
 
 
-cpu_d_I(4) <= ((cpu_rnw AND frx AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+cpu_d_I(4) <= ((NOT Ncs2 AND cpu_rnw AND frx AND NOT cpu_a(1) AND cpu_a(0) AND 
+	cpu_Nphi2)
+	OR (NOT Ncs2 AND cpu_rnw AND slaveinten AND cpu_a(1) AND 
 	cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND slaveinten AND cpu_a(1) AND cs1 AND NOT Ncs2 AND 
-	cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND spidatain(4) AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+	OR (NOT Ncs2 AND cpu_rnw AND spidatain(4) AND NOT cpu_a(1) AND 
 	NOT cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND cpu_a(1) AND cs1 AND NOT Ncs2 AND NOT cpu_a(0) AND 
-	NOT spi_int AND cpu_Nphi2));
+	OR (NOT Ncs2 AND cpu_rnw AND cpu_a(1) AND NOT cpu_a(0) AND NOT spi_int AND 
+	cpu_Nphi2));
 cpu_d(4) <= cpu_d_I(4) when cpu_d_OE(4) = '1' else 'Z';
-cpu_d_OE(4) <= (cpu_rnw AND cs1 AND NOT Ncs2 AND cpu_Nphi2);
+cpu_d_OE(4) <= (NOT Ncs2 AND cpu_rnw AND cpu_Nphi2);
 
 
-cpu_d_I(5) <= ((cpu_rnw AND spidatain(5) AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+cpu_d_I(5) <= ((NOT Ncs2 AND cpu_rnw AND spidatain(5) AND NOT cpu_a(1) AND 
 	NOT cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND NOT cpu_a(1) AND start_shifting AND cs1 AND 
-	NOT Ncs2 AND cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND cpu_a(0) AND 
+	OR (NOT Ncs2 AND cpu_rnw AND NOT cpu_a(1) AND start_shifting AND 
+	cpu_a(0) AND cpu_Nphi2)
+	OR (NOT Ncs2 AND cpu_rnw AND NOT cpu_a(1) AND cpu_a(0) AND 
 	shifting2 AND cpu_Nphi2));
 cpu_d(5) <= cpu_d_I(5) when cpu_d_OE(5) = '1' else 'Z';
-cpu_d_OE(5) <= (cpu_rnw AND cs1 AND NOT Ncs2 AND cpu_Nphi2);
+cpu_d_OE(5) <= (NOT Ncs2 AND cpu_rnw AND cpu_Nphi2);
 
 
-cpu_d_I(6) <= ((cpu_rnw AND ier AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
-	cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND spidatain(6) AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+cpu_d_I(6) <= ((NOT Ncs2 AND cpu_rnw AND ier AND NOT cpu_a(1) AND cpu_a(0) AND 
+	cpu_Nphi2)
+	OR (NOT Ncs2 AND cpu_rnw AND spidatain(6) AND NOT cpu_a(1) AND 
 	NOT cpu_a(0) AND cpu_Nphi2));
 cpu_d(6) <= cpu_d_I(6) when cpu_d_OE(6) = '1' else 'Z';
-cpu_d_OE(6) <= (cpu_rnw AND cs1 AND NOT Ncs2 AND cpu_Nphi2);
+cpu_d_OE(6) <= (NOT Ncs2 AND cpu_rnw AND cpu_Nphi2);
 
 
-cpu_d_I(7) <= ((cpu_rnw AND spidatain(7) AND NOT cpu_a(1) AND cs1 AND NOT Ncs2 AND 
+cpu_d_I(7) <= ((NOT Ncs2 AND cpu_rnw AND spidatain(7) AND NOT cpu_a(1) AND 
 	NOT cpu_a(0) AND cpu_Nphi2)
-	OR (cpu_rnw AND NOT cpu_a(1) AND tc AND cs1 AND NOT Ncs2 AND 
-	cpu_a(0) AND cpu_Nphi2));
+	OR (NOT Ncs2 AND cpu_rnw AND NOT cpu_a(1) AND tc AND cpu_a(0) AND 
+	cpu_Nphi2));
 cpu_d(7) <= cpu_d_I(7) when cpu_d_OE(7) = '1' else 'Z';
-cpu_d_OE(7) <= (cpu_rnw AND cs1 AND NOT Ncs2 AND cpu_Nphi2);
+cpu_d_OE(7) <= (NOT Ncs2 AND cpu_rnw AND cpu_Nphi2);
 
-FDCPE_spi_mosi: FDCPE port map (spi_mosi_I,spi_mosi,NOT $OpTx$INV$22__$INT,'0',NOT cpu_Nres);
+FDCPE_spi_mosi: FDCPE port map (spi_mosi_I,spi_mosi,NOT $OpTx$INV$24__$INT,'0',NOT cpu_Nres);
 spi_mosi <= ((EXP6_.EXP)
 	OR (shifting2.EXP)
-	OR (shiftcnt(3) AND shiftcnt(2) AND NOT shiftcnt(1) AND 
-	NOT shiftdone AND NOT spidataout(1) AND shifting2)
-	OR (NOT shiftcnt(3) AND shiftcnt(2) AND NOT shiftcnt(1) AND 
-	NOT shiftdone AND NOT spidataout(5) AND shifting2));
+	OR (shiftcnt(3) AND shiftcnt(2) AND shiftcnt(1) AND 
+	NOT shiftdone AND NOT spidataout(0) AND shifting2)
+	OR (NOT shiftcnt(3) AND shiftcnt(2) AND shiftcnt(1) AND 
+	NOT shiftdone AND NOT spidataout(4) AND shifting2));
 spi_mosi <= spi_mosi_I when spi_mosi_OE = '1' else 'Z';
 spi_mosi_OE <= NOT tmo;
 
-FDCPE_spi_sclk: FDCPE port map (spi_sclk,spi_sclk_D,NOT $OpTx$INV$22__$INT,spi_sclk_CLR,spi_sclk_PRE);
+FDCPE_spi_sclk: FDCPE port map (spi_sclk,spi_sclk_D,NOT $OpTx$INV$24__$INT,spi_sclk_CLR,spi_sclk_PRE);
 spi_sclk_D <= cpol
 	 XOR 
-spi_sclk_D <= ((EXP7_.EXP)
+spi_sclk_D <= ((shiftcnt(1).EXP)
 	OR (cpu_Nres AND NOT cpha AND shiftcnt(0) AND NOT shiftdone AND 
 	shifting2));
 spi_sclk_CLR <= (NOT cpu_Nres AND NOT cpol);
@@ -555,144 +577,138 @@ spi_sclk_PRE <= (NOT cpu_Nres AND cpol);
 
 led <= (spi_Nsel AND NOT start_shifting AND NOT shifting2);
 
-FDCPE_shiftcnt0: FDCPE port map (shiftcnt(0),shiftcnt_D(0),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0');
+
+ng <= (Ncs2 AND nio_stb AND nio_sel);
+
+
+noe <= NOT (((NOT nio_stb AND add_dec/XLXN_11)
+	OR (NOT nio_sel AND add_dec/XLXN_11)));
+
+FDCPE_shiftcnt0: FDCPE port map (shiftcnt(0),shiftcnt_D(0),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0');
 shiftcnt_D(0) <= (NOT shiftcnt(0) AND shifting2);
 
-FDCPE_shiftcnt1: FDCPE port map (shiftcnt(1),shiftcnt_D(1),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0');
+FDCPE_shiftcnt1: FDCPE port map (shiftcnt(1),shiftcnt_D(1),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0');
 shiftcnt_D(1) <= ((shiftcnt(0) AND NOT shiftcnt(1) AND shifting2)
 	OR (NOT shiftcnt(0) AND shiftcnt(1) AND shifting2));
 
-FTCPE_shiftcnt2: FTCPE port map (shiftcnt(2),shiftcnt_T(2),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0');
+FTCPE_shiftcnt2: FTCPE port map (shiftcnt(2),shiftcnt_T(2),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0');
 shiftcnt_T(2) <= ((shiftcnt(2) AND NOT shifting2)
 	OR (shiftcnt(0) AND shiftcnt(1) AND shifting2));
 
-FTCPE_shiftcnt3: FTCPE port map (shiftcnt(3),shiftcnt_T(3),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0');
+FTCPE_shiftcnt3: FTCPE port map (shiftcnt(3),shiftcnt_T(3),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0');
 shiftcnt_T(3) <= ((shiftcnt(3) AND NOT shifting2)
 	OR (shiftcnt(2) AND shiftcnt(0) AND shiftcnt(1) AND 
 	shifting2));
 
-FDCPE_shiftdone: FDCPE port map (shiftdone,shiftdone_D,NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0');
+FDCPE_shiftdone: FDCPE port map (shiftdone,shiftdone_D,NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0');
 shiftdone_D <= (shiftcnt(3) AND shiftcnt(2) AND shiftcnt(0) AND 
 	shiftcnt(1));
 
-FDCPE_shifting2: FDCPE port map (shifting2,shifting2_D,NOT $OpTx$INV$22__$INT,'0','0');
+FDCPE_shifting2: FDCPE port map (shifting2,shifting2_D,NOT $OpTx$INV$24__$INT,'0','0');
 shifting2_D <= (NOT shiftdone AND start_shifting);
 
-FTCPE_slaveinten: FTCPE port map (slaveinten,slaveinten_T,slaveinten_C,NOT cpu_Nres,'0',NOT cpu_rnw);
+FTCPE_slaveinten: FTCPE port map (slaveinten,slaveinten_T,Ncs2,NOT cpu_Nres,'0',NOT cpu_rnw);
 slaveinten_T <= ((slaveinten AND cpu_a(1) AND cpu_a(0) AND NOT cpu_d(4).PIN)
 	OR (NOT slaveinten AND cpu_a(1) AND cpu_a(0) AND cpu_d(4).PIN));
-slaveinten_C <= NOT ((cs1 AND NOT Ncs2));
 
-FTCPE_spi_Nsel: FTCPE port map (spi_Nsel,spi_Nsel_T,spi_Nsel_C,'0',NOT cpu_Nres,NOT cpu_rnw);
+FTCPE_spi_Nsel: FTCPE port map (spi_Nsel,spi_Nsel_T,Ncs2,'0',NOT cpu_Nres,NOT cpu_rnw);
 spi_Nsel_T <= ((spi_Nsel AND cpu_a(1) AND cpu_a(0) AND NOT cpu_d(0).PIN)
 	OR (NOT spi_Nsel AND cpu_a(1) AND cpu_a(0) AND cpu_d(0).PIN));
-spi_Nsel_C <= NOT ((cs1 AND NOT Ncs2));
 
-FDCPE_spidatain0: FDCPE port map (spidatain(0),spidatain_D(0),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0',spidatain_CE(0));
+FDCPE_spidatain0: FDCPE port map (spidatain(0),spidatain_D(0),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0',spidatain_CE(0));
 spidatain_D(0) <= (NOT spi_Nsel AND spi_miso);
 spidatain_CE(0) <= (shiftcnt(0) AND shifting2);
 
-FDCPE_spidatain1: FDCPE port map (spidatain(1),spidatain(0),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0',spidatain_CE(1));
+FDCPE_spidatain1: FDCPE port map (spidatain(1),spidatain(0),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0',spidatain_CE(1));
 spidatain_CE(1) <= (shiftcnt(0) AND shifting2);
 
-FDCPE_spidatain2: FDCPE port map (spidatain(2),spidatain(1),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0',spidatain_CE(2));
+FDCPE_spidatain2: FDCPE port map (spidatain(2),spidatain(1),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0',spidatain_CE(2));
 spidatain_CE(2) <= (shiftcnt(0) AND shifting2);
 
-FDCPE_spidatain3: FDCPE port map (spidatain(3),spidatain(2),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0',spidatain_CE(3));
+FDCPE_spidatain3: FDCPE port map (spidatain(3),spidatain(2),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0',spidatain_CE(3));
 spidatain_CE(3) <= (shiftcnt(0) AND shifting2);
 
-FDCPE_spidatain4: FDCPE port map (spidatain(4),spidatain(3),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0',spidatain_CE(4));
+FDCPE_spidatain4: FDCPE port map (spidatain(4),spidatain(3),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0',spidatain_CE(4));
 spidatain_CE(4) <= (shiftcnt(0) AND shifting2);
 
-FDCPE_spidatain5: FDCPE port map (spidatain(5),spidatain(4),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0',spidatain_CE(5));
+FDCPE_spidatain5: FDCPE port map (spidatain(5),spidatain(4),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0',spidatain_CE(5));
 spidatain_CE(5) <= (shiftcnt(0) AND shifting2);
 
-FDCPE_spidatain6: FDCPE port map (spidatain(6),spidatain(5),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0',spidatain_CE(6));
+FDCPE_spidatain6: FDCPE port map (spidatain(6),spidatain(5),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0',spidatain_CE(6));
 spidatain_CE(6) <= (shiftcnt(0) AND shifting2);
 
-FDCPE_spidatain7: FDCPE port map (spidatain(7),spidatain(6),NOT $OpTx$INV$22__$INT,NOT cpu_Nres,'0',spidatain_CE(7));
+FDCPE_spidatain7: FDCPE port map (spidatain(7),spidatain(6),NOT $OpTx$INV$24__$INT,NOT cpu_Nres,'0',spidatain_CE(7));
 spidatain_CE(7) <= (shiftcnt(0) AND shifting2);
 
-FTCPE_spidataout0: FTCPE port map (spidataout(0),spidataout_T(0),spidataout_C(0),'0','0',spidataout_CE(0));
+FTCPE_spidataout0: FTCPE port map (spidataout(0),spidataout_T(0),Ncs2,'0','0',spidataout_CE(0));
 spidataout_T(0) <= ((NOT cpu_a(1) AND spidataout(0) AND NOT cpu_a(0) AND 
 	NOT cpu_d(0).PIN)
 	OR (NOT cpu_a(1) AND NOT spidataout(0) AND NOT cpu_a(0) AND 
 	cpu_d(0).PIN));
-spidataout_C(0) <= NOT ((cs1 AND NOT Ncs2));
 spidataout_CE(0) <= (cpu_Nres AND NOT cpu_rnw);
 
-FTCPE_spidataout1: FTCPE port map (spidataout(1),spidataout_T(1),spidataout_C(1),'0','0',spidataout_CE(1));
+FTCPE_spidataout1: FTCPE port map (spidataout(1),spidataout_T(1),Ncs2,'0','0',spidataout_CE(1));
 spidataout_T(1) <= ((NOT cpu_a(1) AND spidataout(1) AND NOT cpu_a(0) AND 
 	NOT cpu_d(1).PIN)
 	OR (NOT cpu_a(1) AND NOT spidataout(1) AND NOT cpu_a(0) AND 
 	cpu_d(1).PIN));
-spidataout_C(1) <= NOT ((cs1 AND NOT Ncs2));
 spidataout_CE(1) <= (cpu_Nres AND NOT cpu_rnw);
 
-FTCPE_spidataout2: FTCPE port map (spidataout(2),spidataout_T(2),spidataout_C(2),'0','0',spidataout_CE(2));
+FTCPE_spidataout2: FTCPE port map (spidataout(2),spidataout_T(2),Ncs2,'0','0',spidataout_CE(2));
 spidataout_T(2) <= ((NOT cpu_a(1) AND spidataout(2) AND NOT cpu_a(0) AND 
 	NOT cpu_d(2).PIN)
 	OR (NOT cpu_a(1) AND NOT spidataout(2) AND NOT cpu_a(0) AND 
 	cpu_d(2).PIN));
-spidataout_C(2) <= NOT ((cs1 AND NOT Ncs2));
 spidataout_CE(2) <= (cpu_Nres AND NOT cpu_rnw);
 
-FTCPE_spidataout3: FTCPE port map (spidataout(3),spidataout_T(3),spidataout_C(3),'0','0',spidataout_CE(3));
+FTCPE_spidataout3: FTCPE port map (spidataout(3),spidataout_T(3),Ncs2,'0','0',spidataout_CE(3));
 spidataout_T(3) <= ((NOT cpu_a(1) AND spidataout(3) AND NOT cpu_a(0) AND 
 	NOT cpu_d(3).PIN)
 	OR (NOT cpu_a(1) AND NOT spidataout(3) AND NOT cpu_a(0) AND 
 	cpu_d(3).PIN));
-spidataout_C(3) <= NOT ((cs1 AND NOT Ncs2));
 spidataout_CE(3) <= (cpu_Nres AND NOT cpu_rnw);
 
-FTCPE_spidataout4: FTCPE port map (spidataout(4),spidataout_T(4),spidataout_C(4),'0','0',spidataout_CE(4));
+FTCPE_spidataout4: FTCPE port map (spidataout(4),spidataout_T(4),Ncs2,'0','0',spidataout_CE(4));
 spidataout_T(4) <= ((NOT cpu_a(1) AND spidataout(4) AND NOT cpu_a(0) AND 
 	NOT cpu_d(4).PIN)
 	OR (NOT cpu_a(1) AND NOT spidataout(4) AND NOT cpu_a(0) AND 
 	cpu_d(4).PIN));
-spidataout_C(4) <= NOT ((cs1 AND NOT Ncs2));
 spidataout_CE(4) <= (cpu_Nres AND NOT cpu_rnw);
 
-FTCPE_spidataout5: FTCPE port map (spidataout(5),spidataout_T(5),spidataout_C(5),'0','0',spidataout_CE(5));
+FTCPE_spidataout5: FTCPE port map (spidataout(5),spidataout_T(5),Ncs2,'0','0',spidataout_CE(5));
 spidataout_T(5) <= ((NOT cpu_a(1) AND spidataout(5) AND NOT cpu_a(0) AND 
 	NOT cpu_d(5).PIN)
 	OR (NOT cpu_a(1) AND NOT spidataout(5) AND NOT cpu_a(0) AND 
 	cpu_d(5).PIN));
-spidataout_C(5) <= NOT ((cs1 AND NOT Ncs2));
 spidataout_CE(5) <= (cpu_Nres AND NOT cpu_rnw);
 
-FTCPE_spidataout6: FTCPE port map (spidataout(6),spidataout_T(6),spidataout_C(6),'0','0',spidataout_CE(6));
+FTCPE_spidataout6: FTCPE port map (spidataout(6),spidataout_T(6),Ncs2,'0','0',spidataout_CE(6));
 spidataout_T(6) <= ((NOT cpu_a(1) AND spidataout(6) AND NOT cpu_a(0) AND 
 	NOT cpu_d(6).PIN)
 	OR (NOT cpu_a(1) AND NOT spidataout(6) AND NOT cpu_a(0) AND 
 	cpu_d(6).PIN));
-spidataout_C(6) <= NOT ((cs1 AND NOT Ncs2));
 spidataout_CE(6) <= (cpu_Nres AND NOT cpu_rnw);
 
-FTCPE_spidataout7: FTCPE port map (spidataout(7),spidataout_T(7),spidataout_C(7),'0','0',spidataout_CE(7));
+FTCPE_spidataout7: FTCPE port map (spidataout(7),spidataout_T(7),Ncs2,'0','0',spidataout_CE(7));
 spidataout_T(7) <= ((NOT cpu_a(1) AND spidataout(7) AND NOT cpu_a(0) AND 
 	NOT cpu_d(7).PIN)
 	OR (NOT cpu_a(1) AND NOT spidataout(7) AND NOT cpu_a(0) AND 
 	cpu_d(7).PIN));
-spidataout_C(7) <= NOT ((cs1 AND NOT Ncs2));
 spidataout_CE(7) <= (cpu_Nres AND NOT cpu_rnw);
 
-FTCPE_start_shifting: FTCPE port map (start_shifting,start_shifting_T,start_shifting_C,NOT start_shifting/start_shifting_RSTF__$INT,'0');
+FTCPE_start_shifting: FTCPE port map (start_shifting,start_shifting_T,Ncs2,NOT start_shifting/start_shifting_RSTF__$INT,'0');
 start_shifting_T <= ((NOT cpu_rnw AND NOT cpu_a(1) AND NOT start_shifting AND NOT cpu_a(0))
 	OR (frx AND NOT cpu_a(1) AND NOT start_shifting AND NOT cpu_a(0)));
-start_shifting_C <= NOT ((cs1 AND NOT Ncs2));
 
 
 start_shifting/start_shifting_RSTF__$INT <= (cpu_Nres AND NOT shiftdone);
 
-FDCPE_tc: FDCPE port map (tc,'0',tc_C,'0',shiftdone,tc_CE);
-tc_C <= NOT ((cs1 AND NOT Ncs2));
+FDCPE_tc: FDCPE port map (tc,'0',Ncs2,'0',shiftdone,tc_CE);
 tc_CE <= (NOT cpu_a(1) AND NOT cpu_a(0));
 
-FTCPE_tmo: FTCPE port map (tmo,tmo_T,tmo_C,NOT cpu_Nres,'0',NOT cpu_rnw);
+FTCPE_tmo: FTCPE port map (tmo,tmo_T,Ncs2,NOT cpu_Nres,'0',NOT cpu_rnw);
 tmo_T <= ((tmo AND NOT cpu_a(1) AND cpu_a(0) AND NOT cpu_d(3).PIN)
 	OR (NOT tmo AND NOT cpu_a(1) AND cpu_a(0) AND cpu_d(3).PIN));
-tmo_C <= NOT ((cs1 AND NOT Ncs2));
 
 Register Legend:
  FDCPE (Q,D,C,CLR,PRE,CE); 
@@ -725,9 +741,9 @@ Pin Signal                         Pin Signal
 No. Name                           No. Name                          
   1 TIE                              23 GND                           
   2 cpu_d<0>                         24 cpu_a<1>                      
-  3 cpu_d<1>                         25 TIE                           
-  4 cpu_d<2>                         26 TIE                           
-  5 cpu_Nphi2                        27 TIE                           
+  3 cpu_d<1>                         25 b8                            
+  4 cpu_d<2>                         26 b9                            
+  5 cpu_Nphi2                        27 b10                           
   6 extclk                           28 spi_Nsel                      
   7 cpu_rnw                          29 led                           
   8 cpu_d<3>                         30 TDO                           
@@ -736,14 +752,14 @@ No. Name                           No. Name
  11 cpu_d<5>                         33 TIE                           
  12 cpu_d<6>                         34 spi_sclk                      
  13 cpu_d<7>                         35 spi_mosi                      
- 14 cpu_Nirq                         36 TIE                           
- 15 TDI                              37 TIE                           
- 16 TMS                              38 TIE                           
- 17 TCK                              39 TIE                           
- 18 Ncs2                             40 TIE                           
+ 14 noe                              36 a8                            
+ 15 TDI                              37 a9                            
+ 16 TMS                              38 a10                           
+ 17 TCK                              39 cpu_Nirq                      
+ 18 Ncs2                             40 nio_sel                       
  19 cpu_Nres                         41 VCC                           
- 20 cs1                              42 spi_int                       
- 21 VCC                              43 TIE                           
+ 20 ng                               42 spi_int                       
+ 21 VCC                              43 nio_stb                       
  22 cpu_a<0>                         44 spi_miso                      
 
 

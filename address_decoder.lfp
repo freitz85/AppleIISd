@@ -1,0 +1,15 @@
+# begin LFP file C:\sources\AppleIISd\address_decoder.lfp
+designfile address_decoder.ngd
+INST "address_decoder" COLOR=15  ;
+NET "OE" COLOR=6  ;
+NET "IO_STB" COLOR=6  ;
+NET "IO_SEL" COLOR=6  ;
+NET "extclk" COLOR=6  ;
+NET "A10_B" COLOR=6  ;
+NET "A10" COLOR=6  ;
+NET "A9_B" COLOR=6  ;
+NET "A9" COLOR=6  ;
+NET "A8_B" COLOR=6  ;
+NET "A8" COLOR=6  ;
+INST "XLXI_16" COLOR=7  ;
+INST "XLXI_16/U0" COLOR=7  ;
