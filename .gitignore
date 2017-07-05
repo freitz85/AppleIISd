@@ -44,6 +44,8 @@ eagle.epf
 
 *.eps
 
+*.?$?
+
 # file locks introduced since 7.x
 *.lck
 
@@ -166,3 +168,5 @@ VHDL/*.untf
 VHDL/*.vm6
 VHDL/*.xml
 VHDL/*.err
+
+Hardware/SD_A2\.b\$1

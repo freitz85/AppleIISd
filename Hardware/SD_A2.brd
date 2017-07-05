@@ -2544,7 +2544,7 @@ Covered vias can be set in Masks (Limit).
 <wire x1="38.1941875" y1="28.0558125" x2="44.9441875" y2="28.0558125" width="0.4" layer="16"/>
 <wire x1="44.9441875" y1="28.0558125" x2="45" y2="28" width="0.4" layer="16"/>
 </signal>
-<signal name="A10_B">
+<signal name="B10">
 <contactref element="IC3" pad="19"/>
 <wire x1="33.59" y1="29.82" x2="33.59" y2="39.41" width="0.4" layer="1"/>
 <wire x1="33.59" y1="39.41" x2="32.25" y2="40.75" width="0.4" layer="1"/>
@@ -2554,7 +2554,7 @@ Covered vias can be set in Masks (Limit).
 <wire x1="35.5" y1="55.28" x2="35.54" y2="55.32" width="0.4" layer="1"/>
 <wire x1="32.25" y1="40.75" x2="32.25" y2="47.5" width="0.4" layer="1"/>
 </signal>
-<signal name="A9_B">
+<signal name="B9">
 <contactref element="IC3" pad="22"/>
 <wire x1="41.21" y1="29.82" x2="41.21" y2="39.29" width="0.4" layer="1"/>
 <wire x1="41.21" y1="39.29" x2="40" y2="40.75" width="0.4" layer="1"/>
@@ -2564,7 +2564,7 @@ Covered vias can be set in Masks (Limit).
 <wire x1="39.5" y1="54" x2="39.5" y2="56.74" width="0.4" layer="1"/>
 <wire x1="39.5" y1="56.74" x2="40.62" y2="57.86" width="0.4" layer="1"/>
 </signal>
-<signal name="A8_B">
+<signal name="B8">
 <contactref element="IC3" pad="23"/>
 <wire x1="43.75" y1="29.82" x2="43.75" y2="39.25" width="0.4" layer="1"/>
 <wire x1="43.75" y1="39.25" x2="42.5" y2="40.75" width="0.4" layer="1"/>
@@ -2573,22 +2573,6 @@ Covered vias can be set in Masks (Limit).
 <wire x1="40.75" y1="54.25" x2="40.75" y2="55.19" width="0.4" layer="1"/>
 <wire x1="40.75" y1="55.19" x2="40.62" y2="55.32" width="0.4" layer="1"/>
 <wire x1="42.5" y1="52.5" x2="40.75" y2="54.25" width="0.4" layer="1"/>
-</signal>
-<signal name="!OE">
-<contactref element="U$1" pad="14"/>
-<contactref element="IC3" pad="20"/>
-<wire x1="31.05" y1="39.45" x2="29.75" y2="40.75" width="0.4" layer="1"/>
-<wire x1="35.5" y1="28.25" x2="31.5" y2="28.25" width="0.4" layer="16"/>
-<wire x1="31.05" y1="28.7" x2="31.5" y2="28.25" width="0.4" layer="16"/>
-<wire x1="29.75" y1="52.5" x2="29.25" y2="53" width="0.4" layer="1"/>
-<wire x1="29.25" y1="53" x2="29.25" y2="61.73" width="0.4" layer="1"/>
-<wire x1="29.25" y1="61.73" x2="30.46" y2="62.94" width="0.4" layer="1"/>
-<wire x1="29.75" y1="40.75" x2="29.75" y2="52.5" width="0.4" layer="1"/>
-<contactref element="IC3" pad="18"/>
-<wire x1="31.05" y1="29.82" x2="31.05" y2="28.7" width="0.4" layer="16"/>
-<wire x1="31.05" y1="29.82" x2="31.05" y2="39.45" width="0.4" layer="1"/>
-<wire x1="36.13" y1="29.82" x2="36.13" y2="28.88" width="0.4" layer="16"/>
-<wire x1="36.13" y1="28.88" x2="35.5" y2="28.25" width="0.4" layer="16"/>
 </signal>
 <signal name="N$5">
 <contactref element="ST1" pad="24"/>
@@ -2706,10 +2690,10 @@ Covered vias can be set in Masks (Limit).
 <signal name="ADD3">
 <contactref element="ST1" pad="05"/>
 <contactref element="IC3" pad="5"/>
-<wire x1="37.465" y1="39.285" x2="36.25" y2="40.75" width="0.4" layer="1"/>
+<wire x1="37.465" y1="39.535" x2="36.25" y2="40.75" width="0.4" layer="1"/>
 <wire x1="36.25" y1="40.75" x2="36.25" y2="44.94" width="0.4" layer="1"/>
 <wire x1="36.25" y1="44.94" x2="36.13" y2="45.06" width="0.4" layer="1"/>
-<wire x1="37.465" y1="4.445" x2="37.465" y2="39.285" width="0.4" layer="1"/>
+<wire x1="37.465" y1="4.445" x2="37.465" y2="39.535" width="0.4" layer="1"/>
 </signal>
 <signal name="ADD4">
 <contactref element="ST1" pad="06"/>
@@ -2777,9 +2761,9 @@ Covered vias can be set in Masks (Limit).
 <wire x1="29" y1="27.5" x2="28.5" y2="28" width="0.4" layer="16"/>
 <wire x1="28.5" y1="28" x2="28.5" y2="29.81" width="0.4" layer="16"/>
 <wire x1="28.5" y1="29.81" x2="28.51" y2="29.82" width="0.4" layer="16"/>
-<wire x1="28.51" y1="29.82" x2="28.51" y2="39.24" width="0.4" layer="1"/>
+<wire x1="28.51" y1="29.82" x2="28.51" y2="39.49" width="0.4" layer="1"/>
 <wire x1="48.87" y1="22.88" x2="48.87" y2="21.66" width="0.4" layer="16"/>
-<wire x1="28.51" y1="39.24" x2="27.25" y2="40.75" width="0.4" layer="1"/>
+<wire x1="28.51" y1="39.49" x2="27.25" y2="40.75" width="0.4" layer="1"/>
 <wire x1="27.25" y1="40.75" x2="27.25" y2="54.75" width="0.4" layer="1"/>
 <wire x1="27.25" y1="54.75" x2="26.75" y2="55.25" width="0.4" layer="1"/>
 <wire x1="26.75" y1="62" x2="26.75" y2="55.25" width="0.4" layer="1"/>
@@ -2976,22 +2960,6 @@ Covered vias can be set in Masks (Limit).
 <wire x1="45.75" y1="73" x2="43.26" y2="73" width="0.4" layer="1"/>
 <wire x1="43.26" y1="73" x2="43.16" y2="73.1" width="0.4" layer="1"/>
 </signal>
-<signal name="!IO_SEL">
-<wire x1="36.17" y1="39.33" x2="35" y2="40.75" width="0.4" layer="1"/>
-<contactref element="ST1" pad="01"/>
-<via x="27.25" y="35.25" extent="1-16" drill="0.3" diameter="0.6"/>
-<wire x1="27.25" y1="35.25" x2="27.25" y2="4.5" width="0.4" layer="1"/>
-<wire x1="27.25" y1="4.5" x2="27.305" y2="4.445" width="0.4" layer="1"/>
-<contactref element="U$1" pad="25"/>
-<wire x1="37" y1="56.78" x2="38.08" y2="57.86" width="0.4" layer="1"/>
-<wire x1="27.25" y1="35.25" x2="36.25" y2="35.25" width="0.4" layer="16"/>
-<via x="36.25" y="35.25" extent="1-16" drill="0.35"/>
-<wire x1="36.25" y1="35.25" x2="36.25" y2="39.25" width="0.4" layer="1"/>
-<wire x1="36.25" y1="39.25" x2="36.17" y2="39.33" width="0.4" layer="1"/>
-<wire x1="35" y1="40.75" x2="35" y2="48.75" width="0.4" layer="1"/>
-<wire x1="35" y1="48.75" x2="37" y2="50.75" width="0.4" layer="1"/>
-<wire x1="37" y1="50.75" x2="37" y2="56.78" width="0.4" layer="1"/>
-</signal>
 <signal name="!DEV_SEL">
 <wire x1="50.165" y1="9.915" x2="53.5" y2="13" width="0.4" layer="16"/>
 <via x="53.5" y="13" extent="1-16" drill="0.3" diameter="0.6"/>
@@ -3081,6 +3049,37 @@ Covered vias can be set in Masks (Limit).
 <wire x1="58.25" y1="61.5" x2="57.85" y2="61.1" width="0.4" layer="1"/>
 <wire x1="57.85" y1="58.98075625" x2="58.65" y2="58.18075625" width="0.4" layer="1"/>
 <wire x1="57.85" y1="61.1" x2="57.85" y2="58.98075625" width="0.4" layer="1"/>
+</signal>
+<signal name="!OE">
+<contactref element="U$1" pad="25"/>
+<contactref element="IC3" pad="20"/>
+<contactref element="IC3" pad="18"/>
+<wire x1="37" y1="56.78" x2="38.08" y2="57.86" width="0.4" layer="1"/>
+<wire x1="37" y1="50.75" x2="35" y2="48.5" width="0.4" layer="1"/>
+<wire x1="37" y1="50.75" x2="37" y2="56.78" width="0.4" layer="1"/>
+<wire x1="35.5" y1="28.25" x2="31.5" y2="28.25" width="0.4" layer="16"/>
+<wire x1="31.05" y1="28.7" x2="31.5" y2="28.25" width="0.4" layer="16"/>
+<wire x1="31.05" y1="29.82" x2="31.05" y2="28.7" width="0.4" layer="16"/>
+<wire x1="36.13" y1="29.82" x2="36.13" y2="28.88" width="0.4" layer="16"/>
+<wire x1="36.13" y1="28.88" x2="35.5" y2="28.25" width="0.4" layer="16"/>
+<wire x1="35" y1="40.75" x2="35" y2="48.5" width="0.4" layer="1"/>
+<wire x1="36.13" y1="29.82" x2="36.13" y2="39.62" width="0.4" layer="1"/>
+<wire x1="36.13" y1="39.62" x2="35" y2="40.75" width="0.4" layer="1"/>
+</signal>
+<signal name="!IO_SEL">
+<contactref element="U$1" pad="14"/>
+<contactref element="ST1" pad="01"/>
+<wire x1="27.305" y1="4.445" x2="27.305" y2="34.195" width="0.4" layer="1"/>
+<wire x1="27.305" y1="34.195" x2="27.25" y2="34.25" width="0.4" layer="1"/>
+<via x="27.25" y="34.25" extent="1-16" drill="0.35"/>
+<wire x1="27.25" y1="34.25" x2="31" y2="34.25" width="0.4" layer="16"/>
+<via x="31" y="34.25" extent="1-16" drill="0.35"/>
+<wire x1="31" y1="34.25" x2="31" y2="39.5" width="0.4" layer="1"/>
+<wire x1="31" y1="39.5" x2="29.75" y2="40.75" width="0.4" layer="1"/>
+<wire x1="29.75" y1="40.75" x2="29.75" y2="53.25" width="0.4" layer="1"/>
+<wire x1="29.75" y1="53.25" x2="29.25" y2="53.75" width="0.4" layer="1"/>
+<wire x1="29.25" y1="53.75" x2="29.25" y2="61.73" width="0.4" layer="1"/>
+<wire x1="29.25" y1="61.73" x2="30.46" y2="62.94" width="0.4" layer="1"/>
 </signal>
 </signals>
 <errors>
