@@ -33,7 +33,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-use address_decoder.ALL;
+use AddressDecoder.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -45,7 +45,7 @@ use address_decoder.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity SPI6502B is
+entity AppleIISd is
 
 
     Port ( cpu_d : inout  STD_LOGIC_VECTOR (7 downto 0);
@@ -77,9 +77,9 @@ entity SPI6502B is
 			  
 	constant DIV_WIDTH		: integer := 3;
 				
-end SPI6502B;
+end AppleIISd;
 
-architecture Behavioral of SPI6502B is
+architecture Behavioral of AppleIISd is
 	
 	-- interface signals
 	signal selected: std_logic;
@@ -130,7 +130,7 @@ architecture Behavioral of SPI6502B is
 	
 	signal shiftclk : std_logic;
 
-	component address_decoder
+	component AddressDecoder
    port ( A8     : in    std_logic; 
           A9     : in    std_logic; 
           A10    : in    std_logic; 
@@ -144,7 +144,7 @@ architecture Behavioral of SPI6502B is
 	end component;
 	
 begin
-	add_dec : address_decoder
+	add_dec : AddressDecoder
       port map (A8=>a8,      
                 A9=>a9,
 			 A10=>a10,
