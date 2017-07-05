@@ -154,3 +154,15 @@ xlnx_auto_0_xdb/
 xst/
 _ngo/
 _xmsgs/
+VHDL/appleiisd_html*
+*.vhf
+*.dhp
+VHDL/*.gyd
+VHDL/*.jed
+VHDL/*.mfd
+VHDL/*.pnx
+VHDL/*.rpt
+VHDL/*.untf
+VHDL/*.vm6
+VHDL/*.xml
+VHDL/*.err
