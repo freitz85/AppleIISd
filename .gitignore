@@ -168,5 +168,6 @@ VHDL/*.untf
 VHDL/*.vm6
 VHDL/*.xml
 VHDL/*.err
+VHDL/*.lfp
 
 Hardware/SD_A2\.b\$1

@@ -46,20 +46,21 @@ use AddressDecoder.ALL;
 --use UNISIM.VComponents.all;
 
 entity AppleIISd is
-    Port ( cpu_d : inout  STD_LOGIC_VECTOR (7 downto 0);
-           cpu_rnw : in  STD_LOGIC;
-           cpu_Nirq : out  STD_LOGIC;
-           cpu_Nres : in  STD_LOGIC;
-           cpu_a : in  STD_LOGIC_VECTOR (1 downto 0);
-           cpu_Nphi2 : in  STD_LOGIC;
-           Ncs2 : in  STD_LOGIC;
+    Port ( data : inout  STD_LOGIC_VECTOR (7 downto 0);
+           nrw : in  STD_LOGIC;
+           nirq : out  STD_LOGIC;
+           nreset : in  STD_LOGIC;
+           addr : in  STD_LOGIC_VECTOR (1 downto 0);
+           nphi2 : in  STD_LOGIC;
+           ndev_sel : in  STD_LOGIC;
            extclk : in  STD_LOGIC;
            spi_miso: in std_logic;
            spi_mosi : out  STD_LOGIC;
            spi_sclk : out  STD_LOGIC;
            spi_Nsel : out  STD_LOGIC;
-		 spi_int : in  STD_LOGIC;
-           led : out std_logic;
+		 wp : in  STD_LOGIC;
+		 card : in STD_LOGIC;
+           led : out STD_LOGIC;
 
 		a8     : in    std_logic; 
           a9     : in    std_logic; 
@@ -111,7 +112,6 @@ architecture Behavioral of AppleIISd is
 	
 	signal slavesel: std_logic;		-- slave select output (0=selected)
 	signal slaveinten: std_logic;	-- slave interrupt enable (1=enabled)
-	signal slaveint: std_logic;		-- slave interrupt inputs
 	
 	--------------------------
 	-- helper signals
@@ -133,6 +133,7 @@ architecture Behavioral of AppleIISd is
           A9     : in    std_logic; 
           A10    : in    std_logic; 
           CLK : in    std_logic; 
+		NDEV_SEL : in std_logic;
           NIO_SEL : in    std_logic; 
           NIO_STB : in    std_logic; 
           B8   : out   std_logic; 
@@ -147,6 +148,7 @@ begin
                 A9=>a9,
 			 A10=>a10,
 			 CLK=>extclk,
+			 NDEV_SEL=>ndev_sel,
 			 NIO_SEL=>nio_sel,
 			 NIO_STB=>nio_stb,
 			 B8=>b8,
@@ -156,7 +158,7 @@ begin
 	
 			
 	led <= not (bsy or not slavesel); --'0'; --shifting2; --shiftdone; --shiftcnt(2);
-	ng <=  Ncs2 and nio_sel and nio_stb;
+	ng <=  ndev_sel and nio_sel and nio_stb;
 	--------------------------
 	
 	bsy <= start_shifting or shifting2;
@@ -246,13 +248,13 @@ begin
 
 
 	-- shift operation enable
-	shiften: process(reset, selected, cpu_rnw, cpu_a, frx, shiftdone)
+	shiften: process(reset, selected, nrw, addr, frx, shiftdone)
 	begin
 		-- start shifting
 		if (reset='1' or shiftdone='1') then
 			start_shifting <= '0';
-		elsif (falling_edge(selected) and cpu_a="00" and (frx='1' or cpu_rnw='0')) then
-			-- access to register 00, either write (cpu_rnw=0) or fast receive bit set (frx)
+		elsif (falling_edge(selected) and addr="00" and (frx='1' or nrw='0')) then
+			-- access to register 00, either write (nrw=0) or fast receive bit set (frx)
 			-- then both types of access (write but also read)
 			start_shifting <= '1';
 		end if;
@@ -261,7 +263,7 @@ begin
 	--------------------------
 	-- spiclk - spi clock generation
 	-- spiclk is still 2 times the freq. than sclk
-	clksrc <= cpu_Nphi2 when (ece = '0') else extclk;
+	clksrc <= nphi2 when (ece = '0') else extclk;
 	
 	-- is a pulse signal to allow for divisor==0
 	--shiftclk <= clksrc when divcnt = "000000" else '0';
@@ -284,23 +286,21 @@ begin
 	
 	--------------------------
 	-- interrupt generation
-	int_out <= spiint 
-			or (slaveint and slaveinten);
+	int_out <= spiint and slaveinten;
 
 	--------------------------
 	-- interface section
 	-- inputs
-	reset <= not (cpu_Nres);
-	selected <= not(Ncs2); -- and cpu_phi2;
-	is_read <= selected and cpu_Nphi2 and cpu_rnw;
-	int_din <= cpu_d;	
-	slaveint <= not(spi_int);		-- active low interrupt inputs
+	reset <= not (nreset);
+	selected <= not(ndev_sel); -- and cpu_phi2;
+	is_read <= selected and nphi2 and nrw;
+	int_din <= data;	
 
 	int_miso <= (spi_miso and not slavesel);
 	
 	-- outputs
-	cpu_d <= int_dout when (is_read='1') else (others => 'Z');		-- data bus tristate
-	cpu_Nirq <= '0' when (int_out='1') else 'Z';			-- wired-or
+	data <= int_dout when (is_read='1') else (others => 'Z');		-- data bus tristate
+	nirq <= '0' when (int_out='1') else 'Z';			-- wired-or
 	spi_sclk <= int_sclk;
 	spi_mosi <= int_mosi when tmo='0' else 'Z';		-- mosi tri-state
 	spi_Nsel <= slavesel;
@@ -309,9 +309,9 @@ begin
 	begin
 		if (shiftdone = '1') then
 			tc <= '1';
-		elsif (falling_edge(selected) and cpu_a="00"
-		--elsif (falling_edge(cpu_phi2) and selected='1' and cpu_a="00" 
-				--and cpu_rnw='1'		-- both reads _and_ writes clear the interrupt
+		elsif (falling_edge(selected) and addr="00"
+		--elsif (falling_edge(cpu_phi2) and selected='1' and addr="00" 
+				--and nrw='1'		-- both reads _and_ writes clear the interrupt
 				) then
 			tc <= '0';
 		end if;
@@ -322,12 +322,12 @@ begin
 	--------------------------
 	-- cpu register section
 	-- cpu read
-	cpu_read: process (is_read, cpu_a, 
+	cpu_read: process (is_read, addr, 
 			spidatain, tc, ier, bsy, frx, tmo, ece, cpol, cpha, divisor,
-			slavesel, slaveint, slaveinten)
+			slavesel, slaveinten, wp, card)
 	begin
 		if (is_read = '1') then 
-			case cpu_a is
+			case addr is
 				when "00" =>		-- read SPI data in
 					int_dout <= spidatain;
 				when "01" => 		-- read status register
@@ -341,14 +341,14 @@ begin
 					int_dout(7) <= tc;
 				when "10" =>		-- read sclk divisor
 					int_dout(DIV_WIDTH-1 downto 0) <= divisor;
-					int_dout(3) <= '0';
-					int_dout(4) <= slaveint;
-					int_dout(7 downto 5) <= (others => '0');
+					int_dout(7 downto 3) <= (others => '0');
 				when "11" =>		-- read slave select / slave interrupt state
 					int_dout(0) <= slavesel;
 					int_dout(3 downto 1) <= (others => '0');
 					int_dout(4) <= slaveinten;
-					int_dout(7 downto 5) <= (others => '0');
+					int_dout(5) <= wp;
+					int_dout(6) <= card;
+					int_dout(7) <= '0';
 				when others => 
 					int_dout <= (others => '0');
 			end case;
@@ -358,7 +358,7 @@ begin
 	end process;
 
 	-- cpu write 
-	cpu_write: process(reset, selected, cpu_rnw, cpu_a, int_din)
+	cpu_write: process(reset, selected, nrw, addr, int_din)
 	begin
 		if (reset = '1') then
 			cpha <= '0';
@@ -370,9 +370,9 @@ begin
 			slavesel <= '1';
 			slaveinten <= '0';
 			divisor <= (others => '0');
-		elsif (falling_edge(selected) and cpu_rnw = '0') then
-		--elsif (falling_edge(cpu_phi2) and selected='1' and cpu_rnw='0') then
-			case cpu_a is
+		elsif (falling_edge(selected) and nrw = '0') then
+		--elsif (falling_edge(cpu_phi2) and selected='1' and nrw='0') then
+			case addr is
 				when "00" =>		-- write SPI data out (see other process above)
 					spidataout <= int_din;
 				when "01" =>		-- write status register
