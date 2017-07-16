@@ -435,7 +435,7 @@ BLOCK          PHY              ; save Y
 *
 ********************************
 
-COMMAND        PLY              ; save Y
+COMMAND        PHY              ; save Y
                LDY   SLOT
                STA   DATA,X     ; send command
 :WAIT          BIT   CTRL,X
