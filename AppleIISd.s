@@ -13,7 +13,12 @@
                DAT
 
                XC               ; enable 65C02 code
+DEBUG          =     1
+               DO    DEBUG
+               ORG   $8000
+               ELSE
                ORG   $C800      ; Expansion ROM
+               FIN
 
 * Memory defines
 
@@ -53,9 +58,16 @@ DUMMY          =     $FF
                LDX   #$03
                STX   WORK
 
-               PAG
 * find slot nr
 
+               DO    DEBUG
+               LDA   #$04
+               STA   SLOT
+               LDA   #$C4
+               STA   CURSLOT
+               LDA   #$40
+               STA   SLOT16
+               ELSE
                JSR   $FF58
                TSX
                LDA   $0100,X
@@ -68,6 +80,8 @@ DUMMY          =     $FF
                ASL   A
                ASL   A
                STA   SLOT16     ; $s0
+               FIN
+               TAX              ; X holds now SLOT16
 
                JSR   INIT
                BIT   $CFFF
@@ -89,10 +103,11 @@ INSLP          LDA   $BF32,X    ; get a devnum
 * restore the devnum to the list
 
                LDX   $BF31      ; get devcnt again
-               CPX   #$0D       device table full?
+               CPX   #$0D       ; device table full?
                BNE   INSLP2
 
-               JMP   INSOUT      ; do something!
+               JSR   $FF3A      ; bell
+               JMP   INSOUT     ; do something!
 
 INSLP2         LDA   $BF32-1,X  ; move all entries down
                STA   $BF32,X    ; to make room at front
@@ -103,14 +118,18 @@ INSLP2         LDA   $BF32-1,X  ; move all entries down
                STA   $BF32      ; slot, drive 1 at top of list
                INC   $BF31      ; update devcnt
 
-               PAG
 * now insert the device driver vector
 
                LDA   SLOT
+               ASL
                TAX
                LDA   #<DRIVER
-               STA   $BF10,X
+               STA   $BF10,X    ; write to driver table
+               DO    DEBUG
+               LDA   #>DRIVER
+               ELSE
                LDA   CURSLOT
+               FIN
                STA   $BF11,X
 
 INSOUT         RTS
@@ -123,6 +142,14 @@ INSOUT         RTS
 ********************************
 
 DRIVER         CLD
+               DO    DEBUG
+               LDA   #$04
+               STA   SLOT
+               LDA   #$C4
+               STA   CURSLOT
+               LDA   #$40
+               STA   SLOT16
+               ELSE
                JSR   $FF58      ; find slot nr
                TSX
                LDA   $0100,X
@@ -135,6 +162,7 @@ DRIVER         CLD
                ASL   A
                ASL   A
                STA   SLOT16     ; $s0
+               FIN
                TAX              ; X holds now SLOT16
 
                BIT   $CFFF
@@ -156,10 +184,10 @@ DRIVER         CLD
 :WRITE         JMP   WRITE
 :FORMAT        JMP   FORMAT
 
-               PAG
 * Signature bytes
 
-               ORG   $C8FC
+               DS    \          ; fill with zeroes
+               DS    -4         ; locate to $C8FC
                DW    $FFFF      ; 65535 blocks
                DB    $47        ; Status bits
                DB    #<DRIVER   ; LSB of driver
@@ -177,10 +205,7 @@ DRIVER         CLD
 *
 ********************************
 
-               ORG   $C900
-
 INIT           CLD
-               LDX   SLOT16
                LDA   #$03       ; set SPI mode 3
                STA   CTRL,X
                LDA   #SSNONE
@@ -279,18 +304,18 @@ INIT           CLD
                BNE   :IOERROR   ; error!
 
 :END           CLC              ; all ok
-               LDX   #0
+               LDY   #0
                BCC   :END1
 :CDERROR       SEC
-               LDX   #$28       ; no card error
+               LDY   #$28       ; no card error
                BCS   :END1
 :IOERROR       SEC
-               LDX   #$27       ; init error
+               LDY   #$27       ; init error
 :END1          LDA   #SSNONE    ; deselect card
                STA   SS,X
                LDA   #0         ; set div to 2
                STA   DIV,X
-               TXA              ; retval in A
+               TYA              ; retval in A
                RTS
 
 
@@ -313,7 +338,7 @@ CMD            PHY
                PLY
                RTS
 
-               PAG
+
 ********************************
 *
 * Get R1
@@ -346,17 +371,16 @@ GETR1          LDA   #DUMMY
 GETR3          JSR   GETR1      ; get R1 first
                PHA              ; save R1
                PHY              ; save Y
-               LDA   #04        ; load counter
-               STA   WORK
-               LDY   SLOT
+               LDY   #04        ; load counter
 :LOOP          LDA   #DUMMY     ; send dummy
                STA   DATA,X
 :WAIT          BIT   CTRL,X
                BPL   :WAIT
                LDA   DATA,X
                PHA
-               DEC   WORK
+               DEY
                BNE   :LOOP      ; do 4 times
+               LDY   SLOT
                PLA
                STA   R33,Y      ; save R3
                PLA
@@ -364,7 +388,7 @@ GETR3          JSR   GETR1      ; get R1 first
                PLA
                STA   R31,Y
                PLA
-               STA   R30,X
+               STA   R30,Y
                PLY              ; restore Y
                LDA   #DUMMY
                STA   DATA,X     ; send another dummy
@@ -374,8 +398,86 @@ GETR3          JSR   GETR1      ; get R1 first
 
 ********************************
 *
+* Calculate block address
+* Block no is in $46-47
+* Address is in R30-R33
+*
+********************************
+
+BLOCK          PHY              ; save Y
+               LDY   SLOT
+               LDA   $46        ; store block num
+               STA   R33,Y      ; in R30-R33
+               LDA   $47
+               STA   R32,Y
+               LDA   #0
+               STA   R31,Y
+               STA   R30,Y
+
+               PHX
+               LDY   #9
+               LDX   SLOT       ; ASL can't be done with Y
+:LOOP          ASL   R33,X      ; mul block num
+               ROL   R32,X      ; by 512 to get
+               ROL   R31,X      ; real address
+               ROL   R30,X
+               DEY
+               BNE   :LOOP
+               PLX
+               PLY              ; restore Y
+               RTS
+
+
+********************************
+*
+* Send SD command
+* Cmd is in A
+*
+********************************
+
+COMMAND        PLY              ; save Y
+               LDY   SLOT
+               STA   DATA,X     ; send command
+:WAIT          BIT   CTRL,X
+               BPL   :WAIT
+:ARG           LDA   R30,Y      ; get arg from R30 on
+               STA   DATA,X
+:WAIT1         BIT   CTRL,X
+               BPL   :WAIT1
+               LDA   R31,Y
+               STA   DATA,X
+:WAIT11        BIT   CTRL,X
+               BPL   :WAIT11
+               LDA   R32,Y
+               STA   DATA,X
+:WAIT12        BIT   CTRL,X
+               BPL   :WAIT12
+               LDA   R33,Y
+               STA   DATA,X
+:WAIT13        BIT   CTRL,X
+               BPL   :WAIT13
+               LDA   #DUMMY
+               STA   DATA,X     ; dummy crc
+:WAIT2         BIT   CTRL,X
+               BPL   :WAIT2
+:GETR1         LDA   #DUMMY
+               STA   DATA,X     ; get R1
+:WAIT3         BIT   CTRL,X
+               BPL   :WAIT3
+               LDA   DATA,X     ; get response
+*
+* TODO: check for error!
+*
+               CMP   #$FE
+               BNE   :GETR1     ; wait for $FE
+               PLY              ; restore Y
+               RTS
+
+
+********************************
+*
 * Status request
-* $43    Unt number DSSS000
+* $43    Unit number DSSS000
 * $44-45 Unused
 * $46-47 Unused
 *
@@ -416,66 +518,12 @@ STATUS         CLC              ; no error
 
 * TODO: check for card detect!
 
-READ           LDA   #SS0       ; enable /CS
+READ           JSR   BLOCK      ; calc block address
+
+               LDA   #SS0       ; enable /CS
                STA   SS,X
-
-               PHY              ; save Y
-               LDY   SLOT
-               LDA   $46        ; store block num
-               STA   R33,Y      ; in R30-R33
-               LDA   $47
-               STA   R32,Y
-               LDA   #0
-               STA   R31,Y
-               STA   R30,Y
-
-               PHX
-               PHY
-               LDY   #9
-               LDX   SLOT       ; ASL can't be done with Y
-:LOOP          ASL   R33,X      ; mul block num
-               ROL   R32,X      ; by 512 to get
-               ROL   R31,X      ; real address
-               ROL   R30,X
-               DEY
-               BNE   :LOOP
-               PLY
-               PLX
-
                LDA   #$51       ; send CMD17
-               STA   DATA,X
-:WAIT          BIT   CTRL,X
-               BPL   :WAIT
-:ARG           LDA   R30,Y      ; get arg from R30 on
-               STA   DATA,X
-:WAIT1         BIT   CTRL,X
-               BPL   :WAIT1
-               LDA   R31,Y
-               STA   DATA,X
-:WAIT11        BIT   CTRL,X
-               BPL   :WAIT11
-               LDA   R32,Y
-               STA   DATA,X
-:WAIT12        BIT   CTRL,X
-               BPL   :WAIT12
-               LDA   R33,Y
-               STA   DATA,X
-:WAIT13        BIT   CTRL,X
-               BPL   :WAIT13
-               LDA   #DUMMY
-               STA   DATA,X     ; dummy crc
-:WAIT2         BIT   CTRL,X
-               BPL   :WAIT2
-:GETR1         LDA   #DUMMY
-               STA   DATA,X     ; get R1
-:WAIT3         BIT   CTRL,X
-               BPL   :WAIT3
-               LDA   DATA,X     ; get response
-*
-* TODO: check for error!
-*
-               CMP   #$FE
-               BNE   :GETR1     ; wait for $FE
+               JSR   COMMAND    ; send command
 
                PHY
                LDY   #2         ; read data from card
@@ -495,7 +543,7 @@ READ           LDA   #SS0       ; enable /CS
                BNE   :LOOPY
                PLY
 
-:OK            JSR   GETR3      ; read 2 bytes crc
+               JSR   GETR3      ; read 2 bytes crc
                LDA   #SSNONE
                STA   SS,X       ; disable /CS
                CLC              ; no error
@@ -528,66 +576,12 @@ READ           LDA   #SS0       ; enable /CS
 
 * TODO: check for card detect and write protect!
 
-WRITE          LDA   #SS0       ; enable /CS
+WRITE          JSR   BLOCK      ; calc block address
+
+               LDA   #SS0       ; enable /CS
                STA   SS,X
-
-               PHY
-               LDY   SLOT
-               LDA   $46        ; store block num
-               STA   R33,Y
-               LDA   $47
-               STA   R32,Y
-               LDA   #0
-               STA   R31,Y
-               STA   R30,Y
-
-               PHX
-               PHY
-               LDY   #9
-               LDX   SLOT       ; ASL can't be done with Y
-:LOOP          ASL   R33,X      ; mul block num
-               ROL   R32,X      ; by 512 to get
-               ROL   R31,X      ; real address
-               ROL   R30,X
-               DEY
-               BNE   :LOOP
-               PLY
-               PLX
-
                LDA   #$58       ; send CMD24
-               STA   DATA,X
-:WAIT          BIT   CTRL,X
-               BPL   :WAIT
-:ARG           LDA   R30,Y      ; get arg from R30 on
-               STA   DATA,X
-:WAIT1         BIT   CTRL,X
-               BPL   :WAIT1
-               LDA   R31,Y
-               STA   DATA,X
-:WAIT11        BIT   CTRL,X
-               BPL   :WAIT11
-               LDA   R32,Y
-               STA   DATA,X
-:WAIT12        BIT   CTRL,X
-               BPL   :WAIT12
-               LDA   R33,Y
-               STA   DATA,X
-:WAIT13        BIT   CTRL,X
-               BPL   :WAIT13
-               LDA   #DUMMY
-               STA   DATA,X     ; dummy crc
-:WAIT2         BIT   CTRL,X
-               BPL   :WAIT2
-:GETR1         LDA   #DUMMY
-               STA   DATA,X     ; get R1
-:WAIT3         BIT   CTRL,X
-               BPL   :WAIT3
-               LDA   DATA,X     ; get response
-*
-* TODO: check for error!
-*
-               CMP   #$FE
-               BNE   :GETR1     ; wait for $FE
+               JSR   COMMAND    ; send command
 
                PHY
                LDY   #2         ; send data to card
@@ -612,7 +606,7 @@ WRITE          LDA   #SS0       ; enable /CS
                BNE   :CRC
                PLY
 
-:OK            LDA   #SSNONE    ; disable /CS
+               LDA   #SSNONE    ; disable /CS
                STA   SS,X
                CLC              ; no error
                LDA   #0
@@ -632,7 +626,6 @@ FORMAT         SEC
                RTS
 
 
-
 CMD0           HEX   400000
                HEX   000095
 CMD1           HEX   410000
@@ -647,4 +640,3 @@ ACMD4140       HEX   694000
                HEX   000077
 ACMD410        HEX   690000
                HEX   0000FF
-               PAG
