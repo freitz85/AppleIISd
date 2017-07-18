@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.2.0">
+<eagle version="7.7.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -68,13 +68,13 @@ Standard 50-pin edge connector for Apple ][ systems
 Dimensions for slot #1 to #3
 &lt;br /&gt;
 Dimensions taken from Tech Note #28</description>
-<wire x1="-9.652" y1="0.508" x2="-10.287" y2="-0.127" width="0.2032" layer="21"/>
-<wire x1="-10.287" y1="-0.127" x2="-74.803" y2="-0.127" width="0.2032" layer="21"/>
-<wire x1="-74.803" y1="-0.127" x2="-75.438" y2="0.508" width="0.2032" layer="21"/>
-<wire x1="-9.652" y1="7.747" x2="-9.652" y2="0.508" width="0.2032" layer="21"/>
-<wire x1="-0.127" y1="7.747" x2="-9.652" y2="7.747" width="0.2032" layer="21"/>
-<wire x1="-75.438" y1="7.747" x2="-177.927" y2="7.747" width="0.2032" layer="21"/>
-<wire x1="-75.438" y1="7.747" x2="-75.438" y2="0.508" width="0.2032" layer="21"/>
+<wire x1="-9.652" y1="0.508" x2="-10.287" y2="-0.127" width="0.2032" layer="49"/>
+<wire x1="-10.287" y1="-0.127" x2="-74.803" y2="-0.127" width="0.2032" layer="49"/>
+<wire x1="-74.803" y1="-0.127" x2="-75.438" y2="0.508" width="0.2032" layer="49"/>
+<wire x1="-9.652" y1="7.747" x2="-9.652" y2="0.508" width="0.2032" layer="49"/>
+<wire x1="-0.127" y1="7.747" x2="-9.652" y2="7.747" width="0.2032" layer="49"/>
+<wire x1="-75.438" y1="7.747" x2="-177.927" y2="7.747" width="0.2032" layer="49"/>
+<wire x1="-75.438" y1="7.747" x2="-75.438" y2="0.508" width="0.2032" layer="49"/>
 <wire x1="-82.5246" y1="-0.127" x2="-87.5284" y2="-0.127" width="0" layer="48"/>
 <wire x1="-87.5284" y1="-0.127" x2="-86.8426" y2="1.4986" width="0" layer="48"/>
 <wire x1="-87.5284" y1="-0.127" x2="-88.4174" y2="-0.127" width="0" layer="48"/>
@@ -94,8 +94,8 @@ Dimensions taken from Tech Note #28</description>
 <wire x1="-9.6774" y1="-6.985" x2="-12.065" y2="-5.715" width="0" layer="48"/>
 <wire x1="-12.065" y1="-5.715" x2="-12.065" y2="-8.255" width="0" layer="48"/>
 <wire x1="-12.065" y1="-8.255" x2="-9.6774" y2="-6.985" width="0" layer="48"/>
-<wire x1="-0.127" y1="77.597" x2="-177.927" y2="77.597" width="0.2032" layer="21"/>
-<wire x1="-75.438" y1="7.747" x2="-75.438" y2="5.715" width="0.1524" layer="21"/>
+<wire x1="-0.127" y1="77.597" x2="-177.927" y2="77.597" width="0.2032" layer="49"/>
+<wire x1="-75.438" y1="7.747" x2="-75.438" y2="5.715" width="0.1524" layer="49"/>
 <wire x1="-101.6" y1="2.54" x2="-101.6" y2="-3.81" width="1.016" layer="34"/>
 <wire x1="-99.06" y1="2.54" x2="-99.06" y2="-3.81" width="1.016" layer="34"/>
 <wire x1="-96.52" y1="2.54" x2="-96.52" y2="-3.81" width="1.016" layer="34"/>
@@ -160,7 +160,7 @@ Dimensions taken from Tech Note #28</description>
 <wire x1="-27.94" y1="2.54" x2="-27.94" y2="-3.81" width="1.016" layer="33"/>
 <wire x1="-25.4" y1="2.54" x2="-25.4" y2="-3.81" width="1.016" layer="33"/>
 <wire x1="-105.41" y1="-3.81" x2="-16.51" y2="-3.81" width="1.016" layer="33"/>
-<wire x1="-0.127" y1="77.597" x2="-0.127" y2="7.778" width="0.2032" layer="21"/>
+<wire x1="-0.127" y1="77.597" x2="-0.127" y2="7.778" width="0.2032" layer="49"/>
 <smd name="26" x="-12.065" y="4.445" dx="1.524" dy="6.477" layer="16" cream="no"/>
 <smd name="27" x="-14.605" y="4.445" dx="1.524" dy="6.477" layer="16" cream="no"/>
 <smd name="28" x="-17.145" y="4.445" dx="1.524" dy="6.477" layer="16" cream="no"/>
@@ -278,7 +278,7 @@ Dimensions taken from Tech Note #28</description>
 <rectangle x1="-28.702" y1="1.778" x2="-27.178" y2="8.382" layer="33"/>
 <rectangle x1="-26.162" y1="1.778" x2="-24.638" y2="8.382" layer="34"/>
 <rectangle x1="-26.162" y1="1.778" x2="-24.638" y2="8.382" layer="33"/>
-<wire x1="-177.927" y1="77.597" x2="-177.927" y2="7.747" width="0.2032" layer="21"/>
+<wire x1="-177.927" y1="77.597" x2="-177.927" y2="7.747" width="0.2032" layer="49"/>
 </package>
 <package name="A2-50PIN-SL4-7">
 <description>&lt;B&gt;Apple ][ Peripheral Card&lt;/B&gt;

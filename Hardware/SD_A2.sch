@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.2.2">
+<eagle version="7.7.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -78,13 +78,13 @@ Standard 50-pin edge connector for Apple ][ systems
 Dimensions for slot #1 to #3
 &lt;br /&gt;
 Dimensions taken from Tech Note #28</description>
-<wire x1="-9.652" y1="0.508" x2="-10.287" y2="-0.127" width="0.2032" layer="21"/>
-<wire x1="-10.287" y1="-0.127" x2="-74.803" y2="-0.127" width="0.2032" layer="21"/>
-<wire x1="-74.803" y1="-0.127" x2="-75.438" y2="0.508" width="0.2032" layer="21"/>
-<wire x1="-9.652" y1="7.747" x2="-9.652" y2="0.508" width="0.2032" layer="21"/>
-<wire x1="-0.127" y1="7.747" x2="-9.652" y2="7.747" width="0.2032" layer="21"/>
-<wire x1="-75.438" y1="7.747" x2="-177.927" y2="7.747" width="0.2032" layer="21"/>
-<wire x1="-75.438" y1="7.747" x2="-75.438" y2="0.508" width="0.2032" layer="21"/>
+<wire x1="-9.652" y1="0.508" x2="-10.287" y2="-0.127" width="0.2032" layer="49"/>
+<wire x1="-10.287" y1="-0.127" x2="-74.803" y2="-0.127" width="0.2032" layer="49"/>
+<wire x1="-74.803" y1="-0.127" x2="-75.438" y2="0.508" width="0.2032" layer="49"/>
+<wire x1="-9.652" y1="7.747" x2="-9.652" y2="0.508" width="0.2032" layer="49"/>
+<wire x1="-0.127" y1="7.747" x2="-9.652" y2="7.747" width="0.2032" layer="49"/>
+<wire x1="-75.438" y1="7.747" x2="-177.927" y2="7.747" width="0.2032" layer="49"/>
+<wire x1="-75.438" y1="7.747" x2="-75.438" y2="0.508" width="0.2032" layer="49"/>
 <wire x1="-82.5246" y1="-0.127" x2="-87.5284" y2="-0.127" width="0" layer="48"/>
 <wire x1="-87.5284" y1="-0.127" x2="-86.8426" y2="1.4986" width="0" layer="48"/>
 <wire x1="-87.5284" y1="-0.127" x2="-88.4174" y2="-0.127" width="0" layer="48"/>
@@ -104,8 +104,8 @@ Dimensions taken from Tech Note #28</description>
 <wire x1="-9.6774" y1="-6.985" x2="-12.065" y2="-5.715" width="0" layer="48"/>
 <wire x1="-12.065" y1="-5.715" x2="-12.065" y2="-8.255" width="0" layer="48"/>
 <wire x1="-12.065" y1="-8.255" x2="-9.6774" y2="-6.985" width="0" layer="48"/>
-<wire x1="-0.127" y1="77.597" x2="-177.927" y2="77.597" width="0.2032" layer="21"/>
-<wire x1="-75.438" y1="7.747" x2="-75.438" y2="5.715" width="0.1524" layer="21"/>
+<wire x1="-0.127" y1="77.597" x2="-177.927" y2="77.597" width="0.2032" layer="49"/>
+<wire x1="-75.438" y1="7.747" x2="-75.438" y2="5.715" width="0.1524" layer="49"/>
 <wire x1="-101.6" y1="2.54" x2="-101.6" y2="-3.81" width="1.016" layer="34"/>
 <wire x1="-99.06" y1="2.54" x2="-99.06" y2="-3.81" width="1.016" layer="34"/>
 <wire x1="-96.52" y1="2.54" x2="-96.52" y2="-3.81" width="1.016" layer="34"/>
@@ -170,7 +170,7 @@ Dimensions taken from Tech Note #28</description>
 <wire x1="-27.94" y1="2.54" x2="-27.94" y2="-3.81" width="1.016" layer="33"/>
 <wire x1="-25.4" y1="2.54" x2="-25.4" y2="-3.81" width="1.016" layer="33"/>
 <wire x1="-105.41" y1="-3.81" x2="-16.51" y2="-3.81" width="1.016" layer="33"/>
-<wire x1="-0.127" y1="77.597" x2="-0.127" y2="7.778" width="0.2032" layer="21"/>
+<wire x1="-0.127" y1="77.597" x2="-0.127" y2="7.778" width="0.2032" layer="49"/>
 <smd name="26" x="-12.065" y="4.445" dx="1.524" dy="6.477" layer="16" cream="no"/>
 <smd name="27" x="-14.605" y="4.445" dx="1.524" dy="6.477" layer="16" cream="no"/>
 <smd name="28" x="-17.145" y="4.445" dx="1.524" dy="6.477" layer="16" cream="no"/>
@@ -288,7 +288,7 @@ Dimensions taken from Tech Note #28</description>
 <rectangle x1="-28.702" y1="1.778" x2="-27.178" y2="8.382" layer="33"/>
 <rectangle x1="-26.162" y1="1.778" x2="-24.638" y2="8.382" layer="34"/>
 <rectangle x1="-26.162" y1="1.778" x2="-24.638" y2="8.382" layer="33"/>
-<wire x1="-177.927" y1="77.597" x2="-177.927" y2="7.747" width="0.2032" layer="21"/>
+<wire x1="-177.927" y1="77.597" x2="-177.927" y2="7.747" width="0.2032" layer="49"/>
 </package>
 <package name="A2-50PIN-SL4-7">
 <description>&lt;B&gt;Apple ][ Peripheral Card&lt;/B&gt;
@@ -574,7 +574,7 @@ Pins are laid out as seen from the top of the slot</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="xilinx-xc9" urn="urn:adsk.eagle:library:416">
+<library name="xilinx-xc9">
 <description>&lt;b&gt;XILINXIn-System Programmable CPLD Family&lt;/b&gt;&lt;p&gt;
 http://www.xilinx.com&lt;br&gt;
 &lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;&lt;p&gt;</description>
@@ -1017,7 +1017,7 @@ http://www.xilinx.com&lt;br&gt;
 </deviceset>
 </devicesets>
 </library>
-<library name="74xx-eu" urn="urn:adsk.eagle:library:85">
+<library name="74xx-eu">
 <description>&lt;b&gt;TTL Devices, 74xx Series with European Symbols&lt;/b&gt;&lt;p&gt;
 Based on the following sources:
 &lt;ul&gt;
@@ -1356,7 +1356,7 @@ Based on the following sources:
 </deviceset>
 </devicesets>
 </library>
-<library name="v-reg" urn="urn:adsk.eagle:library:409">
+<library name="v-reg">
 <description>&lt;b&gt;Voltage Regulators&lt;/b&gt;&lt;p&gt;
 &lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
 <packages>
@@ -1436,7 +1436,7 @@ Based on the following sources:
 </deviceset>
 </devicesets>
 </library>
-<library name="rcl" urn="urn:adsk.eagle:library:334">
+<library name="rcl">
 <description>&lt;b&gt;Resistors, Capacitors, Inductors&lt;/b&gt;&lt;p&gt;
 Based on the previous libraries:
 &lt;ul&gt;
@@ -13585,7 +13585,7 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="supply1" urn="urn:adsk.eagle:library:371">
+<library name="supply1">
 <description>&lt;b&gt;Supply Symbols&lt;/b&gt;&lt;p&gt;
  GND, VCC, 0V, +5V, -5V, etc.&lt;p&gt;
  Please keep in mind, that these devices are necessary for the
@@ -13656,7 +13656,7 @@ Source: http://www.mouser.com/ds/2/392/products_18-2245.pdf</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="led" urn="urn:adsk.eagle:library:259">
+<library name="led">
 <description>&lt;b&gt;LEDs&lt;/b&gt;&lt;p&gt;
 &lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;&lt;br&gt;
 Extended by Federico Battaglin &lt;author&gt;&amp;lt;federico.rd@fdpinternational.com&amp;gt;&lt;/author&gt; with DUOLED</description>
@@ -15161,7 +15161,7 @@ Source: www.kingbright.com</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="memory" urn="urn:adsk.eagle:library:279">
+<library name="memory">
 <description>&lt;b&gt;Generic Memories&lt;/b&gt;&lt;p&gt;
 &lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
 <packages>
@@ -15202,7 +15202,7 @@ Source: www.kingbright.com</description>
 </package>
 </packages>
 <symbols>
-<symbol name="2716" library_version="1">
+<symbol name="2716">
 <wire x1="-10.16" y1="-20.32" x2="5.08" y2="-20.32" width="0.4064" layer="94"/>
 <wire x1="5.08" y1="-20.32" x2="5.08" y2="20.32" width="0.4064" layer="94"/>
 <wire x1="5.08" y1="20.32" x2="-10.16" y2="20.32" width="0.4064" layer="94"/>
@@ -15241,7 +15241,7 @@ Source: www.kingbright.com</description>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="2716" prefix="IC" uservalue="yes" library_version="1">
+<deviceset name="2716" prefix="IC" uservalue="yes">
 <description>&lt;b&gt;MEMORY&lt;/b&gt;</description>
 <gates>
 <gate name="A" symbol="2716" x="22.86" y="0"/>
@@ -15302,8 +15302,8 @@ Source: www.kingbright.com</description>
 <wire x1="29.5" y1="14.65" x2="29.5" y2="-13.5" width="0.127" layer="21"/>
 <pad name="GND1" x="24.2" y="14.55" drill="1.6"/>
 <smd name="CD" x="11.3" y="-13.125" dx="1.75" dy="1.2" layer="1" rot="R90"/>
-<smd name="WP" x="20.1" y="-13.125" dx="1.75" dy="1.2" layer="1" rot="R90"/>
-<smd name="SC" x="21.4" y="-13.125" dx="1.75" dy="1.2" layer="1" rot="R90"/>
+<smd name="WP" x="20.1" y="-13.125" dx="1.75" dy="1" layer="1" rot="R90"/>
+<smd name="SC" x="21.4" y="-13.125" dx="1.75" dy="1" layer="1" rot="R90"/>
 </package>
 </packages>
 <symbols>
@@ -15359,7 +15359,7 @@ Source: www.kingbright.com</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="frames" urn="urn:adsk.eagle:library:229">
+<library name="frames">
 <description>&lt;b&gt;Frames for Sheet and Layout&lt;/b&gt;</description>
 <packages>
 </packages>
@@ -15408,7 +15408,7 @@ DIN A3, landscape with location and doc. field</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="con-lstb" urn="urn:adsk.eagle:library:162">
+<library name="con-lstb">
 <description>&lt;b&gt;Pin Headers&lt;/b&gt;&lt;p&gt;
 Naming:&lt;p&gt;
 MA = male&lt;p&gt;
@@ -15416,7 +15416,7 @@ MA = male&lt;p&gt;
 W = angled&lt;p&gt;
 &lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
 <packages>
-<package name="MA03-1" library_version="1">
+<package name="MA03-1">
 <description>&lt;b&gt;PIN HEADER&lt;/b&gt;</description>
 <wire x1="-3.175" y1="1.27" x2="-1.905" y2="1.27" width="0.1524" layer="21"/>
 <wire x1="-1.905" y1="1.27" x2="-1.27" y2="0.635" width="0.1524" layer="21"/>
@@ -15448,7 +15448,7 @@ W = angled&lt;p&gt;
 <rectangle x1="-2.794" y1="-0.254" x2="-2.286" y2="0.254" layer="51"/>
 <rectangle x1="2.286" y1="-0.254" x2="2.794" y2="0.254" layer="51"/>
 </package>
-<package name="MA06-1" library_version="1">
+<package name="MA06-1">
 <description>&lt;b&gt;PIN HEADER&lt;/b&gt;</description>
 <wire x1="-6.985" y1="1.27" x2="-5.715" y2="1.27" width="0.1524" layer="21"/>
 <wire x1="-5.715" y1="1.27" x2="-5.08" y2="0.635" width="0.1524" layer="21"/>
@@ -15507,7 +15507,7 @@ W = angled&lt;p&gt;
 </package>
 </packages>
 <symbols>
-<symbol name="MA03-1" library_version="1">
+<symbol name="MA03-1">
 <wire x1="3.81" y1="-5.08" x2="-1.27" y2="-5.08" width="0.4064" layer="94"/>
 <wire x1="1.27" y1="2.54" x2="2.54" y2="2.54" width="0.6096" layer="94"/>
 <wire x1="1.27" y1="0" x2="2.54" y2="0" width="0.6096" layer="94"/>
@@ -15521,7 +15521,7 @@ W = angled&lt;p&gt;
 <pin name="2" x="7.62" y="0" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
 <pin name="3" x="7.62" y="2.54" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
 </symbol>
-<symbol name="MA06-1" library_version="1">
+<symbol name="MA06-1">
 <wire x1="3.81" y1="-10.16" x2="-1.27" y2="-10.16" width="0.4064" layer="94"/>
 <wire x1="1.27" y1="-2.54" x2="2.54" y2="-2.54" width="0.6096" layer="94"/>
 <wire x1="1.27" y1="-5.08" x2="2.54" y2="-5.08" width="0.6096" layer="94"/>
@@ -15543,7 +15543,7 @@ W = angled&lt;p&gt;
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="MA03-1" prefix="SV" uservalue="yes" library_version="1">
+<deviceset name="MA03-1" prefix="SV" uservalue="yes">
 <description>&lt;b&gt;PIN HEADER&lt;/b&gt;</description>
 <gates>
 <gate name="G$1" symbol="MA03-1" x="0" y="0"/>
@@ -15566,7 +15566,7 @@ W = angled&lt;p&gt;
 </device>
 </devices>
 </deviceset>
-<deviceset name="MA06-1" prefix="SV" uservalue="yes" library_version="1">
+<deviceset name="MA06-1" prefix="SV" uservalue="yes">
 <description>&lt;b&gt;PIN HEADER&lt;/b&gt;</description>
 <gates>
 <gate name="1" symbol="MA06-1" x="0" y="0"/>
@@ -15605,56 +15605,56 @@ W = angled&lt;p&gt;
 </classes>
 <parts>
 <part name="ST1" library="con-apple2" deviceset="A2-50PIN" device="SLOT1-3"/>
-<part name="IC4" library="xilinx-xc9" library_urn="urn:adsk.eagle:library:416" deviceset="XC9572_S44" device="" value="XC9572XL"/>
-<part name="IC1" library="74xx-eu" library_urn="urn:adsk.eagle:library:85" deviceset="74*245" device="N" technology="HCT"/>
-<part name="IC2" library="v-reg" library_urn="urn:adsk.eagle:library:409" deviceset="LM317TL" device="" value="LM317"/>
-<part name="C2" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="CPOL-EU" device="E2.5-5" value="1u"/>
-<part name="R1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="200"/>
-<part name="R2" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="330"/>
-<part name="R3" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100k"/>
-<part name="+3V1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
-<part name="P+1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
-<part name="GND1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="P+2" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
-<part name="GND5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="+3V5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
-<part name="+3V2" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
-<part name="P+3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
-<part name="GND2" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="GND3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="GND6" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="R4" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="470"/>
-<part name="+3V4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
-<part name="LED1" library="led" library_urn="urn:adsk.eagle:library:259" deviceset="LED" device="SQR2X5"/>
-<part name="IC3" library="memory" library_urn="urn:adsk.eagle:library:279" deviceset="2716" device="" value="2716 / 2732"/>
-<part name="P+4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
-<part name="GND7" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
+<part name="IC4" library="xilinx-xc9" deviceset="XC9572_S44" device="" value="XC9572XL"/>
+<part name="IC1" library="74xx-eu" deviceset="74*245" device="N" technology="HCT"/>
+<part name="IC2" library="v-reg" deviceset="LM317TL" device="" value="LM317"/>
+<part name="C2" library="rcl" deviceset="CPOL-EU" device="E2.5-5" value="1u"/>
+<part name="R1" library="rcl" deviceset="R-EU_" device="R0603" value="200"/>
+<part name="R2" library="rcl" deviceset="R-EU_" device="R0603" value="330"/>
+<part name="R3" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="+3V1" library="supply1" deviceset="+3V3" device=""/>
+<part name="P+1" library="supply1" deviceset="+5V" device=""/>
+<part name="GND1" library="supply1" deviceset="GND" device=""/>
+<part name="P+2" library="supply1" deviceset="+5V" device=""/>
+<part name="GND5" library="supply1" deviceset="GND" device=""/>
+<part name="+3V5" library="supply1" deviceset="+3V3" device=""/>
+<part name="+3V2" library="supply1" deviceset="+3V3" device=""/>
+<part name="P+3" library="supply1" deviceset="+5V" device=""/>
+<part name="GND2" library="supply1" deviceset="GND" device=""/>
+<part name="GND3" library="supply1" deviceset="GND" device=""/>
+<part name="GND6" library="supply1" deviceset="GND" device=""/>
+<part name="R4" library="rcl" deviceset="R-EU_" device="R0603" value="470"/>
+<part name="+3V4" library="supply1" deviceset="+3V3" device=""/>
+<part name="LED1" library="led" deviceset="LED" device="SQR2X5"/>
+<part name="IC3" library="memory" deviceset="2716" device="" value="2716 / 2732"/>
+<part name="P+4" library="supply1" deviceset="+5V" device=""/>
+<part name="GND7" library="supply1" deviceset="GND" device=""/>
 <part name="U$2" library="con-sd-attend2" deviceset="104H-TDA0-R" device=""/>
-<part name="FRAME1" library="frames" library_urn="urn:adsk.eagle:library:229" deviceset="A3L-LOC" device=""/>
-<part name="R5" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100k"/>
-<part name="R6" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100k"/>
-<part name="R7" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100k"/>
-<part name="R8" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="68k"/>
-<part name="R9" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100k"/>
-<part name="P+5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
-<part name="SV1" library="con-lstb" library_urn="urn:adsk.eagle:library:162" deviceset="MA03-1" device=""/>
-<part name="R10" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="10k"/>
-<part name="P+6" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
-<part name="GND4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="SV2" library="con-lstb" library_urn="urn:adsk.eagle:library:162" deviceset="MA06-1" device=""/>
-<part name="+3V3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
-<part name="GND8" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="C5" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0603K" value="100n"/>
-<part name="C6" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0603K" value="100n"/>
-<part name="C7" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0603K" value="100n"/>
-<part name="C8" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0603K" value="10n"/>
-<part name="C9" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0603K" value="10n"/>
-<part name="C10" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0603K" value="10n"/>
-<part name="C3" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0603K" value="100n"/>
-<part name="C4" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0603K" value="100n"/>
-<part name="GND9" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="R11" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0603" value="100k"/>
-<part name="C1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0603K" value="100n"/>
+<part name="FRAME1" library="frames" deviceset="A3L-LOC" device=""/>
+<part name="R5" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="R6" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="R7" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="R8" library="rcl" deviceset="R-EU_" device="R0603" value="68k"/>
+<part name="R9" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="P+5" library="supply1" deviceset="+5V" device=""/>
+<part name="SV1" library="con-lstb" deviceset="MA03-1" device=""/>
+<part name="R10" library="rcl" deviceset="R-EU_" device="R0603" value="10k"/>
+<part name="P+6" library="supply1" deviceset="+5V" device=""/>
+<part name="GND4" library="supply1" deviceset="GND" device=""/>
+<part name="SV2" library="con-lstb" deviceset="MA06-1" device=""/>
+<part name="+3V3" library="supply1" deviceset="+3V3" device=""/>
+<part name="GND8" library="supply1" deviceset="GND" device=""/>
+<part name="C5" library="rcl" deviceset="C-EU" device="C0603K" value="100n"/>
+<part name="C6" library="rcl" deviceset="C-EU" device="C0603K" value="100n"/>
+<part name="C7" library="rcl" deviceset="C-EU" device="C0603K" value="100n"/>
+<part name="C8" library="rcl" deviceset="C-EU" device="C0603K" value="10n"/>
+<part name="C9" library="rcl" deviceset="C-EU" device="C0603K" value="10n"/>
+<part name="C10" library="rcl" deviceset="C-EU" device="C0603K" value="10n"/>
+<part name="C3" library="rcl" deviceset="C-EU" device="C0603K" value="100n"/>
+<part name="C4" library="rcl" deviceset="C-EU" device="C0603K" value="100n"/>
+<part name="GND9" library="supply1" deviceset="GND" device=""/>
+<part name="R11" library="rcl" deviceset="R-EU_" device="R0603" value="100k"/>
+<part name="C1" library="rcl" deviceset="C-EU" device="C0603K" value="100n"/>
 </parts>
 <sheets>
 <sheet>
@@ -16726,11 +16726,6 @@ Program CPLD</text>
 <note version="6.3" minversion="6.2.2" severity="warning">
 Since Version 6.2.2 text objects can contain more than one line,
 which will not be processed correctly with this version.
-</note>
-<note version="8.2" severity="warning">
-Since Version 8.2, Eagle supports online libraries. The ids
-of those online libraries will not be understood (or retained)
-with this version.
 </note>
 </compatibility>
 </eagle>
