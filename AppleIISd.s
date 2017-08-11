@@ -13,7 +13,7 @@
                DAT
 
                XC               ; enable 65C02 code
-DEBUG          =     1
+DEBUG          =     0
                DO    DEBUG
                ORG   $8000
                ELSE
@@ -83,8 +83,8 @@ DUMMY          =     $FF
                FIN
                TAX              ; X holds now SLOT16
 
-               JSR   INIT
                BIT   $CFFF
+               JSR   INIT
 
 *
 * TODO: check for init error
@@ -404,27 +404,26 @@ GETR3          JSR   GETR1      ; get R1 first
 *
 ********************************
 
-BLOCK          PHY              ; save Y
-               LDY   SLOT
+BLOCK          PHX              ; save X
+               PHY              ; save Y
+               LDX   SLOT
                LDA   $46        ; store block num
-               STA   R33,Y      ; in R30-R33
+               STA   R33,X      ; in R30-R33
                LDA   $47
-               STA   R32,Y
+               STA   R32,X
                LDA   #0
-               STA   R31,Y
-               STA   R30,Y
+               STA   R31,X
+               STA   R30,X
 
-               PHX
-               LDY   #9
-               LDX   SLOT       ; ASL can't be done with Y
+               LDY   #9         ; ASL can't be used with Y
 :LOOP          ASL   R33,X      ; mul block num
                ROL   R32,X      ; by 512 to get
                ROL   R31,X      ; real address
                ROL   R30,X
                DEY
                BNE   :LOOP
-               PLX
                PLY              ; restore Y
+               PLX              ; restore X
                RTS
 
 
@@ -460,16 +459,7 @@ COMMAND        PHY              ; save Y
                STA   DATA,X     ; dummy crc
 :WAIT2         BIT   CTRL,X
                BPL   :WAIT2
-:GETR1         LDA   #DUMMY
-               STA   DATA,X     ; get R1
-:WAIT3         BIT   CTRL,X
-               BPL   :WAIT3
-               LDA   DATA,X     ; get response
-*
-* TODO: check for error!
-*
-               CMP   #$FE
-               BNE   :GETR1     ; wait for $FE
+               JSR   GETR1
                PLY              ; restore Y
                RTS
 
@@ -525,13 +515,23 @@ READ           JSR   BLOCK      ; calc block address
                LDA   #$51       ; send CMD17
                JSR   COMMAND    ; send command
 
-               PHY
+:GETTOK        LDA   #DUMMY     ; get data token
+               STA   DATA,X
+:WAIT          BIT   CTRL,X
+               BPL   :WAIT
+               LDA   DATA,X     ; get response
+*
+* TODO: check for error!
+*
+               CMP   #$FE
+               BNE   :GETTOK    ; wait for $FE
+
                LDY   #2         ; read data from card
 :LOOPY         STZ   WORK
 :LOOPW         LDA   #DUMMY
                STA   DATA,X
-:WAIT4         BIT   CTRL,X
-               BPL   :WAIT4
+:WAIT1         BIT   CTRL,X
+               BPL   :WAIT1
                LDA   DATA,X
                STA   ($44)
                INC   $44
@@ -541,21 +541,12 @@ READ           JSR   BLOCK      ; calc block address
                BNE   :LOOPW
                DEY
                BNE   :LOOPY
-               PLY
 
                JSR   GETR3      ; read 2 bytes crc
                LDA   #SSNONE
                STA   SS,X       ; disable /CS
                CLC              ; no error
                LDA   #$00
-               PLY              ; restore Y
-               RTS
-
-:ERROR         LDA   #SSNONE
-               STA   SS,X       ; disable /CS
-               SEC              ; an error occured
-               LDA   #$27
-               PLY              ; restore Y
                RTS
 
 
@@ -569,27 +560,35 @@ READ           JSR   BLOCK      ; calc block address
 * C Clear - No error
 *   Set   - Error
 * A $00   - No error
-*   $27   - Bad block number
+*   $27   - I/O error or bad block number
 *   $28   - No card inserted
+*   $2B   - Card write protected
 *
 ********************************
 
 * TODO: check for card detect and write protect!
 
 WRITE          JSR   BLOCK      ; calc block address
-
                LDA   #SS0       ; enable /CS
                STA   SS,X
                LDA   #$58       ; send CMD24
                JSR   COMMAND    ; send command
 
-               PHY
+               LDA   #DUMMY
+               STA   DATA,X     ; send dummy
+:WAIT1         BIT   CTRL,X
+               BPL   :WAIT1
+               LDA   #$FE
+               STA   DATA,X     ; send data token
+:WAIT2         BIT   CTRL,X
+               BPL   :WAIT2
+
                LDY   #2         ; send data to card
 :LOOPY         STZ   WORK
 :LOOPW         LDA   ($44)
                STA   DATA,X
-:WAIT4         BIT   CTRL,X
-               BPL   :WAIT4
+:WAIT3         BIT   CTRL,X
+               BPL   :WAIT3
                INC   $44
                BNE   :INW
                INC   $45        ; inc msb on page boundary
@@ -600,17 +599,46 @@ WRITE          JSR   BLOCK      ; calc block address
 
                LDY   #2         ; send 2 dummy crc bytes
 :CRC           STA   DATA,X
-:WAIT5         BIT   CTRL,X
-               BPL   :WAIT5
+:WAIT4         BIT   CTRL,X
+               BPL   :WAIT4
                DEY
                BNE   :CRC
-               PLY
+
+               LDA   #DUMMY     ; get data response
+               STA   DATA,X
+:WAIT5         BIT   CTRL,X
+               BPL   :WAIT5
+               LDA   DATA,X
+               AND   #$1F
+               CMP   #$05
+               BNE   :ERROR     ; check for write error
+
+:WAIT6         LDA   #DUMMY     ; wait for write cycle
+               STA   DATA,X     ; to complete
+:WAIT61        BIT   CTRL,X
+               BPL   :WAIT61
+               LDA   DATA,X
+               CMP   #$00
+               BEQ   :WAIT6
 
                LDA   #SSNONE    ; disable /CS
                STA   SS,X
                CLC              ; no error
                LDA   #0
-               PLY
+               RTS
+
+:ERROR
+:WAIT7         LDA   #DUMMY     ; wait for write cycle
+               STA   DATA,X     ; to complete
+:WAIT71        BIT   CTRL,X
+               BPL   :WAIT71
+               LDA   DATA,X
+               CMP   #$00
+               BEQ   :WAIT7
+               LDA   #SSNONE
+               STA   SS,X       ; disable /CS
+               SEC              ; an error occured
+               LDA   #$27
                RTS
 
 
