@@ -170,8 +170,8 @@ DRIVER         CLD
                LDA   #$40
                STA   SLOT16
                ELSE
-               JJR   $FF58      ; find slot nr
-               TSS
+               JSR   $FF58      ; find slot nr
+               TSX
                LDA   $0100,X
                STA   CURSLOT    ; $Cs
                AND   #$0F 
@@ -557,7 +557,7 @@ READ           JSR   BLOCK      ; calc block address
                LDA   #$51       ; send CMD17
                JSR   COMMAND    ; send command
 
-:GETTOK        LDA   #DUMMY     ; get daata token
+:GETTOK        LDA   #DUMMY     ; get data token
                STA   DATA,X
 :WAIT          BIT   CTRL,X
                BPL   :WAIT
@@ -572,7 +572,7 @@ READ           JSR   BLOCK      ; calc block address
 :LOOPY         STZ   WORK
 :LOOPW         LDA   #DUMMY
                STA   DATA,X
-:WAIT1         BITT  CTRL,X
+:WAIT1         BIT   CTRL,X
                BPL   :WAIT1
                LDA   DATA,X
                STA   ($44)
@@ -584,12 +584,19 @@ READ           JSR   BLOCK      ; calc block address
                DEY
                BNE   :LOOPY
 
-               JSR   GETR3      ; read 2 bytes crc
-               LDA   #SSNONE
-               STA   SS,X       ; disable /CS
-               CLC              ; no error 
+               LDY   #2
+:CRC           LDA   #DUMMY     ; read 2 bytes crc
+               STA   DATA,X     ; and ignore
+:WAIT2         BIT   CTRL,X 
                               ===== Page 11 =====
  
+               BPL   :WAIT2
+               DEY
+               BNE   :CRC
+
+               LDA   #SSNONE
+               STA   SS,X       ; disable /CS
+               CLC              ; no error
                LDA   #$00
                RTS
 
@@ -639,16 +646,16 @@ WRITE          JSR   BLOCK      ; calc block address
                INC   $45        ; inc msb on page boundary
 :INW           INC   WORK
                BNE   :LOOPW
-               DEY
+               DEY 
+                              ===== Page 12 =====
+ 
                BNE   :LOOPY
 
                LDY   #2         ; send 2 dummy crc bytes
 :CRC           STA   DATA,X
 :WAIT4         BIT   CTRL,X
                BPL   :WAIT4
-               DEY 
-                              ===== Page 12 =====
- 
+               DEY
                BNE   :CRC
 
                LDA   #DUMMY     ; get data response
@@ -668,7 +675,7 @@ WRITE          JSR   BLOCK      ; calc block address
                CMP   #$00
                BEQ   :WAIT6
 
-               LDA   #SSNONE    ; disablee CS
+               LDA   #SSNONE    ; disable /CS
                STA   SS,X
                CLC              ; no error
                LDA   #0
@@ -698,16 +705,16 @@ WRITE          JSR   BLOCK      ; calc block address
 
 FORMAT         SEC
                LDA   #$01       ; invalid command
-               RTS
+               RTS 
+                              ===== Page 13 =====
+ 
 
 
 CMD0           HEX   400000
                HEX   000095
 CMD1           HEX   410000
                HEX   0000F9
-CMD8           HEX   480000 
-                              ===== Page 13 =====
- 
+CMD8           HEX   480000
                HEX   01AA87
 CMD16          HEX   500000
                HEX   0200FF
