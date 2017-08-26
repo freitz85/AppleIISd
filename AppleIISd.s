@@ -1,7 +1,7 @@
 ********************************
 *
 * Apple][Sd Firmware
-* Version 0.5
+* Version 0.6
 *
 * (c) Florian Reitz, 2017
 *
@@ -44,13 +44,9 @@ INITED      =     $0678
 SSNONE      =     $0F
 SS0         =     $0E
 DUMMY       =     $FF
+FRXEN       =     $17
+FRXDIS      =     $07
 
-
-********************************
-*
-* Install SD card driver
-*
-********************************
 
 * signature bytes
 
@@ -72,9 +68,10 @@ DUMMY       =     $FF
             JSR   $FF58
             TSX
             LDA   $0100,X
-            STA   CURSLOT     ; $Cs
             AND   #$0F
             STA   SLOT        ; $0s
+            ORA   #$C0
+            STA   CURSLOT     ; $Cs
             ASL   A
             ASL   A
             ASL   A
@@ -86,34 +83,41 @@ DUMMY       =     $FF
             BIT   $CFFF
             JSR   INIT
 
-            DO    DEBUG
 *
 * TODO: check for init error
 *
 
+********************************
+*
+* Install SD card driver
+*
+********************************
+
+            DO    DEBUG
+
 * see if slot has a driver already
 
             LDX   $BF31       ; get devcnt
-INSLP       LDA   $BF32,X     ; get a devnum
+INSTALL     LDA   $BF32,X     ; get a devnum
             AND   #$70        ; isolate slot
             CMP   SLOT16      ; slot?
-            BEQ   INSOUT      ; yes, skip it
+            BEQ   :INSOUT     ; yes, skip it
             DEX
-            BPL   INSLP       ; keep up the search
+            BPL   INSTALL     ; keep up the search
 
 * restore the devnum to the list
 
             LDX   $BF31       ; get devcnt again
             CPX   #$0D        ; device table full?
-            BNE   INSLP2
+            BNE   :INST2
 
             JSR   $FF3A       ; bell
-            JMP   INSOUT      ; do something!
+            JMP   :INSOUT     ; do something!
 
-INSLP2      LDA   $BF32-1,X   ; move all entries down
+:INST2      LDA   $BF32-1,X   ; move all entries down
             STA   $BF32,X     ; to make room at front
             DEX               ; for a new entry
-            BNE   INSLP2
+            BNE   :INST2
             LDA   #$04        ; ProFile type device
             ORA   SLOT16
             STA   $BF32       ; slot, drive 1 at top of list
@@ -128,9 +132,16 @@ INSLP2      LDA   $BF32-1,X   ; move all entries down
             STA   $BF10,X     ; write to driver table
             LDA   #>DRIVER
             STA   $BF11,X
+:INSOUT     RTS
 
-INSOUT      RTS
-            FIN
+
+********************************
+*
+* Boot from SD card
+*
+********************************
+
+            ELSE
 
 BOOT        LDA   #$01
             STA   $42         ; load command
@@ -145,6 +156,8 @@ BOOT        LDA   #$01
             BIT   $CFFF
             JSR   READ        ; call driver
             JMP   $801        ; goto bootloader
+
+            FIN
 
 
 ********************************
@@ -165,9 +178,10 @@ DRIVER      CLD
             JSR   $FF58       ; find slot nr
             TSX
             LDA   $0100,X
-            STA   CURSLOT     ; $Cs
             AND   #$0F
             STA   SLOT        ; $0s
+            ORA   #$C0
+            STA   CURSLOT     ; $Cs
             ASL   A
             ASL   A
             ASL   A
@@ -201,10 +215,11 @@ DRIVER      CLD
 :INIT       JSR   INIT
             BRA   :CMD
 
+
 * Signature bytes
 
             DS    \           ; fill with zeroes
-            ORG   *-4         ; locate to $C8FC
+            DS    -4          ; locate to $xxFC
             DW    $FFFF       ; 65535 blocks
             DB    $47         ; Status bits
             DB    #<DRIVER    ; LSB of driver
@@ -320,10 +335,10 @@ INIT        CLD
             CMP   #$00
             BNE   :IOERROR    ; error!
 
-:END        LDY   SLOT        ; all ok
+:END        LDY   SLOT
             LDA   #$01
             STA   INITED,Y    ; initialized
-            CLC
+            CLC               ; all ok
             LDY   #0
             BCC   :END1
 :CDERROR    SEC
@@ -333,6 +348,8 @@ INIT        CLD
             LDY   #$27        ; init error
 :END1       LDA   #SSNONE     ; deselect card
             STA   SS,X
+            LDA   #7          ; enable 7MHz
+            STA   CTRL,X
             LDA   #0          ; set div to 2
             STA   DIV,X
             TYA               ; retval in A
@@ -457,28 +474,16 @@ BLOCK       PHX               ; save X
 COMMAND     PHY               ; save Y
             LDY   SLOT
             STA   DATA,X      ; send command
-:WAIT       BIT   CTRL,X
-            BPL   :WAIT
-:ARG        LDA   R30,Y       ; get arg from R30 on
+            LDA   R30,Y       ; get arg from R30 on
             STA   DATA,X
-:WAIT1      BIT   CTRL,X
-            BPL   :WAIT1
             LDA   R31,Y
             STA   DATA,X
-:WAIT11     BIT   CTRL,X
-            BPL   :WAIT11
             LDA   R32,Y
             STA   DATA,X
-:WAIT12     BIT   CTRL,X
-            BPL   :WAIT12
             LDA   R33,Y
             STA   DATA,X
-:WAIT13     BIT   CTRL,X
-            BPL   :WAIT13
             LDA   #DUMMY
             STA   DATA,X      ; dummy crc
-:WAIT2      BIT   CTRL,X
-            BPL   :WAIT2
             JSR   GETR1
             PLY               ; restore Y
             RTS
@@ -535,24 +540,22 @@ READ        JSR   BLOCK       ; calc block address
             LDA   #$51        ; send CMD17
             JSR   COMMAND     ; send command
 
+            CMP   #0          ; check for error
+            BNE   :ERROR
+
 :GETTOK     LDA   #DUMMY      ; get data token
             STA   DATA,X
-:WAIT       BIT   CTRL,X
-            BPL   :WAIT
             LDA   DATA,X      ; get response
-*
-* TODO: check for error!
-*
             CMP   #$FE
             BNE   :GETTOK     ; wait for $FE
 
             LDY   #2          ; read data from card
-:LOOPY      STZ   WORK
-:LOOPW      LDA   #DUMMY
+            LDA   #FRXEN      ; enable FRX
+            STA   CTRL,X
+            LDA   #DUMMY
             STA   DATA,X
-:WAIT1      BIT   CTRL,X
-            BPL   :WAIT1
-            LDA   DATA,X
+:LOOPY      STZ   WORK
+:LOOPW      LDA   DATA,X
             STA   ($44)
             INC   $44
             BNE   :INW
@@ -562,18 +565,22 @@ READ        JSR   BLOCK       ; calc block address
             DEY
             BNE   :LOOPY
 
-            LDY   #2
-:CRC        LDA   #DUMMY      ; read 2 bytes crc
-            STA   DATA,X      ; and ignore
-:WAIT2      BIT   CTRL,X
-            BPL   :WAIT2
-            DEY
-            BNE   :CRC
+            LDA   #FRXDIS     ; disable FRX
+            STA   CTRL,X
+
+:CRC        LDA   #DUMMY      ; first crc byte has
+            STA   DATA,X      ; already been read
 
             LDA   #SSNONE
             STA   SS,X        ; disable /CS
             CLC               ; no error
             LDA   #$00
+            RTS
+
+:ERROR      LDA   #SSNONE
+            STA   SS,X        ; disable /CS
+            SEC               ; an error occured
+            LDA   #$27
             RTS
 
 
@@ -602,21 +609,18 @@ WRITE       JSR   BLOCK       ; calc block address
             LDA   #$58        ; send CMD24
             JSR   COMMAND     ; send command
 
+            CMP   #0          ; check for error
+            BNE   :ERROR
+
             LDA   #DUMMY
             STA   DATA,X      ; send dummy
-:WAIT1      BIT   CTRL,X
-            BPL   :WAIT1
             LDA   #$FE
             STA   DATA,X      ; send data token
-:WAIT2      BIT   CTRL,X
-            BPL   :WAIT2
 
             LDY   #2          ; send data to card
 :LOOPY      STZ   WORK
 :LOOPW      LDA   ($44)
             STA   DATA,X
-:WAIT3      BIT   CTRL,X
-            BPL   :WAIT3
             INC   $44
             BNE   :INW
             INC   $45         ; inc msb on page boundary
@@ -625,27 +629,18 @@ WRITE       JSR   BLOCK       ; calc block address
             DEY
             BNE   :LOOPY
 
-            LDY   #2          ; send 2 dummy crc bytes
-:CRC        STA   DATA,X
-:WAIT4      BIT   CTRL,X
-            BPL   :WAIT4
-            DEY
-            BNE   :CRC
-
-            LDA   #DUMMY      ; get data response
+:CRC        STA   DATA,X      ; send 2 dummy crc bytes
             STA   DATA,X
-:WAIT5      BIT   CTRL,X
-            BPL   :WAIT5
+
+            STA   DATA,X      ; get data response
             LDA   DATA,X
             AND   #$1F
             CMP   #$05
             BNE   :ERROR      ; check for write error
 
-:WAIT6      LDA   #DUMMY      ; wait for write cycle
-            STA   DATA,X      ; to complete
-:WAIT61     BIT   CTRL,X
-            BPL   :WAIT61
-            LDA   DATA,X
+:WAIT6      LDA   #DUMMY
+            STA   DATA,X      ; wait for write cycle
+            LDA   DATA,X      ; to complete
             CMP   #$00
             BEQ   :WAIT6
 
@@ -655,14 +650,12 @@ WRITE       JSR   BLOCK       ; calc block address
             LDA   #0
             RTS
 
-:ERROR
-:WAIT7      LDA   #DUMMY      ; wait for write cycle
-            STA   DATA,X      ; to complete
-:WAIT71     BIT   CTRL,X
-            BPL   :WAIT71
-            LDA   DATA,X
+:ERROR      LDA   #DUMMY
+            STA   DATA,X      ; wait for write cycle
+            LDA   DATA,X      ; to complete
             CMP   #$00
-            BEQ   :WAIT7
+            BEQ   :ERROR
+
             LDA   #SSNONE
             STA   SS,X        ; disable /CS
             SEC               ; an error occured
@@ -696,3 +689,4 @@ ACMD4140    HEX   694000
             HEX   000077
 ACMD410     HEX   690000
             HEX   0000FF
+

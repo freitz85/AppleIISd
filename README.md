@@ -5,7 +5,7 @@ The **Apple][Sd** is a SD card based replaced for the ProFile harddrive. In cont
 
 A Xilinx CPLD is used as a SPI controller and translates, together with the ROM driver, SD card data to/from the Apple IIe. The VHDL source is based on [SPI65/B](http://www.6502.org/users/andre/spi65b) by André Fachat.
 
-The assembler sources were originally written in Merlin-8, but have been updated to Merlin-32. The [schematics](AppleIISd.pdf) are available as PDF.
+The assembler sources were written in Merlin-8. The [schematics](AppleIISd.pdf) are available as PDF.
 
 ## Features
 * up to 128MB storage space (4x 65535 blocks), currently 32MB
