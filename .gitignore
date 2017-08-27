@@ -160,7 +160,6 @@ VHDL/appleiisd_html*
 VHDL/*.vhf
 VHDL/*.dhp
 VHDL/*.gyd
-VHDL/*.jed
 VHDL/*.mfd
 VHDL/*.pnx
 VHDL/*.rpt

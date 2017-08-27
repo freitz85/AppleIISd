@@ -46,36 +46,36 @@ use AddressDecoder.ALL;
 --use UNISIM.VComponents.all;
 
 entity AppleIISd is
-    Port ( data : inout  STD_LOGIC_VECTOR (7 downto 0);
-           nrw : in  STD_LOGIC;
-           nirq : out  STD_LOGIC;
-           nreset : in  STD_LOGIC;
-           addr : in  STD_LOGIC_VECTOR (1 downto 0);
-           nphi2 : in  STD_LOGIC;
-           ndev_sel : in  STD_LOGIC;
-           extclk : in  STD_LOGIC;
-           spi_miso: in std_logic;
-           spi_mosi : out  STD_LOGIC;
-           spi_sclk : out  STD_LOGIC;
-           spi_Nsel : out  STD_LOGIC;
-		 wp : in  STD_LOGIC;
-		 card : in STD_LOGIC;
-           led : out STD_LOGIC;
+Port ( data : inout  STD_LOGIC_VECTOR (7 downto 0);
+       nrw : in  STD_LOGIC;
+       nirq : out  STD_LOGIC;
+       nreset : in  STD_LOGIC;
+       addr : in  STD_LOGIC_VECTOR (1 downto 0);
+       nphi2 : in  STD_LOGIC;
+       ndev_sel : in  STD_LOGIC;
+       extclk : in  STD_LOGIC;
+       spi_miso: in std_logic;
+       spi_mosi : out  STD_LOGIC;
+       spi_sclk : out  STD_LOGIC;
+       spi_Nsel : out  STD_LOGIC;
+       wp : in  STD_LOGIC;
+       card : in  STD_LOGIC;
+       led : out  STD_LOGIC;
 
-		a8     : in    std_logic; 
-          a9     : in    std_logic; 
-          a10    : in    std_logic; 
-          nio_sel : in    std_logic; 
-          nio_stb : in    std_logic; 
-          b8   : out   std_logic; 
-          b9   : out   std_logic; 
-          b10  : out   std_logic; 
-          noe     : out   std_logic;
-		ng	  : out 	std_logic
-		);
-			  
-	constant DIV_WIDTH		: integer := 3;
-				
+       a8 : in  std_logic;
+       a9 : in  std_logic;
+       a10 : in  std_logic;
+       nio_sel : in  std_logic;
+       nio_stb : in  std_logic;
+       b8 : out  std_logic;
+       b9 : out  std_logic;
+       b10 : out  std_logic;
+       noe : out  std_logic;
+       ng : out  std_logic
+     );
+
+    constant DIV_WIDTH : integer := 3;
+
 end AppleIISd;
 
 architecture Behavioral of AppleIISd is
@@ -97,6 +97,7 @@ architecture Behavioral of AppleIISd is
 	signal spidatain: std_logic_vector (7 downto 0);
 	signal spidataout: std_logic_vector (7 downto 0);
 	signal spiint: std_logic;	-- spi interrupt state
+    signal inited: std_logic;   -- card initialized
 	
 	-- spi register flags
 	signal tc: std_logic;		-- transmission complete; cleared on spi data read
@@ -133,7 +134,7 @@ architecture Behavioral of AppleIISd is
           A9     : in    std_logic; 
           A10    : in    std_logic; 
           CLK : in    std_logic; 
-		NDEV_SEL : in std_logic;
+          NDEV_SEL : in std_logic;
           NIO_SEL : in    std_logic; 
           NIO_STB : in    std_logic; 
           B8   : out   std_logic; 
@@ -324,7 +325,7 @@ begin
 	-- cpu read
 	cpu_read: process (is_read, addr, 
 			spidatain, tc, ier, bsy, frx, tmo, ece, cpol, cpha, divisor,
-			slavesel, slaveinten, wp, card)
+			slavesel, slaveinten, wp, card, inited)
 	begin
 		if (is_read = '1') then 
 			case addr is
@@ -348,7 +349,7 @@ begin
 					int_dout(4) <= slaveinten;
 					int_dout(5) <= wp;
 					int_dout(6) <= card;
-					int_dout(7) <= '0';
+					int_dout(7) <= inited;
 				when others => 
 					int_dout <= (others => '0');
 			end case;
@@ -358,7 +359,7 @@ begin
 	end process;
 
 	-- cpu write 
-	cpu_write: process(reset, selected, nrw, addr, int_din)
+	cpu_write: process(reset, selected, nrw, addr, int_din, inited)
 	begin
 		if (reset = '1') then
 			cpha <= '0';
@@ -369,6 +370,7 @@ begin
 			ier <= '0';
 			slavesel <= '1';
 			slaveinten <= '0';
+            inited <= '0';
 			divisor <= (others => '0');
 		elsif (falling_edge(selected) and nrw = '0') then
 		--elsif (falling_edge(cpu_phi2) and selected='1' and nrw='0') then
@@ -389,6 +391,7 @@ begin
 				when "11" =>		-- write slave select / slave interrupt enable
 					slavesel <= int_din(0);
 					slaveinten <= int_din(4);
+                    inited <= int_din(7);
 				when others =>
 			end case;
 		end if;
