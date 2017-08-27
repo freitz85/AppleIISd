@@ -37,15 +37,16 @@ R30         =     $0478
 R31         =     $04F8
 R32         =     $0578
 R33         =     $05F8
-INITED      =     $0678
 
 * Constants
 
-SSNONE      =     $0F
-SS0         =     $0E
 DUMMY       =     $FF
-FRXEN       =     $17
-FRXDIS      =     $07
+FRX         =     $10         ; CTRL register
+ECE         =     $04
+SS0         =     $01         ; SS register
+WP          =     $20
+CARDDET     =     $40
+INITED      =     $80
 
 
 * signature bytes
@@ -191,10 +192,10 @@ DRIVER      CLD
             TAX               ; X holds now SLOT16
 
             BIT   $CFFF
-            LDY   SLOT
-            LDA   INITED,Y    ; check for init
-            CMP   #$01
-            BCC   :INIT
+            LDA   #INITED     ; check for init
+            BIT   SS,X
+            BEQ   :INIT
+
 :CMD        LDA   $42         ; get command
             CMP   #$00
             BEQ   :STATUS
@@ -240,7 +241,8 @@ DRIVER      CLD
 INIT        CLD
             LDA   #$03        ; set SPI mode 3
             STA   CTRL,X
-            LDA   #SSNONE
+            LDA   SS,X
+            ORA   #SS0        ; set CS high
             STA   SS,X
             LDA   #7
             STA   DIV,X
@@ -252,7 +254,8 @@ INIT        CLD
             BPL   :WAIT
             DEY
             BNE   :LOOP       ; do 10 times
-            LDA   #SS0        ; set CS low
+            LDA   SS,X
+            AND   #$FF!SS0    ; set CS low
             STA   SS,X
 
             LDA   #<CMD0      ; send CMD0
@@ -336,8 +339,12 @@ INIT        CLD
             BNE   :IOERROR    ; error!
 
 :END        LDY   SLOT
-            LDA   #$01
-            STA   INITED,Y    ; initialized
+            LDA   SS,X
+            ORA   #INITED     ; initialized
+            STA   SS,X
+            LDA   CTRL,X
+            ORA   #ECE        ; enable 7MHz
+            STA   CTRL,X
             CLC               ; all ok
             LDY   #0
             BCC   :END1
@@ -346,10 +353,9 @@ INIT        CLD
             BCS   :END1
 :IOERROR    SEC
             LDY   #$27        ; init error
-:END1       LDA   #SSNONE     ; deselect card
+:END1       LDA   SS,X        ; set CS high
+            ORA   #SS0
             STA   SS,X
-            LDA   #7          ; enable 7MHz
-            STA   CTRL,X
             LDA   #0          ; set div to 2
             STA   DIV,X
             TYA               ; retval in A
@@ -535,7 +541,8 @@ STATUS      CLC               ; no error
 
 READ        JSR   BLOCK       ; calc block address
 
-            LDA   #SS0        ; enable /CS
+            LDA   SS,X        ; enable /CS
+            AND   #$FF!SS0
             STA   SS,X
             LDA   #$51        ; send CMD17
             JSR   COMMAND     ; send command
@@ -550,7 +557,8 @@ READ        JSR   BLOCK       ; calc block address
             BNE   :GETTOK     ; wait for $FE
 
             LDY   #2          ; read data from card
-            LDA   #FRXEN      ; enable FRX
+            LDA   CTRL,X      ; enable FRX
+            ORA   #FRX
             STA   CTRL,X
             LDA   #DUMMY
             STA   DATA,X
@@ -565,19 +573,22 @@ READ        JSR   BLOCK       ; calc block address
             DEY
             BNE   :LOOPY
 
-            LDA   #FRXDIS     ; disable FRX
+            LDA   CTRL,X      ; disable FRX
+            AND   #$FF!FRX
             STA   CTRL,X
 
 :CRC        LDA   #DUMMY      ; first crc byte has
             STA   DATA,X      ; already been read
 
-            LDA   #SSNONE
+            LDA   SS,X
+            ORA   #SS0
             STA   SS,X        ; disable /CS
             CLC               ; no error
             LDA   #$00
             RTS
 
-:ERROR      LDA   #SSNONE
+:ERROR      LDA   SS,X
+            ORA   #SS0
             STA   SS,X        ; disable /CS
             SEC               ; an error occured
             LDA   #$27
@@ -604,7 +615,8 @@ READ        JSR   BLOCK       ; calc block address
 
 WRITE       JSR   BLOCK       ; calc block address
 
-            LDA   #SS0        ; enable /CS
+            LDA   SS,X        ; enable /CS
+            AND   #$FF!SS0
             STA   SS,X
             LDA   #$58        ; send CMD24
             JSR   COMMAND     ; send command
@@ -644,7 +656,8 @@ WRITE       JSR   BLOCK       ; calc block address
             CMP   #$00
             BEQ   :WAIT6
 
-            LDA   #SSNONE     ; disable /CS
+            LDA   SS,X        ; disable /CS
+            ORA   #SS0
             STA   SS,X
             CLC               ; no error
             LDA   #0
@@ -656,7 +669,8 @@ WRITE       JSR   BLOCK       ; calc block address
             CMP   #$00
             BEQ   :ERROR
 
-            LDA   #SSNONE
+            LDA   SS,X
+            ORA   #SS0
             STA   SS,X        ; disable /CS
             SEC               ; an error occured
             LDA   #$27

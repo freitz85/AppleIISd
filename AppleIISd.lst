@@ -9,772 +9,760 @@
                 9    * Y register is used for counting or SLOT
                 10   *
                 11   ********************************
-                12   
-                              27-AUG-17   0:31
-                14   
+                12
+                              27-AUG-17  14:47
+                14
                 15            XC               ; enable 65C02 code
-                16   DEBUG    =     0          
-                17            DO    DEBUG      
-                18            ORG   $8000      
-                19            ELSE             
+                16   DEBUG    =     0
+                17            DO    DEBUG
+                18            ORG   $8000
+                19            ELSE
                 20            ORG   $C800      ; Expansion ROM
-                21            FIN              
-                22   
+                21            FIN
+                22
                 23   * Memory defines
-                24   
+                24
                 25   SLOT16   =     $2B        ; $s0 -> slot * 16
-                26   WORK     =     $3C        
+                26   WORK     =     $3C
                 27   SLOT     =     $3D        ; $0s
-                28   CMDLO    =     $40        
-                29   CMDHI    =     $41        
-                30   
+                28   CMDLO    =     $40
+                29   CMDHI    =     $41
+                30
                 31   CURSLOT  =     $07F8      ; $Cs
-                32   DATA     =     $C080      
-                33   CTRL     =     DATA+1     
-                34   DIV      =     DATA+2     
-                35   SS       =     DATA+3     
-                36   R30      =     $0478      
-                37   R31      =     $04F8      
-                38   R32      =     $0578      
-                39   R33      =     $05F8      
-                40   INITED   =     $0678      
-                41   
-                42   * Constants
-                43   
-                44   SSNONE   =     $0F        
-                45   SS0      =     $0E        
-                46   DUMMY    =     $FF        
-                47   FRXEN    =     $17        
-                48   FRXDIS   =     $07        
-                49   
-                50   
-                51   * signature bytes
-                52   
-C800: A2 20     53            LDX   #$20       
-C802: A0 00     54            LDY   #$00       
-C804: A2 03     55            LDX   #$03       
-C806: 86 3C     56            STX   WORK       
-                57   
-                58   * find slot nr
-                59    
-                              ===== Page 2 =====
- 
-                60            DO    DEBUG      
-                61            LDA   #$04       
-                62            STA   SLOT       
-                63            LDA   #$C4       
-                64            STA   CURSLOT    
-                65            LDA   #$40       
-                66            STA   SLOT16     
-                67            ELSE             
-C808: 20 58 FF  68            JSR   $FF58      
-C80B: BA        69            TSX              
-C80C: BD 00 01  70            LDA   $0100,X    
-C80F: 29 0F     71            AND   #$0F       
-C811: 85 3D     72            STA   SLOT       ; $0s
-C813: 09 C0     73            ORA   #$C0       
-C815: 8D F8 07  74            STA   CURSLOT    ; $Cs
-C818: 0A        75            ASL   A          
-C819: 0A        76            ASL   A          
-C81A: 0A        77            ASL   A          
-C81B: 0A        78            ASL   A          
-C81C: 85 2B     79            STA   SLOT16     ; $s0
-                80            FIN              
-C81E: AA        81            TAX              ; X holds now SLOT16
-                82   
-C81F: 2C FF CF  83            BIT   $CFFF      
-C822: 20 00 C9  84            JSR   INIT       
-                85   
-                86   *
-                87   * TODO: check for init error
-                88   *
-                89   
-                90   ********************************
-                91   *
-                92   * Install SD card driver
-                93   *
-                94   ********************************
-                95   
-                96            DO    DEBUG      
-                97   
-                98   * see if slot has a driver already
-                99   
-                100           LDX   $BF31      ; get devcnt
-                101  INSTALL  LDA   $BF32,X    ; get a devnum
-                102           AND   #$70       ; isolate slot
-                103           CMP   SLOT16     ; slot?
-                104           BEQ   :INSOUT    ; yes, skip it
-                105           DEX              
-                106           BPL   INSTALL    ; keep up the search
-                107  
-                108  * restore the devnum to the list
-                109  
-                110           LDX   $BF31      ; get devcnt again
-                111           CPX   #$0D       ; device table full?
-                112           BNE   :INST2     
-                113  
-                114           JSR   $FF3A      ; bell
-                115           JMP   :INSOUT    ; do something!
-                116   
-                              ===== Page 3 =====
- 
-                117  :INST2   LDA   $BF32-1,X  ; move all entries down
-                118           STA   $BF32,X    ; to make room at front
-                119           DEX              ; for a new entry
-                120           BNE   :INST2     
-                121           LDA   #$04       ; ProFile type device
-                122           ORA   SLOT16     
-                123           STA   $BF32      ; slot, drive 1 at top of list
-                124           INC   $BF31      ; update devcnt
-                125  
-                126  * now insert the device driver vector
-                127  
-                128           LDA   SLOT       
-                129           ASL              
-                130           TAX              
-                131           LDA   #<DRIVER   
-                132           STA   $BF10,X    ; write to driver table
-                133           LDA   #>DRIVER   
-                134           STA   $BF11,X    
-                135  :INSOUT  RTS              
-                136  
-                137  
-                138  ********************************
-                139  *
-                140  * Boot from SD card
-                141  *
-                142  ********************************
-                143  
-                144           ELSE             
-                145  
-C825: A9 01     146  BOOT     LDA   #$01       
-C827: 85 42     147           STA   $42        ; load command
-C829: A5 2B     148           LDA   SLOT16     
-C82B: AA        149           TAX              
-C82C: 85 43     150           STA   $43        ; slot number
-C82E: 64 44     151           STZ   $44        ; buffer lo
-C830: A9 08     152           LDA   #$08       
-C832: 85 45     153           STA   $45        ; buffer hi
-C834: 64 46     154           STZ   $46        ; block lo
-C836: 64 47     155           STZ   $47        ; block hi
-C838: 2C FF CF  156           BIT   $CFFF      
-C83B: 20 9E CA  157           JSR   READ       ; call driver
-C83E: 4C 01 08  158           JMP   $801       ; goto bootloader
-                159  
-                160           FIN              
-                161  
-                162  
-                163  ********************************
-                164  *
-                165  * Jump table
-                166  *
-                167  ********************************
-                168  
-C841: D8        169  DRIVER   CLD              
-                170           DO    DEBUG      
-                171           LDA   #$04       
-                172           STA   SLOT       
-                173           LDA   #$C4        
-                              ===== Page 4 =====
- 
-                174           STA   CURSLOT    
-                175           LDA   #$40       
-                176           STA   SLOT16     
-                177           ELSE             
-C842: 20 58 FF  178           JSR   $FF58      ; find slot nr
-C845: BA        179           TSX              
-C846: BD 00 01  180           LDA   $0100,X    
-C849: 29 0F     181           AND   #$0F       
-C84B: 85 3D     182           STA   SLOT       ; $0s
-C84D: 09 C0     183           ORA   #$C0       
-C84F: 8D F8 07  184           STA   CURSLOT    ; $Cs
-C852: 0A        185           ASL   A          
-C853: 0A        186           ASL   A          
-C854: 0A        187           ASL   A          
-C855: 0A        188           ASL   A          
-C856: 85 2B     189           STA   SLOT16     ; $s0
-                190           FIN              
-C858: AA        191           TAX              ; X holds now SLOT16
-                192  
-C859: 2C FF CF  193           BIT   $CFFF      
-C85C: A4 3D     194           LDY   SLOT       
-C85E: B9 78 06  195           LDA   INITED,Y   ; check for init
-C861: C9 01     196           CMP   #$01       
-C863: 90 22     197           BCC   :INIT      
-C865: A5 42     198  :CMD     LDA   $42        ; get command
-C867: C9 00     199           CMP   #$00       
-C869: F0 10     200           BEQ   :STATUS    
-C86B: C9 01     201           CMP   #$01       
-C86D: F0 0F     202           BEQ   :READ      
-C86F: C9 02     203           CMP   #$02       
-C871: F0 0E     204           BEQ   :WRITE     
-C873: C9 03     205           CMP   #$03       
-C875: F0 0D     206           BEQ   :FORMAT    
-C877: 38        207           SEC              ; unknown command
-C878: A9 01     208           LDA   #$01       
-C87A: 60        209           RTS              
-                210  
-C87B: 4C 96 CA  211  :STATUS  JMP   STATUS     
-C87E: 4C 9E CA  212  :READ    JMP   READ       
-C881: 4C F7 CA  213  :WRITE   JMP   WRITE      
-C884: 4C 64 CB  214  :FORMAT  JMP   FORMAT     
-C887: 20 00 C9  215  :INIT    JSR   INIT       
-C88A: 80 D9     216           BRA   :CMD       
-                217  
-                218  
-                219  * Signature bytes
-                220  
-C88C: 00 00 00  221           DS    \          ; fill with zeroes
-C88F: 00 00 00 00 
-C893: 00 00 00 00 
-C897: 00 00 00 00 
-C89B: 00 00 00 00 
-C89F: 00 00 00 00 
-C8A3: 00 00 00 00 
-C8A7: 00 00 00 00 
-C8AB: 00 00 00 00 
-C8AF: 00 00 00 00  
-                              ===== Page 5 =====
- 
-C8B3: 00 00 00 00 
-C8B7: 00 00 00 00 
-C8BB: 00 00 00 00 
-C8BF: 00 00 00 00 
-C8C3: 00 00 00 00 
-C8C7: 00 00 00 00 
-C8CB: 00 00 00 00 
-C8CF: 00 00 00 00 
-C8D3: 00 00 00 00 
-C8D7: 00 00 00 00 
-C8DB: 00 00 00 00 
-C8DF: 00 00 00 00 
-C8E3: 00 00 00 00 
-C8E7: 00 00 00 00 
-C8EB: 00 00 00 00 
-C8EF: 00 00 00 00 
-C8F3: 00 00 00 00 
-C8F7: 00 00 00 00 
-C8FB: 00 00 00 00 
-C8FF: 00 
-                222           DS    -4         ; locate to $xxFC
-C8FC: FF FF     223           DW    $FFFF      ; 65535 blocks
-C8FE: 47        224           DB    $47        ; Status bits
-C8FF: 41        225           DB    #<DRIVER   ; LSB of driver
-                226  
-                227  
-                228  ********************************
-                229  *
-                230  * Initialize SD card
-                231  *
-                232  * C Clear - No error
-                233  *   Set   - Error
-                234  * A $00   - No error
-                235  *   $27   - I/O error - Init failed
-                236  *   $28   - No card inserted
-                237  *
-                238  ********************************
-                239  
-C900: D8        240  INIT     CLD              
-C901: A9 03     241           LDA   #$03       ; set SPI mode 3
-C903: 9D 81 C0  242           STA   CTRL,X     
-C906: A9 0F     243           LDA   #SSNONE    
-C908: 9D 83 C0  244           STA   SS,X       
-C90B: A9 07     245           LDA   #7         
-C90D: 9D 82 C0  246           STA   DIV,X      
-C910: A0 0A     247           LDY   #10        
-C912: A9 FF     248           LDA   #DUMMY     
-                249  
-C914: 9D 80 C0  250  :LOOP    STA   DATA,X     
-C917: 3C 81 C0  251  :WAIT    BIT   CTRL,X     
-C91A: 10 FB     252           BPL   :WAIT      
-C91C: 88        253           DEY              
-C91D: D0 F5     254           BNE   :LOOP      ; do 10 times
-C91F: A9 0E     255           LDA   #SS0       ; set CS low
-C921: 9D 83 C0  256           STA   SS,X       
-                257  
-C924: A9 68     258           LDA   #<CMD0     ; send CMD0 
-                              ===== Page 6 =====
- 
-C926: 85 40     259           STA   CMDLO      
-C928: A9 CB     260           LDA   #>CMD0     
-C92A: 85 41     261           STA   CMDHI      
-C92C: 20 E3 C9  262           JSR   CMD        
-C92F: 20 F7 C9  263           JSR   GETR1      ; get response
-C932: C9 01     264           CMP   #$01       
-C934: D0 39     265           BNE   :ERROR1    ; error!
-                266  
-C936: A9 74     267           LDA   #<CMD8     ; send CMD8
-C938: 85 40     268           STA   CMDLO      
-C93A: A9 CB     269           LDA   #>CMD8     
-C93C: 85 41     270           STA   CMDHI      
-C93E: 20 E3 C9  271           JSR   CMD        
-C941: 20 12 CA  272           JSR   GETR3      
-C944: C9 01     273           CMP   #$01       
-C946: D0 2A     274           BNE   :SDV1      ; may be SD Ver. 1
-                275  
-                276  * check for $01aa match!
-C948: A9 80     277  :SDV2    LDA   #<CMD55    
-C94A: 85 40     278           STA   CMDLO      
-C94C: A9 CB     279           LDA   #>CMD55    
-C94E: 85 41     280           STA   CMDHI      
-C950: 20 E3 C9  281           JSR   CMD        
-C953: 20 F7 C9  282           JSR   GETR1      
-C956: A9 86     283           LDA   #<ACMD4140 
-C958: 85 40     284           STA   CMDLO      
-C95A: A9 CB     285           LDA   #>ACMD4140 
-C95C: 85 41     286           STA   CMDHI      
-C95E: 20 E3 C9  287           JSR   CMD        
-C961: 20 F7 C9  288           JSR   GETR1      
-C964: C9 01     289           CMP   #$01       
-C966: F0 E0     290           BEQ   :SDV2      ; wait for ready
-C968: C9 00     291           CMP   #$00       
-C96A: D0 03     292           BNE   :ERROR1    ;  error!
-                293  * send CMD58
-                294  * SD Ver. 2 initialized!
-C96C: 4C AC C9  295           JMP   :BLOCKSZ   
-                296  
-C96F: 4C CF C9  297  :ERROR1  JMP   :IOERROR   ; needed for far jump
-                298  
-C972: A9 80     299  :SDV1    LDA   #<CMD55    
-C974: 85 40     300           STA   CMDLO      
-C976: A9 CB     301           LDA   #>CMD55    
-C978: 85 41     302           STA   CMDHI      
-C97A: 20 E3 C9  303           JSR   CMD        ; ignore response
-C97D: A9 8C     304           LDA   #<ACMD410  
-C97F: 85 40     305           STA   CMDLO      
-C981: A9 CB     306           LDA   #>ACMD410  
-C983: 85 41     307           STA   CMDHI      
-C985: 20 E3 C9  308           JSR   CMD        
-C988: 20 F7 C9  309           JSR   GETR1      
-C98B: C9 01     310           CMP   #$01       
-C98D: F0 E3     311           BEQ   :SDV1      ; wait for ready
-C98F: C9 00     312           CMP   #$00       
-C991: D0 03     313           BNE   :MMC       ; may be MMC card
-                314  * SD Ver. 1 initialized!
-C993: 4C AC C9  315           JMP   :BLOCKSZ    
-                              ===== Page 7 =====
- 
-                316  
-C996: A9 6E     317  :MMC     LDA   #<CMD1     
-C998: 85 40     318           STA   CMDLO      
-C99A: A9 CB     319           LDA   #>CMD1     
-C99C: 85 41     320           STA   CMDHI      
-C99E: 20 E3 C9  321  :LOOP1   JSR   CMD        
-C9A1: 20 F7 C9  322           JSR   GETR1      
-C9A4: C9 01     323           CMP   #$01       
-C9A6: F0 F6     324           BEQ   :LOOP1     ; wait for ready
-C9A8: C9 00     325           CMP   #$00       
-C9AA: D0 23     326           BNE   :IOERROR   ; error!
-                327  * MMC Ver. 3 initialized!
-                328  
-C9AC: A9 7A     329  :BLOCKSZ LDA   #<CMD16    
-C9AE: 85 40     330           STA   CMDLO      
-C9B0: A9 CB     331           LDA   #>CMD16    
-C9B2: 85 41     332           STA   CMDHI      
-C9B4: 20 E3 C9  333           JSR   CMD        
-C9B7: 20 F7 C9  334           JSR   GETR1      
-C9BA: C9 00     335           CMP   #$00       
-C9BC: D0 11     336           BNE   :IOERROR   ; error!
-                337  
-C9BE: A4 3D     338  :END     LDY   SLOT       
-C9C0: A9 01     339           LDA   #$01       
-C9C2: 99 78 06  340           STA   INITED,Y   ; initialized
-C9C5: 18        341           CLC              ; all ok
-C9C6: A0 00     342           LDY   #0         
-C9C8: 90 08     343           BCC   :END1      
-C9CA: 38        344  :CDERROR SEC              
-C9CB: A0 28     345           LDY   #$28       ; no card error
-C9CD: B0 03     346           BCS   :END1      
-C9CF: 38        347  :IOERROR SEC              
-C9D0: A0 27     348           LDY   #$27       ; init error
-C9D2: A9 0F     349  :END1    LDA   #SSNONE    ; deselect card
-C9D4: 9D 83 C0  350           STA   SS,X       
-C9D7: A9 07     351           LDA   #7         ; enable 7MHz
-C9D9: 9D 81 C0  352           STA   CTRL,X     
-C9DC: A9 00     353           LDA   #0         ; set div to 2
-C9DE: 9D 82 C0  354           STA   DIV,X      
-C9E1: 98        355           TYA              ; retval in A
-C9E2: 60        356           RTS              
-                357  
-                358  
-                359  ********************************
-                360  *
-                361  * Send SD command
-                362  * Call with command in CMDHI and CMDLO
-                363  *
-                364  ********************************
-                365  
-C9E3: 5A        366  CMD      PHY              
-C9E4: A0 00     367           LDY   #0         
-C9E6: B1 40     368  :LOOP    LDA   (CMDLO),Y  
-C9E8: 9D 80 C0  369           STA   DATA,X     
-C9EB: 3C 81 C0  370  :WAIT    BIT   CTRL,X     ; TC is in N
-C9EE: 10 FB     371           BPL   :WAIT      
-C9F0: C8        372           INY               
-                              ===== Page 8 =====
- 
-C9F1: C0 06     373           CPY   #6         
-C9F3: 90 F1     374           BCC   :LOOP      
-C9F5: 7A        375           PLY              
-C9F6: 60        376           RTS              
-                377  
-                378  
-                379  ********************************
-                380  *
-                381  * Get R1
-                382  * R1 is in A
-                383  *
-                384  ********************************
-                385  
-C9F7: A9 FF     386  GETR1    LDA   #DUMMY     
-C9F9: 9D 80 C0  387           STA   DATA,X     
-C9FC: 3C 81 C0  388  :WAIT    BIT   CTRL,X     
-C9FF: 10 FB     389           BPL   :WAIT      
-CA01: BD 80 C0  390           LDA   DATA,X     ; get response
-CA04: 85 3C     391           STA   WORK       ; save R1
-CA06: 29 80     392           AND   #$80       
-CA08: D0 ED     393           BNE   GETR1      ; wait for MSB=0
-CA0A: A9 FF     394           LDA   #DUMMY     
-CA0C: 9D 80 C0  395           STA   DATA,X     ; send another dummy
-CA0F: A5 3C     396           LDA   WORK       ; restore R1
-CA11: 60        397           RTS              
-                398  
-                399  
-                400  ********************************
-                401  *
-                402  * Get R3
-                403  * R1 is in A
-                404  * R3 is in scratchpad ram
-                405  *
+                32   DATA     =     $C080
+                33   CTRL     =     DATA+1
+                34   DIV      =     DATA+2
+                35   SS       =     DATA+3
+                36   R30      =     $0478
+                37   R31      =     $04F8
+                38   R32      =     $0578
+                39   R33      =     $05F8
+                40
+                41   * Constants
+                42
+                43   DUMMY    =     $FF
+                44   FRX      =     $10        ; CTRL register
+                45   ECE      =     $04
+                46   SS0      =     $01        ; SS register
+                47   WP       =     $20
+                48   CARDDET  =     $40
+                49   INITED   =     $80
+                50
+                51
+                52   * signature bytes
+                53
+C800: A2 20     54            LDX   #$20
+C802: A0 00     55            LDY   #$00
+C804: A2 03     56            LDX   #$03
+C806: 86 3C     57            STX   WORK
+                58
+                59   * find slot nr
+                60
+                61            DO    DEBUG
+                62            LDA   #$04
+                63            STA   SLOT
+                64            LDA   #$C4
+                65            STA   CURSLOT
+                66            LDA   #$40
+                67            STA   SLOT16
+                68            ELSE
+C808: 20 58 FF  69            JSR   $FF58
+C80B: BA        70            TSX
+C80C: BD 00 01  71            LDA   $0100,X
+C80F: 29 0F     72            AND   #$0F
+C811: 85 3D     73            STA   SLOT       ; $0s
+C813: 09 C0     74            ORA   #$C0
+C815: 8D F8 07  75            STA   CURSLOT    ; $Cs
+C818: 0A        76            ASL   A
+C819: 0A        77            ASL   A
+C81A: 0A        78            ASL   A
+C81B: 0A        79            ASL   A
+C81C: 85 2B     80            STA   SLOT16     ; $s0
+                81            FIN
+C81E: AA        82            TAX              ; X holds now SLOT16
+                83
+C81F: 2C FF CF  84            BIT   $CFFF
+C822: 20 00 C9  85            JSR   INIT
+                86
+                87   *
+                88   * TODO: check for init error
+                89   *
+                90
+                91   ********************************
+                92   *
+                93   * Install SD card driver
+                94   *
+                95   ********************************
+                96
+                97            DO    DEBUG
+                98
+                99   * see if slot has a driver already
+                100
+                101           LDX   $BF31      ; get devcnt
+                102  INSTALL  LDA   $BF32,X    ; get a devnum
+                103           AND   #$70       ; isolate slot
+                104           CMP   SLOT16     ; slot?
+                105           BEQ   :INSOUT    ; yes, skip it
+                106           DEX
+                107           BPL   INSTALL    ; keep up the search
+                108
+                109  * restore the devnum to the list
+                110
+                111           LDX   $BF31      ; get devcnt again
+                112           CPX   #$0D       ; device table full?
+                113           BNE   :INST2
+                114
+                115           JSR   $FF3A      ; bell
+                116           JMP   :INSOUT    ; do something!
+                117
+                118  :INST2   LDA   $BF32-1,X  ; move all entries down
+                119           STA   $BF32,X    ; to make room at front
+                120           DEX              ; for a new entry
+                121           BNE   :INST2
+                122           LDA   #$04       ; ProFile type device
+                123           ORA   SLOT16
+                124           STA   $BF32      ; slot, drive 1 at top of list
+                125           INC   $BF31      ; update devcnt
+                126
+                127  * now insert the device driver vector
+                128
+                129           LDA   SLOT
+                130           ASL
+                131           TAX
+                132           LDA   #<DRIVER
+                133           STA   $BF10,X    ; write to driver table
+                134           LDA   #>DRIVER
+                135           STA   $BF11,X
+                136  :INSOUT  RTS
+                137
+                138
+                139  ********************************
+                140  *
+                141  * Boot from SD card
+                142  *
+                143  ********************************
+                144
+                145           ELSE
+                146
+C825: A9 01     147  BOOT     LDA   #$01
+C827: 85 42     148           STA   $42        ; load command
+C829: A5 2B     149           LDA   SLOT16
+C82B: AA        150           TAX
+C82C: 85 43     151           STA   $43        ; slot number
+C82E: 64 44     152           STZ   $44        ; buffer lo
+C830: A9 08     153           LDA   #$08
+C832: 85 45     154           STA   $45        ; buffer hi
+C834: 64 46     155           STZ   $46        ; block lo
+C836: 64 47     156           STZ   $47        ; block hi
+C838: 2C FF CF  157           BIT   $CFFF
+C83B: 20 AD CA  158           JSR   READ       ; call driver
+C83E: 4C 01 08  159           JMP   $801       ; goto bootloader
+                160
+                161           FIN
+                162
+                163
+                164  ********************************
+                165  *
+                166  * Jump table
+                167  *
+                168  ********************************
+                169
+C841: D8        170  DRIVER   CLD
+                171           DO    DEBUG
+                172           LDA   #$04
+                173           STA   SLOT
+                174           LDA   #$C4
+                175           STA   CURSLOT
+                176           LDA   #$40
+                177           STA   SLOT16
+                178           ELSE
+C842: 20 58 FF  179           JSR   $FF58      ; find slot nr
+C845: BA        180           TSX
+C846: BD 00 01  181           LDA   $0100,X
+C849: 29 0F     182           AND   #$0F
+C84B: 85 3D     183           STA   SLOT       ; $0s
+C84D: 09 C0     184           ORA   #$C0
+C84F: 8D F8 07  185           STA   CURSLOT    ; $Cs
+C852: 0A        186           ASL   A
+C853: 0A        187           ASL   A
+C854: 0A        188           ASL   A
+C855: 0A        189           ASL   A
+C856: 85 2B     190           STA   SLOT16     ; $s0
+                191           FIN
+C858: AA        192           TAX              ; X holds now SLOT16
+                193
+C859: 2C FF CF  194           BIT   $CFFF
+C85C: A9 80     195           LDA   #INITED    ; check for init
+C85E: 3C 83 C0  196           BIT   SS,X
+C861: F0 22     197           BEQ   :INIT
+                198
+C863: A5 42     199  :CMD     LDA   $42        ; get command
+C865: C9 00     200           CMP   #$00
+C867: F0 10     201           BEQ   :STATUS
+C869: C9 01     202           CMP   #$01
+C86B: F0 0F     203           BEQ   :READ
+C86D: C9 02     204           CMP   #$02
+C86F: F0 0E     205           BEQ   :WRITE
+C871: C9 03     206           CMP   #$03
+C873: F0 0D     207           BEQ   :FORMAT
+C875: 38        208           SEC              ; unknown command
+C876: A9 01     209           LDA   #$01
+C878: 60        210           RTS
+                211
+C879: 4C A5 CA  212  :STATUS  JMP   STATUS
+C87C: 4C AD CA  213  :READ    JMP   READ
+C87F: 4C 15 CB  214  :WRITE   JMP   WRITE
+C882: 4C 8B CB  215  :FORMAT  JMP   FORMAT
+C885: 20 00 C9  216  :INIT    JSR   INIT
+C888: 80 D9     217           BRA   :CMD
+                218
+                219
+                220  * Signature bytes
+                221
+C88A: 00 00 00  222           DS    \          ; fill with zeroes
+C88D: 00 00 00 00
+C891: 00 00 00 00
+C895: 00 00 00 00
+C899: 00 00 00 00
+C89D: 00 00 00 00
+C8A1: 00 00 00 00
+C8A5: 00 00 00 00
+C8A9: 00 00 00 00
+C8AD: 00 00 00 00
+C8B1: 00 00 00 00
+C8B5: 00 00 00 00
+C8B9: 00 00 00 00
+C8BD: 00 00 00 00
+C8C1: 00 00 00 00
+C8C5: 00 00 00 00
+C8C9: 00 00 00 00
+C8CD: 00 00 00 00
+C8D1: 00 00 00 00
+C8D5: 00 00 00 00
+C8D9: 00 00 00 00
+C8DD: 00 00 00 00
+C8E1: 00 00 00 00
+C8E5: 00 00 00 00
+C8E9: 00 00 00 00
+C8ED: 00 00 00 00
+C8F1: 00 00 00 00
+C8F5: 00 00 00 00
+C8F9: 00 00 00 00
+C8FD: 00 00 00
+                223           DS    -4         ; locate to $xxFC
+C8FC: FF FF     224           DW    $FFFF      ; 65535 blocks
+C8FE: 47        225           DB    $47        ; Status bits
+C8FF: 41        226           DB    #<DRIVER   ; LSB of driver
+                227
+                228
+                229  ********************************
+                230  *
+                231  * Initialize SD card
+                232  *
+                233  * C Clear - No error
+                234  *   Set   - Error
+                235  * A $00   - No error
+                236  *   $27   - I/O error - Init failed
+                237  *   $28   - No card inserted
+                238  *
+                239  ********************************
+                240
+C900: D8        241  INIT     CLD
+C901: A9 03     242           LDA   #$03       ; set SPI mode 3
+C903: 9D 81 C0  243           STA   CTRL,X
+C906: BD 83 C0  244           LDA   SS,X
+C909: 09 01     245           ORA   #SS0       ; set CS high
+C90B: 9D 83 C0  246           STA   SS,X
+C90E: A9 07     247           LDA   #7
+C910: 9D 82 C0  248           STA   DIV,X
+C913: A0 0A     249           LDY   #10
+C915: A9 FF     250           LDA   #DUMMY
+                251
+C917: 9D 80 C0  252  :LOOP    STA   DATA,X
+C91A: 3C 81 C0  253  :WAIT    BIT   CTRL,X
+C91D: 10 FB     254           BPL   :WAIT
+C91F: 88        255           DEY
+C920: D0 F5     256           BNE   :LOOP      ; do 10 times
+C922: BD 83 C0  257           LDA   SS,X
+C925: 29 FE     258           AND   #$FF!SS0   ; set CS low
+C927: 9D 83 C0  259           STA   SS,X
+                260
+C92A: A9 8F     261           LDA   #<CMD0     ; send CMD0
+C92C: 85 40     262           STA   CMDLO
+C92E: A9 CB     263           LDA   #>CMD0
+C930: 85 41     264           STA   CMDHI
+C932: 20 F2 C9  265           JSR   CMD
+C935: 20 06 CA  266           JSR   GETR1      ; get response
+C938: C9 01     267           CMP   #$01
+C93A: D0 39     268           BNE   :ERROR1    ; error!
+                269
+C93C: A9 9B     270           LDA   #<CMD8     ; send CMD8
+C93E: 85 40     271           STA   CMDLO
+C940: A9 CB     272           LDA   #>CMD8
+C942: 85 41     273           STA   CMDHI
+C944: 20 F2 C9  274           JSR   CMD
+C947: 20 21 CA  275           JSR   GETR3
+C94A: C9 01     276           CMP   #$01
+C94C: D0 2A     277           BNE   :SDV1      ; may be SD Ver. 1
+                278
+                279  * check for $01aa match!
+C94E: A9 A7     280  :SDV2    LDA   #<CMD55
+C950: 85 40     281           STA   CMDLO
+C952: A9 CB     282           LDA   #>CMD55
+C954: 85 41     283           STA   CMDHI
+C956: 20 F2 C9  284           JSR   CMD
+C959: 20 06 CA  285           JSR   GETR1
+C95C: A9 AD     286           LDA   #<ACMD4140
+C95E: 85 40     287           STA   CMDLO
+C960: A9 CB     288           LDA   #>ACMD4140
+C962: 85 41     289           STA   CMDHI
+C964: 20 F2 C9  290           JSR   CMD
+C967: 20 06 CA  291           JSR   GETR1
+C96A: C9 01     292           CMP   #$01
+C96C: F0 E0     293           BEQ   :SDV2      ; wait for ready
+C96E: C9 00     294           CMP   #$00
+C970: D0 03     295           BNE   :ERROR1    ;  error!
+                296  * send CMD58
+                297  * SD Ver. 2 initialized!
+C972: 4C B2 C9  298           JMP   :BLOCKSZ
+                299
+C975: 4C E0 C9  300  :ERROR1  JMP   :IOERROR   ; needed for far jump
+                301
+C978: A9 A7     302  :SDV1    LDA   #<CMD55
+C97A: 85 40     303           STA   CMDLO
+C97C: A9 CB     304           LDA   #>CMD55
+C97E: 85 41     305           STA   CMDHI
+C980: 20 F2 C9  306           JSR   CMD        ; ignore response
+C983: A9 B3     307           LDA   #<ACMD410
+C985: 85 40     308           STA   CMDLO
+C987: A9 CB     309           LDA   #>ACMD410
+C989: 85 41     310           STA   CMDHI
+C98B: 20 F2 C9  311           JSR   CMD
+C98E: 20 06 CA  312           JSR   GETR1
+C991: C9 01     313           CMP   #$01
+C993: F0 E3     314           BEQ   :SDV1      ; wait for ready
+C995: C9 00     315           CMP   #$00
+C997: D0 03     316           BNE   :MMC       ; may be MMC card
+                317  * SD Ver. 1 initialized!
+C999: 4C B2 C9  318           JMP   :BLOCKSZ
+                319
+C99C: A9 95     320  :MMC     LDA   #<CMD1
+C99E: 85 40     321           STA   CMDLO
+C9A0: A9 CB     322           LDA   #>CMD1
+C9A2: 85 41     323           STA   CMDHI
+C9A4: 20 F2 C9  324  :LOOP1   JSR   CMD
+C9A7: 20 06 CA  325           JSR   GETR1
+C9AA: C9 01     326           CMP   #$01
+C9AC: F0 F6     327           BEQ   :LOOP1     ; wait for ready
+C9AE: C9 00     328           CMP   #$00
+C9B0: D0 2E     329           BNE   :IOERROR   ; error!
+                330  * MMC Ver. 3 initialized!
+                331
+C9B2: A9 A1     332  :BLOCKSZ LDA   #<CMD16
+C9B4: 85 40     333           STA   CMDLO
+C9B6: A9 CB     334           LDA   #>CMD16
+C9B8: 85 41     335           STA   CMDHI
+C9BA: 20 F2 C9  336           JSR   CMD
+C9BD: 20 06 CA  337           JSR   GETR1
+C9C0: C9 00     338           CMP   #$00
+C9C2: D0 1C     339           BNE   :IOERROR   ; error!
+                340
+C9C4: A4 3D     341  :END     LDY   SLOT
+C9C6: BD 83 C0  342           LDA   SS,X
+C9C9: 09 80     343           ORA   #INITED    ; initialized
+C9CB: 9D 83 C0  344           STA   SS,X
+C9CE: BD 81 C0  345           LDA   CTRL,X
+C9D1: 09 04     346           ORA   #ECE       ; enable 7MHz
+C9D3: 9D 81 C0  347           STA   CTRL,X
+C9D6: 18        348           CLC              ; all ok
+C9D7: A0 00     349           LDY   #0
+C9D9: 90 08     350           BCC   :END1
+C9DB: 38        351  :CDERROR SEC
+C9DC: A0 28     352           LDY   #$28       ; no card error
+C9DE: B0 03     353           BCS   :END1
+C9E0: 38        354  :IOERROR SEC
+C9E1: A0 27     355           LDY   #$27       ; init error
+C9E3: BD 83 C0  356  :END1    LDA   SS,X       ; set CS high
+C9E6: 09 01     357           ORA   #SS0
+C9E8: 9D 83 C0  358           STA   SS,X
+C9EB: A9 00     359           LDA   #0         ; set div to 2
+C9ED: 9D 82 C0  360           STA   DIV,X
+C9F0: 98        361           TYA              ; retval in A
+C9F1: 60        362           RTS
+                363
+                364
+                365  ********************************
+                366  *
+                367  * Send SD command
+                368  * Call with command in CMDHI and CMDLO
+                369  *
+                370  ********************************
+                371
+C9F2: 5A        372  CMD      PHY
+C9F3: A0 00     373           LDY   #0
+C9F5: B1 40     374  :LOOP    LDA   (CMDLO),Y
+C9F7: 9D 80 C0  375           STA   DATA,X
+C9FA: 3C 81 C0  376  :WAIT    BIT   CTRL,X     ; TC is in N
+C9FD: 10 FB     377           BPL   :WAIT
+C9FF: C8        378           INY
+CA00: C0 06     379           CPY   #6
+CA02: 90 F1     380           BCC   :LOOP
+CA04: 7A        381           PLY
+CA05: 60        382           RTS
+                383
+                384
+                385  ********************************
+                386  *
+                387  * Get R1
+                388  * R1 is in A
+                389  *
+                390  ********************************
+                391
+CA06: A9 FF     392  GETR1    LDA   #DUMMY
+CA08: 9D 80 C0  393           STA   DATA,X
+CA0B: 3C 81 C0  394  :WAIT    BIT   CTRL,X
+CA0E: 10 FB     395           BPL   :WAIT
+CA10: BD 80 C0  396           LDA   DATA,X     ; get response
+CA13: 85 3C     397           STA   WORK       ; save R1
+CA15: 29 80     398           AND   #$80
+CA17: D0 ED     399           BNE   GETR1      ; wait for MSB=0
+CA19: A9 FF     400           LDA   #DUMMY
+CA1B: 9D 80 C0  401           STA   DATA,X     ; send another dummy
+CA1E: A5 3C     402           LDA   WORK       ; restore R1
+CA20: 60        403           RTS
+                404
+                405
                 406  ********************************
-                407  
-CA12: 20 F7 C9  408  GETR3    JSR   GETR1      ; get R1 first
-CA15: 48        409           PHA              ; save R1
-CA16: 5A        410           PHY              ; save Y
-CA17: A0 04     411           LDY   #04        ; load counter
-CA19: A9 FF     412  :LOOP    LDA   #DUMMY     ; send dummy
-CA1B: 9D 80 C0  413           STA   DATA,X     
-CA1E: 3C 81 C0  414  :WAIT    BIT   CTRL,X     
-CA21: 10 FB     415           BPL   :WAIT      
-CA23: BD 80 C0  416           LDA   DATA,X     
-CA26: 48        417           PHA              
-CA27: 88        418           DEY              
-CA28: D0 EF     419           BNE   :LOOP      ; do 4 times
-CA2A: A4 3D     420           LDY   SLOT       
-CA2C: 68        421           PLA              
-CA2D: 99 F8 05  422           STA   R33,Y      ; save R3
-CA30: 68        423           PLA              
-CA31: 99 78 05  424           STA   R32,Y      
-CA34: 68        425           PLA              
-CA35: 99 F8 04  426           STA   R31,Y      
-CA38: 68        427           PLA              
-CA39: 99 78 04  428           STA   R30,Y      
-CA3C: 7A        429           PLY              ; restore Y 
-                              ===== Page 9 =====
- 
-CA3D: A9 FF     430           LDA   #DUMMY     
-CA3F: 9D 80 C0  431           STA   DATA,X     ; send another dummy
-CA42: 68        432           PLA              ; restore R1
-CA43: 60        433           RTS              
-                434  
-                435  
-                436  ********************************
-                437  *
-                438  * Calculate block address
-                439  * Block no is in $46-47
-                440  * Address is in R30-R33
-                441  *
+                407  *
+                408  * Get R3
+                409  * R1 is in A
+                410  * R3 is in scratchpad ram
+                411  *
+                412  ********************************
+                413
+CA21: 20 06 CA  414  GETR3    JSR   GETR1      ; get R1 first
+CA24: 48        415           PHA              ; save R1
+CA25: 5A        416           PHY              ; save Y
+CA26: A0 04     417           LDY   #04        ; load counter
+CA28: A9 FF     418  :LOOP    LDA   #DUMMY     ; send dummy
+CA2A: 9D 80 C0  419           STA   DATA,X
+CA2D: 3C 81 C0  420  :WAIT    BIT   CTRL,X
+CA30: 10 FB     421           BPL   :WAIT
+CA32: BD 80 C0  422           LDA   DATA,X
+CA35: 48        423           PHA
+CA36: 88        424           DEY
+CA37: D0 EF     425           BNE   :LOOP      ; do 4 times
+CA39: A4 3D     426           LDY   SLOT
+CA3B: 68        427           PLA
+CA3C: 99 F8 05  428           STA   R33,Y      ; save R3
+CA3F: 68        429           PLA
+CA40: 99 78 05  430           STA   R32,Y
+CA43: 68        431           PLA
+CA44: 99 F8 04  432           STA   R31,Y
+CA47: 68        433           PLA
+CA48: 99 78 04  434           STA   R30,Y
+CA4B: 7A        435           PLY              ; restore Y
+CA4C: A9 FF     436           LDA   #DUMMY
+CA4E: 9D 80 C0  437           STA   DATA,X     ; send another dummy
+CA51: 68        438           PLA              ; restore R1
+CA52: 60        439           RTS
+                440
+                441
                 442  ********************************
-                443  
-CA44: DA        444  BLOCK    PHX              ; save X
-CA45: 5A        445           PHY              ; save Y
-CA46: A6 3D     446           LDX   SLOT       
-CA48: A5 46     447           LDA   $46        ; store block num
-CA4A: 9D F8 05  448           STA   R33,X      ; in R30-R33
-CA4D: A5 47     449           LDA   $47        
-CA4F: 9D 78 05  450           STA   R32,X      
-CA52: A9 00     451           LDA   #0         
-CA54: 9D F8 04  452           STA   R31,X      
-CA57: 9D 78 04  453           STA   R30,X      
-                454  
-CA5A: A0 09     455           LDY   #9         ; ASL can't be used with Y
-CA5C: 1E F8 05  456  :LOOP    ASL   R33,X      ; mul block num
-CA5F: 3E 78 05  457           ROL   R32,X      ; by 512 to get
-CA62: 3E F8 04  458           ROL   R31,X      ; real address
-CA65: 3E 78 04  459           ROL   R30,X      
-CA68: 88        460           DEY              
-CA69: D0 F1     461           BNE   :LOOP      
-CA6B: 7A        462           PLY              ; restore Y
-CA6C: FA        463           PLX              ; restore X
-CA6D: 60        464           RTS              
-                465  
-                466  
-                467  ********************************
-                468  *
-                469  * Send SD command
-                470  * Cmd is in A
-                471  *
-                472  ********************************
-                473  
-CA6E: 5A        474  COMMAND  PHY              ; save Y
-CA6F: A4 3D     475           LDY   SLOT       
-CA71: 9D 80 C0  476           STA   DATA,X     ; send command
-CA74: B9 78 04  477           LDA   R30,Y      ; get arg from R30 on
-CA77: 9D 80 C0  478           STA   DATA,X     
-CA7A: B9 F8 04  479           LDA   R31,Y      
-CA7D: 9D 80 C0  480           STA   DATA,X     
-CA80: B9 78 05  481           LDA   R32,Y      
-CA83: 9D 80 C0  482           STA   DATA,X     
-CA86: B9 F8 05  483           LDA   R33,Y      
-CA89: 9D 80 C0  484           STA   DATA,X     
-CA8C: A9 FF     485           LDA   #DUMMY     
-CA8E: 9D 80 C0  486           STA   DATA,X     ; dummy crc 
-                              ===== Page 10 =====
- 
-CA91: 20 F7 C9  487           JSR   GETR1      
-CA94: 7A        488           PLY              ; restore Y
-CA95: 60        489           RTS              
-                490  
-                491  
-                492  ********************************
-                493  *
-                494  * Status request
-                495  * $43    Unit number DSSS000
-                496  * $44-45 Unused
-                497  * $46-47 Unused
-                498  *
-                499  * C Clear - No error
-                500  *   Set   - Error
-                501  * A $00   - No error
-                502  *   $27   - I/O error
-                503  *   $28   - No card inserted / no init
-                504  *   $2B   - Card write protected
-                505  * x       - Blocks avail (low byte)
-                506  * y       - Blocks avail (high byte)
-                507  *
-                508  ********************************
-                509  
-CA96: 18        510  STATUS   CLC              ; no error
-CA97: A9 00     511           LDA   #0         
-CA99: A2 FF     512           LDX   #$FF       ; 32 MB partition
-CA9B: A0 FF     513           LDY   #$FF       
-CA9D: 60        514           RTS              
-                515  
-                516  * TODO: check for card detect and write protect!
-                517  
-                518  
-                519  ********************************
-                520  *
-                521  * Read 512 byte block
-                522  * $43    Unit number DSSS0000
-                523  * $44-45 Address (LO/HI) of buffer
-                524  * $46-47 Block number (LO/HI)
-                525  *
-                526  * C Clear - No error
-                527  *   Set   - Error
-                528  * A $00   - No error
-                529  *   $27   - Bad block number
-                530  *   $28   - No card inserted
+                443  *
+                444  * Calculate block address
+                445  * Block no is in $46-47
+                446  * Address is in R30-R33
+                447  *
+                448  ********************************
+                449
+CA53: DA        450  BLOCK    PHX              ; save X
+CA54: 5A        451           PHY              ; save Y
+CA55: A6 3D     452           LDX   SLOT
+CA57: A5 46     453           LDA   $46        ; store block num
+CA59: 9D F8 05  454           STA   R33,X      ; in R30-R33
+CA5C: A5 47     455           LDA   $47
+CA5E: 9D 78 05  456           STA   R32,X
+CA61: A9 00     457           LDA   #0
+CA63: 9D F8 04  458           STA   R31,X
+CA66: 9D 78 04  459           STA   R30,X
+                460
+CA69: A0 09     461           LDY   #9         ; ASL can't be used with Y
+CA6B: 1E F8 05  462  :LOOP    ASL   R33,X      ; mul block num
+CA6E: 3E 78 05  463           ROL   R32,X      ; by 512 to get
+CA71: 3E F8 04  464           ROL   R31,X      ; real address
+CA74: 3E 78 04  465           ROL   R30,X
+CA77: 88        466           DEY
+CA78: D0 F1     467           BNE   :LOOP
+CA7A: 7A        468           PLY              ; restore Y
+CA7B: FA        469           PLX              ; restore X
+CA7C: 60        470           RTS
+                471
+                472
+                473  ********************************
+                474  *
+                475  * Send SD command
+                476  * Cmd is in A
+                477  *
+                478  ********************************
+                479
+CA7D: 5A        480  COMMAND  PHY              ; save Y
+CA7E: A4 3D     481           LDY   SLOT
+CA80: 9D 80 C0  482           STA   DATA,X     ; send command
+CA83: B9 78 04  483           LDA   R30,Y      ; get arg from R30 on
+CA86: 9D 80 C0  484           STA   DATA,X
+CA89: B9 F8 04  485           LDA   R31,Y
+CA8C: 9D 80 C0  486           STA   DATA,X
+CA8F: B9 78 05  487           LDA   R32,Y
+CA92: 9D 80 C0  488           STA   DATA,X
+CA95: B9 F8 05  489           LDA   R33,Y
+CA98: 9D 80 C0  490           STA   DATA,X
+CA9B: A9 FF     491           LDA   #DUMMY
+CA9D: 9D 80 C0  492           STA   DATA,X     ; dummy crc
+CAA0: 20 06 CA  493           JSR   GETR1
+CAA3: 7A        494           PLY              ; restore Y
+CAA4: 60        495           RTS
+                496
+                497
+                498  ********************************
+                499  *
+                500  * Status request
+                501  * $43    Unit number DSSS000
+                502  * $44-45 Unused
+                503  * $46-47 Unused
+                504  *
+                505  * C Clear - No error
+                506  *   Set   - Error
+                507  * A $00   - No error
+                508  *   $27   - I/O error
+                509  *   $28   - No card inserted / no init
+                510  *   $2B   - Card write protected
+                511  * x       - Blocks avail (low byte)
+                512  * y       - Blocks avail (high byte)
+                513  *
+                514  ********************************
+                515
+CAA5: 18        516  STATUS   CLC              ; no error
+CAA6: A9 00     517           LDA   #0
+CAA8: A2 FF     518           LDX   #$FF       ; 32 MB partition
+CAAA: A0 FF     519           LDY   #$FF
+CAAC: 60        520           RTS
+                521
+                522  * TODO: check for card detect and write protect!
+                523
+                524
+                525  ********************************
+                526  *
+                527  * Read 512 byte block
+                528  * $43    Unit number DSSS0000
+                529  * $44-45 Address (LO/HI) of buffer
+                530  * $46-47 Block number (LO/HI)
                 531  *
-                532  ********************************
-                533  
-                534  * TODO: check for card detect!
-                535  
-CA9E: 20 44 CA  536  READ     JSR   BLOCK      ; calc block address
-                537  
-CAA1: A9 0E     538           LDA   #SS0       ; enable /CS
-CAA3: 9D 83 C0  539           STA   SS,X       
-CAA6: A9 51     540           LDA   #$51       ; send CMD17
-CAA8: 20 6E CA  541           JSR   COMMAND    ; send command
-                542  
-CAAB: C9 00     543           CMP   #0         ; check for error 
-                              ===== Page 11 =====
- 
-CAAD: D0 3F     544           BNE   :ERROR     
-                545  
-CAAF: A9 FF     546  :GETTOK  LDA   #DUMMY     ; get data token
-CAB1: 9D 80 C0  547           STA   DATA,X     
-CAB4: BD 80 C0  548           LDA   DATA,X     ; get response
-CAB7: C9 FE     549           CMP   #$FE       
-CAB9: D0 F4     550           BNE   :GETTOK    ; wait for $FE
-                551  
-CABB: A0 02     552           LDY   #2         ; read data from card
-CABD: A9 17     553           LDA   #FRXEN     ; enable FRX
-CABF: 9D 81 C0  554           STA   CTRL,X     
-CAC2: A9 FF     555           LDA   #DUMMY     
-CAC4: 9D 80 C0  556           STA   DATA,X     
-CAC7: 64 3C     557  :LOOPY   STZ   WORK       
-CAC9: BD 80 C0  558  :LOOPW   LDA   DATA,X     
-CACC: 92 44     559           STA   ($44)      
-CACE: E6 44     560           INC   $44        
-CAD0: D0 02     561           BNE   :INW       
-CAD2: E6 45     562           INC   $45        ; inc msb on page boundary
-CAD4: E6 3C     563  :INW     INC   WORK       
-CAD6: D0 F1     564           BNE   :LOOPW     
-CAD8: 88        565           DEY              
-CAD9: D0 EC     566           BNE   :LOOPY     
-                567  
-CADB: A9 07     568           LDA   #FRXDIS    ; disable FRX
-CADD: 9D 81 C0  569           STA   CTRL,X     
-                570  
-CAE0: A9 FF     571  :CRC     LDA   #DUMMY     ; first crc byte has
-CAE2: 9D 80 C0  572           STA   DATA,X     ; already been read
-                573  
-CAE5: A9 0F     574           LDA   #SSNONE    
-CAE7: 9D 83 C0  575           STA   SS,X       ; disable /CS
-CAEA: 18        576           CLC              ; no error
-CAEB: A9 00     577           LDA   #$00       
-CAED: 60        578           RTS              
-                579  
-CAEE: A9 0F     580  :ERROR   LDA   #SSNONE    
-CAF0: 9D 83 C0  581           STA   SS,X       ; disable /CS
-CAF3: 38        582           SEC              ; an error occured
-CAF4: A9 27     583           LDA   #$27       
-CAF6: 60        584           RTS              
-                585  
-                586  
-                587  ********************************
-                588  *
-                589  * Write 512 byte block
-                590  * $43    Unit number DSSS000
-                591  * $44-45 Address (LO/HI) of buffer
-                592  * $46-47 Block number (LO/HI)
-                593  *
-                594  * C Clear - No error
-                595  *   Set   - Error
-                596  * A $00   - No error
-                597  *   $27   - I/O error or bad block number
-                598  *   $28   - No card inserted
-                599  *   $2B   - Card write protected
-                600  * 
-                              ===== Page 12 =====
- 
-                601  ********************************
-                602  
-                603  * TODO: check for card detect and write protect!
-                604  
-CAF7: 20 44 CA  605  WRITE    JSR   BLOCK      ; calc block address
-                606  
-CAFA: A9 0E     607           LDA   #SS0       ; enable /CS
-CAFC: 9D 83 C0  608           STA   SS,X       
-CAFF: A9 58     609           LDA   #$58       ; send CMD24
-CB01: 20 6E CA  610           JSR   COMMAND    ; send command
-                611  
-CB04: C9 00     612           CMP   #0         ; check for error
-CB06: D0 47     613           BNE   :ERROR     
-                614  
-CB08: A9 FF     615           LDA   #DUMMY     
-CB0A: 9D 80 C0  616           STA   DATA,X     ; send dummy
-CB0D: A9 FE     617           LDA   #$FE       
-CB0F: 9D 80 C0  618           STA   DATA,X     ; send data token
-                619  
-CB12: A0 02     620           LDY   #2         ; send data to card
-CB14: 64 3C     621  :LOOPY   STZ   WORK       
-CB16: B2 44     622  :LOOPW   LDA   ($44)      
-CB18: 9D 80 C0  623           STA   DATA,X     
-CB1B: E6 44     624           INC   $44        
-CB1D: D0 02     625           BNE   :INW       
-CB1F: E6 45     626           INC   $45        ; inc msb on page boundary
-CB21: E6 3C     627  :INW     INC   WORK       
-CB23: D0 F1     628           BNE   :LOOPW     
-CB25: 88        629           DEY              
-CB26: D0 EC     630           BNE   :LOOPY     
-                631  
-CB28: 9D 80 C0  632  :CRC     STA   DATA,X     ; send 2 dummy crc bytes
-CB2B: 9D 80 C0  633           STA   DATA,X     
-                634  
-CB2E: 9D 80 C0  635           STA   DATA,X     ; get data response
-CB31: BD 80 C0  636           LDA   DATA,X     
-CB34: 29 1F     637           AND   #$1F       
-CB36: C9 05     638           CMP   #$05       
-CB38: D0 15     639           BNE   :ERROR     ; check for write error
-                640  
-CB3A: A9 FF     641  :WAIT6   LDA   #DUMMY     
-CB3C: 9D 80 C0  642           STA   DATA,X     ; wait for write cycle
-CB3F: BD 80 C0  643           LDA   DATA,X     ; to complete
-CB42: C9 00     644           CMP   #$00       
-CB44: F0 F4     645           BEQ   :WAIT6     
-                646  
-CB46: A9 0F     647           LDA   #SSNONE    ; disable /CS
-CB48: 9D 83 C0  648           STA   SS,X       
-CB4B: 18        649           CLC              ; no error
-CB4C: A9 00     650           LDA   #0         
-CB4E: 60        651           RTS              
-                652  
-CB4F: A9 FF     653  :ERROR   LDA   #DUMMY     
-CB51: 9D 80 C0  654           STA   DATA,X     ; wait for write cycle
-CB54: BD 80 C0  655           LDA   DATA,X     ; to complete
-CB57: C9 00     656           CMP   #$00       
-CB59: F0 F4     657           BEQ   :ERROR      
-                              ===== Page 13 =====
- 
-                658  
-CB5B: A9 0F     659           LDA   #SSNONE    
-CB5D: 9D 83 C0  660           STA   SS,X       ; disable /CS
-CB60: 38        661           SEC              ; an error occured
-CB61: A9 27     662           LDA   #$27       
-CB63: 60        663           RTS              
-                664  
-                665  
-                666  ********************************
-                667  *
-                668  * Format
-                669  * not supported!
-                670  *
-                671  ********************************
-                672  
-CB64: 38        673  FORMAT   SEC              
-CB65: A9 01     674           LDA   #$01       ; invalid command
-CB67: 60        675           RTS              
-                676  
-                677  
-CB68: 40 00 00  678  CMD0     HEX   400000     
-CB6B: 00 00 95  679           HEX   000095     
-CB6E: 41 00 00  680  CMD1     HEX   410000     
-CB71: 00 00 F9  681           HEX   0000F9     
-CB74: 48 00 00  682  CMD8     HEX   480000     
-CB77: 01 AA 87  683           HEX   01AA87     
-CB7A: 50 00 00  684  CMD16    HEX   500000     
-CB7D: 02 00 FF  685           HEX   0200FF     
-CB80: 77 00 00  686  CMD55    HEX   770000     
-CB83: 00 00 65  687           HEX   000065     
-CB86: 69 40 00  688  ACMD4140 HEX   694000     
-CB89: 00 00 77  689           HEX   000077     
-CB8C: 69 00 00  690  ACMD410  HEX   690000     
-CB8F: 00 00 FF  691           HEX   0000FF     
- 
- 
---End assembly, 914 bytes, Errors: 0 
+                532  * C Clear - No error
+                533  *   Set   - Error
+                534  * A $00   - No error
+                535  *   $27   - Bad block number
+                536  *   $28   - No card inserted
+                537  *
+                538  ********************************
+                539
+                540  * TODO: check for card detect!
+                541
+CAAD: 20 53 CA  542  READ     JSR   BLOCK      ; calc block address
+                543
+CAB0: BD 83 C0  544           LDA   SS,X       ; enable /CS
+CAB3: 29 FE     545           AND   #$FF!SS0
+CAB5: 9D 83 C0  546           STA   SS,X
+CAB8: A9 51     547           LDA   #$51       ; send CMD17
+CABA: 20 7D CA  548           JSR   COMMAND    ; send command
+                549
+CABD: C9 00     550           CMP   #0         ; check for error
+CABF: D0 48     551           BNE   :ERROR
+                552
+CAC1: A9 FF     553  :GETTOK  LDA   #DUMMY     ; get data token
+CAC3: 9D 80 C0  554           STA   DATA,X
+CAC6: BD 80 C0  555           LDA   DATA,X     ; get response
+CAC9: C9 FE     556           CMP   #$FE
+CACB: D0 F4     557           BNE   :GETTOK    ; wait for $FE
+                558
+CACD: A0 02     559           LDY   #2         ; read data from card
+CACF: BD 81 C0  560           LDA   CTRL,X     ; enable FRX
+CAD2: 09 10     561           ORA   #FRX
+CAD4: 9D 81 C0  562           STA   CTRL,X
+CAD7: A9 FF     563           LDA   #DUMMY
+CAD9: 9D 80 C0  564           STA   DATA,X
+CADC: 64 3C     565  :LOOPY   STZ   WORK
+CADE: BD 80 C0  566  :LOOPW   LDA   DATA,X
+CAE1: 92 44     567           STA   ($44)
+CAE3: E6 44     568           INC   $44
+CAE5: D0 02     569           BNE   :INW
+CAE7: E6 45     570           INC   $45        ; inc msb on page boundary
+CAE9: E6 3C     571  :INW     INC   WORK
+CAEB: D0 F1     572           BNE   :LOOPW
+CAED: 88        573           DEY
+CAEE: D0 EC     574           BNE   :LOOPY
+                575
+CAF0: BD 81 C0  576           LDA   CTRL,X     ; disable FRX
+CAF3: 29 EF     577           AND   #$FF!FRX
+CAF5: 9D 81 C0  578           STA   CTRL,X
+                579
+CAF8: A9 FF     580  :CRC     LDA   #DUMMY     ; first crc byte has
+CAFA: 9D 80 C0  581           STA   DATA,X     ; already been read
+                582
+CAFD: BD 83 C0  583           LDA   SS,X
+CB00: 09 01     584           ORA   #SS0
+CB02: 9D 83 C0  585           STA   SS,X       ; disable /CS
+CB05: 18        586           CLC              ; no error
+CB06: A9 00     587           LDA   #$00
+CB08: 60        588           RTS
+                589
+CB09: BD 83 C0  590  :ERROR   LDA   SS,X
+CB0C: 09 01     591           ORA   #SS0
+CB0E: 9D 83 C0  592           STA   SS,X       ; disable /CS
+CB11: 38        593           SEC              ; an error occured
+CB12: A9 27     594           LDA   #$27
+CB14: 60        595           RTS
+                596
+                597
+                598  ********************************
+                599  *
+                600  * Write 512 byte block
+                601  * $43    Unit number DSSS000
+                602  * $44-45 Address (LO/HI) of buffer
+                603  * $46-47 Block number (LO/HI)
+                604  *
+                605  * C Clear - No error
+                606  *   Set   - Error
+                607  * A $00   - No error
+                608  *   $27   - I/O error or bad block number
+                609  *   $28   - No card inserted
+                610  *   $2B   - Card write protected
+                611  *
+                612  ********************************
+                613
+                614  * TODO: check for card detect and write protect!
+                615
+CB15: 20 53 CA  616  WRITE    JSR   BLOCK      ; calc block address
+                617
+CB18: BD 83 C0  618           LDA   SS,X       ; enable /CS
+CB1B: 29 FE     619           AND   #$FF!SS0
+CB1D: 9D 83 C0  620           STA   SS,X
+CB20: A9 58     621           LDA   #$58       ; send CMD24
+CB22: 20 7D CA  622           JSR   COMMAND    ; send command
+                623
+CB25: C9 00     624           CMP   #0         ; check for error
+CB27: D0 4A     625           BNE   :ERROR
+                626
+CB29: A9 FF     627           LDA   #DUMMY
+CB2B: 9D 80 C0  628           STA   DATA,X     ; send dummy
+CB2E: A9 FE     629           LDA   #$FE
+CB30: 9D 80 C0  630           STA   DATA,X     ; send data token
+                631
+CB33: A0 02     632           LDY   #2         ; send data to card
+CB35: 64 3C     633  :LOOPY   STZ   WORK
+CB37: B2 44     634  :LOOPW   LDA   ($44)
+CB39: 9D 80 C0  635           STA   DATA,X
+CB3C: E6 44     636           INC   $44
+CB3E: D0 02     637           BNE   :INW
+CB40: E6 45     638           INC   $45        ; inc msb on page boundary
+CB42: E6 3C     639  :INW     INC   WORK
+CB44: D0 F1     640           BNE   :LOOPW
+CB46: 88        641           DEY
+CB47: D0 EC     642           BNE   :LOOPY
+                643
+CB49: 9D 80 C0  644  :CRC     STA   DATA,X     ; send 2 dummy crc bytes
+CB4C: 9D 80 C0  645           STA   DATA,X
+                646
+CB4F: 9D 80 C0  647           STA   DATA,X     ; get data response
+CB52: BD 80 C0  648           LDA   DATA,X
+CB55: 29 1F     649           AND   #$1F
+CB57: C9 05     650           CMP   #$05
+CB59: D0 18     651           BNE   :ERROR     ; check for write error
+                652
+CB5B: A9 FF     653  :WAIT6   LDA   #DUMMY
+CB5D: 9D 80 C0  654           STA   DATA,X     ; wait for write cycle
+CB60: BD 80 C0  655           LDA   DATA,X     ; to complete
+CB63: C9 00     656           CMP   #$00
+CB65: F0 F4     657           BEQ   :WAIT6
+                658
+CB67: BD 83 C0  659           LDA   SS,X       ; disable /CS
+CB6A: 09 01     660           ORA   #SS0
+CB6C: 9D 83 C0  661           STA   SS,X
+CB6F: 18        662           CLC              ; no error
+CB70: A9 00     663           LDA   #0
+CB72: 60        664           RTS
+                665
+CB73: A9 FF     666  :ERROR   LDA   #DUMMY
+CB75: 9D 80 C0  667           STA   DATA,X     ; wait for write cycle
+CB78: BD 80 C0  668           LDA   DATA,X     ; to complete
+CB7B: C9 00     669           CMP   #$00
+CB7D: F0 F4     670           BEQ   :ERROR
+                671
+CB7F: BD 83 C0  672           LDA   SS,X
+CB82: 09 01     673           ORA   #SS0
+CB84: 9D 83 C0  674           STA   SS,X       ; disable /CS
+CB87: 38        675           SEC              ; an error occured
+CB88: A9 27     676           LDA   #$27
+CB8A: 60        677           RTS
+                678
+                679
+                680  ********************************
+                681  *
+                682  * Format
+                683  * not supported!
+                684  *
+                685  ********************************
+                686
+CB8B: 38        687  FORMAT   SEC
+CB8C: A9 01     688           LDA   #$01       ; invalid command
+CB8E: 60        689           RTS
+                690
+                691
+CB8F: 40 00 00  692  CMD0     HEX   400000
+CB92: 00 00 95  693           HEX   000095
+CB95: 41 00 00  694  CMD1     HEX   410000
+CB98: 00 00 F9  695           HEX   0000F9
+CB9B: 48 00 00  696  CMD8     HEX   480000
+CB9E: 01 AA 87  697           HEX   01AA87
+CBA1: 50 00 00  698  CMD16    HEX   500000
+CBA4: 02 00 FF  699           HEX   0200FF
+CBA7: 77 00 00  700  CMD55    HEX   770000
+CBAA: 00 00 65  701           HEX   000065
+CBAD: 69 40 00  702  ACMD4140 HEX   694000
+CBB0: 00 00 77  703           HEX   000077
+CBB3: 69 00 00  704  ACMD410  HEX   690000
+CBB6: 00 00 FF  705           HEX   0000FF
+
+
+--End assembly, 953 bytes, Errors: 0
 
 
 Symbol table - alphabetical order:
 
-   ACMD410 =$CB8C      ACMD4140=$CB86      BLOCK   =$CA44   ?  BOOT    =$C825
-   CMD     =$C9E3      CMD0    =$CB68      CMD1    =$CB6E      CMD16   =$CB7A
-   CMD55   =$CB80      CMD8    =$CB74      CMDHI   =$41        CMDLO   =$40
-   COMMAND =$CA6E      CTRL    =$C081      CURSLOT =$07F8      DATA    =$C080
-   DEBUG   =$00        DIV     =$C082      DRIVER  =$C841      DUMMY   =$FF
-   FORMAT  =$CB64      FRXDIS  =$07        FRXEN   =$17        GETR1   =$C9F7
-   GETR3   =$CA12      INIT    =$C900      INITED  =$0678      R30     =$0478
-   R31     =$04F8      R32     =$0578      R33     =$05F8      READ    =$CA9E
-   SLOT    =$3D        SLOT16  =$2B        SS      =$C083      SS0     =$0E
-   SSNONE  =$0F        STATUS  =$CA96      WORK    =$3C        WRITE   =$CAF7
-
+   ACMD410 =$CBB3      ACMD4140=$CBAD      BLOCK   =$CA53   ?  BOOT    =$C825
+?  CARDDET =$40        CMD     =$C9F2      CMD0    =$CB8F      CMD1    =$CB95
+   CMD16   =$CBA1      CMD55   =$CBA7      CMD8    =$CB9B      CMDHI   =$41
+   CMDLO   =$40        COMMAND =$CA7D      CTRL    =$C081      CURSLOT =$07F8
+   DATA    =$C080      DEBUG   =$00        DIV     =$C082      DRIVER  =$C841
+   DUMMY   =$FF        ECE     =$04        FORMAT  =$CB8B      FRX     =$10
+   GETR1   =$CA06      GETR3   =$CA21      INIT    =$C900      INITED  =$80
+   R30     =$0478      R31     =$04F8      R32     =$0578      R33     =$05F8
+   READ    =$CAAD      SLOT    =$3D        SLOT16  =$2B        SS      =$C083
+   SS0     =$01        STATUS  =$CAA5      WORK    =$3C     ?  WP      =$20
+   WRITE   =$CB15
 
 
 Symbol table - numerical order:
 
-   DEBUG   =$00        FRXDIS  =$07        SS0     =$0E        SSNONE  =$0F 
-                              ===== Page 14 =====
- 
-   FRXEN   =$17        SLOT16  =$2B        WORK    =$3C        SLOT    =$3D
-   CMDLO   =$40        CMDHI   =$41        DUMMY   =$FF        R30     =$0478
-   R31     =$04F8      R32     =$0578      R33     =$05F8      INITED  =$0678
-   CURSLOT =$07F8      DATA    =$C080      CTRL    =$C081      DIV     =$C082
-   SS      =$C083   ?  BOOT    =$C825      DRIVER  =$C841      INIT    =$C900
-   CMD     =$C9E3      GETR1   =$C9F7      GETR3   =$CA12      BLOCK   =$CA44
-   COMMAND =$CA6E      STATUS  =$CA96      READ    =$CA9E      WRITE   =$CAF7
-   FORMAT  =$CB64      CMD0    =$CB68      CMD1    =$CB6E      CMD8    =$CB74
-   CMD16   =$CB7A      CMD55   =$CB80      ACMD4140=$CB86      ACMD410 =$CB8C
-
+   DEBUG   =$00        SS0     =$01        ECE     =$04        FRX     =$10
+?  WP      =$20        SLOT16  =$2B        WORK    =$3C        SLOT    =$3D
+   CMDLO   =$40     ?  CARDDET =$40        CMDHI   =$41        INITED  =$80
+   DUMMY   =$FF        R30     =$0478      R31     =$04F8      R32     =$0578
+   R33     =$05F8      CURSLOT =$07F8      DATA    =$C080      CTRL    =$C081
+   DIV     =$C082      SS      =$C083   ?  BOOT    =$C825      DRIVER  =$C841
+   INIT    =$C900      CMD     =$C9F2      GETR1   =$CA06      GETR3   =$CA21
+   BLOCK   =$CA53      COMMAND =$CA7D      STATUS  =$CAA5      READ    =$CAAD
+   WRITE   =$CB15      FORMAT  =$CB8B      CMD0    =$CB8F      CMD1    =$CB95
+   CMD8    =$CB9B      CMD16   =$CBA1      CMD55   =$CBA7      ACMD4140=$CBAD
+   ACMD410 =$CBB3
 
