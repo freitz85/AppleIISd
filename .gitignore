@@ -156,7 +156,7 @@ xlnx_auto_0_xdb/
 xst/
 _ngo/
 _xmsgs/
-VHDL/appleiisd_html*
+VHDL/*_html
 VHDL/*.vhf
 VHDL/*.dhp
 VHDL/*.gyd
@@ -170,3 +170,4 @@ VHDL/*.err
 VHDL/*.lfp
 
 Hardware/SD_A2\.b\$1
+

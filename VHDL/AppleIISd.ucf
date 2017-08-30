@@ -24,7 +24,6 @@ NET "ndev_sel"  LOC = "P24"  ;
 NET "ng"  LOC = "P12"  ;
 NET "nio_sel"  LOC = "P14"  ;
 NET "nio_stb"  LOC = "P42"  ;
-NET "nirq"  LOC = "P44"  ;
 NET "noe"  LOC = "P25"  ;
 NET "nphi2"  LOC = "P8"  ;
 NET "nreset"  LOC = "P20"  ;

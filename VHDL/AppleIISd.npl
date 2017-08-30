@@ -21,5 +21,7 @@ GENERATEDSIMULATIONMODELTIME 0
 SOURCE AppleIISd.vhd
 SOURCE AddressDecoder.sch
 DEPASSOC appleiisd AppleIISd.ucf
+[Normal]
+p_CPLDFitterminate=xstvhd, 9500xl, VHDL.t_vm6File, 1504132429, Float
 [STRATEGY-LIST]
 Normal=True

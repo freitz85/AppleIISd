@@ -98,6 +98,7 @@ architecture Behavioral of AppleIISd is
 	signal spidataout: std_logic_vector (7 downto 0);
 	signal spiint: std_logic;	-- spi interrupt state
     signal inited: std_logic;   -- card initialized
+    signal inited_int: std_logic;
 	
 	-- spi register flags
 	signal tc: std_logic;		-- transmission complete; cleared on spi data read
@@ -160,6 +161,7 @@ begin
 			
 	led <= not (bsy or not slavesel); --'0'; --shifting2; --shiftdone; --shiftcnt(2);
 	ng <=  ndev_sel and nio_sel and nio_stb;
+    inited <= inited_int and not card;
 	--------------------------
 	
 	bsy <= start_shifting or shifting2;
@@ -370,7 +372,7 @@ begin
 			ier <= '0';
 			slavesel <= '1';
 			slaveinten <= '0';
-            inited <= '0';
+            inited_int <= '0';
 			divisor <= (others => '0');
 		elsif (falling_edge(selected) and nrw = '0') then
 		--elsif (falling_edge(cpu_phi2) and selected='1' and nrw='0') then
@@ -391,7 +393,7 @@ begin
 				when "11" =>		-- write slave select / slave interrupt enable
 					slavesel <= int_din(0);
 					slaveinten <= int_din(4);
-                    inited <= int_din(7);
+                    inited_int <= int_din(7);
 				when others =>
 			end case;
 		end if;
