@@ -45,7 +45,7 @@ FRX         =     $10         ; CTRL register
 ECE         =     $04
 SS0         =     $01         ; SS register
 WP          =     $20
-CARDDET     =     $40
+CD          =     $40
 INITED      =     $80
 
 
@@ -65,28 +65,30 @@ INITED      =     $80
             STA   CURSLOT
             LDA   #$40
             STA   SLOT16
+
             ELSE
             JSR   $FF58
             TSX
             LDA   $0100,X
+            STA   CURSLOT     ; $Cs
             AND   #$0F
             STA   SLOT        ; $0s
-            ORA   #$C0
-            STA   CURSLOT     ; $Cs
             ASL   A
             ASL   A
             ASL   A
             ASL   A
             STA   SLOT16      ; $s0
             FIN
+
             TAX               ; X holds now SLOT16
-
             BIT   $CFFF
-            JSR   INIT
+            JSR   CARDDET
+            BCC   :INIT
+            LDA   #$27        ; no card inserted
+            BRK
 
-*
-* TODO: check for init error
-*
+:INIT       JSR   INIT
+
 
 ********************************
 *
@@ -144,7 +146,11 @@ INSTALL     LDA   $BF32,X     ; get a devnum
 
             ELSE
 
-BOOT        LDA   #$01
+BOOT        CMP   #0          ; check for error
+            BEQ   :BOOT1
+            BRK
+
+:BOOT1      LDA   #$01
             STA   $42         ; load command
             LDA   SLOT16
             TAX
@@ -168,6 +174,7 @@ BOOT        LDA   #$01
 ********************************
 
 DRIVER      CLD
+
             DO    DEBUG
             LDA   #$04
             STA   SLOT
@@ -175,38 +182,44 @@ DRIVER      CLD
             STA   CURSLOT
             LDA   #$40
             STA   SLOT16
+
             ELSE
             JSR   $FF58       ; find slot nr
             TSX
             LDA   $0100,X
+            STA   CURSLOT     ; $Cs
             AND   #$0F
             STA   SLOT        ; $0s
-            ORA   #$C0
-            STA   CURSLOT     ; $Cs
             ASL   A
             ASL   A
             ASL   A
             ASL   A
             STA   SLOT16      ; $s0
             FIN
-            TAX               ; X holds now SLOT16
 
+            TAX               ; X holds now SLOT16
             BIT   $CFFF
-            LDA   #INITED     ; check for init
+            JSR   CARDDET
+            BCC   :INITED
+            LDA   #$27        ; no card inserted
+            BRA   :DONE
+
+:INITED     LDA   #INITED     ; check for init
             BIT   SS,X
             BEQ   :INIT
 
 :CMD        LDA   $42         ; get command
-            CMP   #$00
+            CMP   #0
             BEQ   :STATUS
-            CMP   #$01
+            CMP   #1
             BEQ   :READ
-            CMP   #$02
+            CMP   #2
             BEQ   :WRITE
-            CMP   #$03
+            CMP   #3
             BEQ   :FORMAT
-            SEC               ; unknown command
-            LDA   #$01
+            LDA   #1          ; unknown command
+
+:DONE       SEC
             RTS
 
 :STATUS     JMP   STATUS
@@ -221,8 +234,8 @@ DRIVER      CLD
 
             DS    \           ; fill with zeroes
             DS    -4          ; locate to $xxFC
-            DW    $FFFF       ; 65535 blocks
-            DB    $47         ; Status bits
+            DW    $0000       ; use status request
+            DB    $17         ; Status bits
             DB    #<DRIVER    ; LSB of driver
 
 
@@ -442,6 +455,7 @@ GETR3       JSR   GETR1       ; get R1 first
 ********************************
 *
 * Calculate block address
+* Unit number is in $43 DSSS0000
 * Block no is in $46-47
 * Address is in R30-R33
 *
@@ -458,7 +472,13 @@ BLOCK       PHX               ; save X
             STA   R31,X
             STA   R30,X
 
-            LDY   #9          ; ASL can't be used with Y
+            LDA   #$80        ; drive number
+            BIT   $43
+            BEQ   :SHIFT      ; D1
+            LDA   #1          ; D2
+            STA   R31,X
+
+:SHIFT      LDY   #9          ; ASL can't be used with Y
 :LOOP       ASL   R33,X       ; mul block num
             ROL   R32,X       ; by 512 to get
             ROL   R31,X       ; real address
@@ -497,6 +517,44 @@ COMMAND     PHY               ; save Y
 
 ********************************
 *
+* Check for card detect
+*
+* C Clear - card in slot
+*   Set   - no card in slot
+*
+********************************
+
+CARDDET     PHA
+            LDA   #CD         ; 0: card in
+            BIT   SS,X        ; 1: card out
+            CLC
+            BEQ   :DONE       ; card is in
+            SEC               ; card is out
+:DONE       PLA
+            RTS
+
+
+********************************
+*
+* Check for write protect
+*
+* C Clear - card not protected
+*   Set   - card write protected
+*
+********************************
+
+WRPROT      PHA
+            LDA   #WP         ; 0: write enabled
+            BIT   SS,X        ; 1: write disabled
+            CLC
+            BEQ   :DONE
+            SEC
+:DONE       PLA
+            RTS
+
+
+********************************
+*
 * Status request
 * $43    Unit number DSSS000
 * $44-45 Unused
@@ -508,18 +566,20 @@ COMMAND     PHY               ; save Y
 *   $27   - I/O error
 *   $28   - No card inserted / no init
 *   $2B   - Card write protected
-* x       - Blocks avail (low byte)
-* y       - Blocks avail (high byte)
+* X       - Blocks avail (low byte)
+* Y       - Blocks avail (high byte)
 *
 ********************************
 
-STATUS      CLC               ; no error
-            LDA   #0
+STATUS      LDA   #0          ; no error
             LDX   #$FF        ; 32 MB partition
             LDY   #$FF
-            RTS
 
-* TODO: check for card detect and write protect!
+            JSR   WRPROT
+            BCC   :DONE
+            LDA   #$2B        ; card write protected
+
+:DONE       RTS
 
 
 ********************************
@@ -537,9 +597,10 @@ STATUS      CLC               ; no error
 *
 ********************************
 
-* TODO: check for card detect!
+READ        JSR   CARDDET
+            BCS   :ERROR      ; no card inserted
 
-READ        JSR   BLOCK       ; calc block address
+            JSR   BLOCK       ; calc block address
 
             LDA   SS,X        ; enable /CS
             AND   #$FF!SS0
@@ -573,32 +634,34 @@ READ        JSR   BLOCK       ; calc block address
             DEY
             BNE   :LOOPY
 
+:CRC        LDA   DATA,X      ; read two bytes crc
+            LDA   DATA,X      ; and ignore
+            LDA   DATA,X      ; read a dummy byte
+
             LDA   CTRL,X      ; disable FRX
             AND   #$FF!FRX
             STA   CTRL,X
+            CLC               ; no error
+            LDA   #0
 
-:CRC        LDA   #DUMMY      ; first crc byte has
-            STA   DATA,X      ; already been read
-
+:DONE       PHP
+            PHA
             LDA   SS,X
             ORA   #SS0
             STA   SS,X        ; disable /CS
-            CLC               ; no error
-            LDA   #$00
+            PLA
+            PLP
             RTS
 
-:ERROR      LDA   SS,X
-            ORA   #SS0
-            STA   SS,X        ; disable /CS
-            SEC               ; an error occured
+:ERROR      SEC               ; an error occured
             LDA   #$27
-            RTS
+            BRA   :DONE
 
 
 ********************************
 *
 * Write 512 byte block
-* $43    Unit number DSSS000
+* $43    Unit number DSSS0000
 * $44-45 Address (LO/HI) of buffer
 * $46-47 Block number (LO/HI)
 *
@@ -606,14 +669,17 @@ READ        JSR   BLOCK       ; calc block address
 *   Set   - Error
 * A $00   - No error
 *   $27   - I/O error or bad block number
-*   $28   - No card inserted
 *   $2B   - Card write protected
 *
 ********************************
 
-* TODO: check for card detect and write protect!
+WRITE       JSR   CARDDET
+            BCS   :IOERROR    ; no card inserted
 
-WRITE       JSR   BLOCK       ; calc block address
+            JSR   WRPROT
+            BCS   :WPERROR    ; card write protected
+
+            JSR   BLOCK       ; calc block address
 
             LDA   SS,X        ; enable /CS
             AND   #$FF!SS0
@@ -622,7 +688,7 @@ WRITE       JSR   BLOCK       ; calc block address
             JSR   COMMAND     ; send command
 
             CMP   #0          ; check for error
-            BNE   :ERROR
+            BNE   :IOERROR
 
             LDA   #DUMMY
             STA   DATA,X      ; send dummy
@@ -648,33 +714,33 @@ WRITE       JSR   BLOCK       ; calc block address
             LDA   DATA,X
             AND   #$1F
             CMP   #$05
-            BNE   :ERROR      ; check for write error
+            BNE   :IOERROR    ; check for write error
+            CLC               ; no error
+            LDA   #0
 
-:WAIT6      LDA   #DUMMY
+:DONE       PHP
+            PHA
+:WAIT       LDA   #DUMMY
             STA   DATA,X      ; wait for write cycle
             LDA   DATA,X      ; to complete
             CMP   #$00
-            BEQ   :WAIT6
+            BEQ   :WAIT
 
             LDA   SS,X        ; disable /CS
             ORA   #SS0
             STA   SS,X
-            CLC               ; no error
-            LDA   #0
+            PLA
+            PLP
             RTS
 
-:ERROR      LDA   #DUMMY
-            STA   DATA,X      ; wait for write cycle
-            LDA   DATA,X      ; to complete
-            CMP   #$00
-            BEQ   :ERROR
-
-            LDA   SS,X
-            ORA   #SS0
-            STA   SS,X        ; disable /CS
-            SEC               ; an error occured
+:IOERROR    SEC               ; an error occured
             LDA   #$27
-            RTS
+            BRA   :DONE
+
+:WPERROR    SEC
+            LDA   #$2B
+            BRA   :DONE
+
 
 
 ********************************

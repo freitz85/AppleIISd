@@ -8,13 +8,16 @@ A Xilinx CPLD is used as a SPI controller and translates, together with the ROM 
 The assembler sources were written in Merlin-8. The [schematics](AppleIISd.pdf) are available as PDF.
 
 ## Features
-* up to 128MB storage space (4x 65535 blocks), currently 32MB
+* up to 64MB storage space (2x 65535 blocks)
 * ProDOS driver in ROM
 * Auto boot
 * Access LED
+* Card detect and write protect sensing
 
 ## Requirements
 The Apple][Sd requires and has been tested on an enhanced IIe computer. The ROM code uses some 65c02 opcodes and will therefore not work on a II, II+ or unenhanced IIe. ProDOS versions 1.1 to 2.4.1 seem to work. 
+
+When a 2732 type ROM is used, the binary image has to be programmed at offset 0x800, because A11 is always high for compatibility with 2716 type ROMs.
 
 ## Timing
 The clock of the SPI bus *SCK* may be derived from either *Phi0* or the *7M* clock. Additionally, the divisor may be 2 to 8.
@@ -52,8 +55,6 @@ LDA $C0C0
 
 ## TODOs
 * Much more testing
-* Support more than one partition
-* Implement card detect and write protect sensing
 * SRAM option (may never work, though)
 * Find a use for the IRQ pin
 * Use 28 pin socket to support other EPROMS than 2716 and 2732
