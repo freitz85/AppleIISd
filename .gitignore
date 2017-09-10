@@ -171,3 +171,9 @@ VHDL/*.lfp
 
 Hardware/SD_A2\.b\$1
 
+
+*.vf
+
+*.nga
+
+*.tspec

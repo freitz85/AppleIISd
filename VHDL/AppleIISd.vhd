@@ -32,38 +32,37 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
---use AddressDecoder.ALL;
 
 
 entity AppleIISd is
 Port (
-		data : inout  STD_LOGIC_VECTOR (7 downto 0);
-		nrw : in  STD_LOGIC;
-		nirq : out  STD_LOGIC;
-		nreset : in  STD_LOGIC;
-		addr : in  STD_LOGIC_VECTOR (1 downto 0);
-		nphi2 : in  STD_LOGIC;
-		ndev_sel : in  STD_LOGIC;
-		extclk : in  STD_LOGIC;
-		spi_miso: in std_logic;
-		spi_mosi : out  STD_LOGIC;
-		spi_sclk : out  STD_LOGIC;
-		spi_Nsel : out  STD_LOGIC;
-		wp : in  STD_LOGIC;
-		card : in  STD_LOGIC;
-		led : out  STD_LOGIC;
+        data : inout  STD_LOGIC_VECTOR (7 downto 0);
+        nrw : in  STD_LOGIC;
+        nirq : out  STD_LOGIC;
+        nreset : in  STD_LOGIC;
+        addr : in  STD_LOGIC_VECTOR (1 downto 0);
+        nphi2 : in  STD_LOGIC;
+        ndev_sel : in  STD_LOGIC;
+        extclk : in  STD_LOGIC;
+        spi_miso: in std_logic;
+        spi_mosi : out  STD_LOGIC;
+        spi_sclk : out  STD_LOGIC;
+        spi_Nsel : out  STD_LOGIC;
+        wp : in  STD_LOGIC;
+        card : in  STD_LOGIC;
+        led : out  STD_LOGIC;
 
-		a8 : in  std_logic;
-		a9 : in  std_logic;
-		a10 : in  std_logic;
-		nio_sel : in  std_logic;
-		nio_stb : in  std_logic;
-		b8 : out  std_logic;
-		b9 : out  std_logic;
-		b10 : out  std_logic;
-		noe : out  std_logic;
-		ng : out  std_logic
-	);
+        a8 : in  std_logic;
+        a9 : in  std_logic;
+        a10 : in  std_logic;
+        nio_sel : in  std_logic;
+        nio_stb : in  std_logic;
+        b8 : out  std_logic;
+        b9 : out  std_logic;
+        b10 : out  std_logic;
+        noe : out  std_logic;
+        ng : out  std_logic
+    );
 
     constant DIV_WIDTH : integer := 3;
 
@@ -89,7 +88,10 @@ architecture Behavioral of AppleIISd is
     signal spidataout: std_logic_vector (7 downto 0);
     signal spiint: std_logic;   -- spi interrupt state
     signal inited: std_logic;   -- card initialized
+    signal inited_set: std_logic;
+    signal inited_reset: std_logic;
     signal inited_int: std_logic;
+    signal inited_intff: std_logic;
     
     -- spi register flags
     signal tc: std_logic;       -- transmission complete; cleared on spi data read
@@ -117,46 +119,62 @@ architecture Behavioral of AppleIISd is
     
     -- spi clock
     signal clksrc: std_logic;                                   -- clock source (phi2 or extclk)
-	-- TODO divcnt is not used at all??
+    -- TODO divcnt is not used at all??
     signal divcnt: std_logic_vector(DIV_WIDTH-1 downto 0);          -- divisor counter
     signal shiftclk : std_logic;
 
     component AddressDecoder
-	port ( 
-		A8     : in    std_logic; 
-		A9     : in    std_logic; 
-		A10    : in    std_logic; 
-		CLK : in    std_logic; 
-		NDEV_SEL : in std_logic;
-		NIO_SEL : in    std_logic; 
-		NIO_STB : in    std_logic; 
-		B8   : out   std_logic; 
-		B9   : out   std_logic; 
-		B10  : out   std_logic; 
-		NOE     : out   std_logic
-	);
+    port ( 
+        A8     : in    std_logic; 
+        A9     : in    std_logic; 
+        A10    : in    std_logic; 
+        CLK : in    std_logic; 
+        NDEV_SEL : in std_logic;
+        NIO_SEL : in    std_logic; 
+        NIO_STB : in    std_logic; 
+        B8   : out   std_logic; 
+        B9   : out   std_logic; 
+        B10  : out   std_logic; 
+        NOE     : out   std_logic
+    );
+    end component;
+    
+    component SR_Latch
+    port (
+        S,R : in std_logic;
+        Q, Q_n : inout std_logic;
+        Reset : in std_logic;
+        Clk : in std_logic
+    );
     end component;
     
 begin
     add_dec : AddressDecoder
-	port map (
-		A8=>a8,      
-		A9=>a9,
-		A10=>a10,
-		CLK=>extclk,
-		NDEV_SEL=>ndev_sel,
-		NIO_SEL=>nio_sel,
-		NIO_STB=>nio_stb,
-		B8=>b8,
-		B9=>b9,
-		B10=>b10,
-		NOE=>noe
-	);
+    port map (
+        A8 => a8,      
+        A9 => a9,
+        A10 => a10,
+        CLK => extclk,
+        NDEV_SEL => ndev_sel,
+        NIO_SEL => nio_sel,
+        NIO_STB => nio_stb,
+        B8 => b8,
+        B9 => b9,
+        B10 => b10,
+        NOE => noe);
     
-	
+    sr_inited : SR_Latch
+    port map (
+        S => inited_set,
+        R => inited_reset,
+        Q => inited,
+        Q_n => open,
+        Reset => reset,
+        Clk => extclk);
+    
     led <= not (bsy or not slavesel);
     ng <=  ndev_sel and nio_sel and nio_stb;
-    inited <= inited_int and not card;
+    inited_reset <= card;
     bsy <= start_shifting or shifting2;
     
     process(start_shifting, shiftdone, shiftclk)
@@ -232,7 +250,7 @@ begin
                         when "101" => int_mosi <= spidataout(2);
                         when "110" => int_mosi <= spidataout(1);
                         when "111" => int_mosi <= spidataout(0);
-						when others => int_mosi <= '1';
+                        when others => int_mosi <= '1';
                     end case;
                     int_sclk <= cpol xor cpha xor shiftcnt(0);
                 end if;
@@ -302,12 +320,27 @@ begin
         if (shiftdone = '1') then
             tc <= '1';
         elsif (falling_edge(selected) and addr="00") then
-			tc <= '0';
+            tc <= '0';
         end if;
     end process;
     
     spiint <= tc and ier;
 
+
+    -- inited_set pulse
+    process(extclk, reset)
+    begin
+        if(reset = '1') then
+            inited_set <= '0';
+        elsif falling_edge(extclk) then
+            inited_intff <= inited_int;     -- one cycle delayed version
+            inited_set <= '0';              -- default value
+            if (inited_int = '1') and (inited_intff = '0') then
+                inited_set <= '1';
+            end if;
+        end if;
+    end process;
+    
     --------------------------
     -- cpu register section
     -- cpu read
@@ -338,8 +371,8 @@ begin
                     int_dout(5) <= wp;
                     int_dout(6) <= card;
                     int_dout(7) <= inited;
-				when others => 
-					int_dout <= (others => '0');
+                when others => 
+                    int_dout <= (others => '0');
             end case;
         else
             int_dout <= (others => '0');
@@ -347,7 +380,7 @@ begin
     end process;
 
     -- cpu write 
-    cpu_write: process(reset, selected, nrw, addr, int_din, inited)
+    cpu_write: process(reset, selected, nrw, addr, int_din)
     begin
         if (reset = '1') then
             cpha <= '0';
@@ -358,7 +391,6 @@ begin
             ier <= '0';
             slavesel <= '1';
             slaveinten <= '0';
-            inited_int <= '0';
             divisor <= (others => '0');
             spidataout <= (others => '1');
         elsif (falling_edge(selected) and nrw = '0') then
@@ -380,7 +412,7 @@ begin
                     slavesel <= int_din(0);
                     slaveinten <= int_din(4);
                     inited_int <= int_din(7);
-				when others =>
+                when others =>
             end case;
         end if;
     end process;
