@@ -54,7 +54,7 @@ INITED      =     $80
             LDX   #$20
             LDY   #$00
             LDX   #$03
-            STX   WORK
+            LDY   #$FF        ; neither 5.25 nor Smartport
 
 * find slot nr
 
@@ -227,6 +227,7 @@ DRIVER      CLD
 :WRITE      JMP   WRITE
 :FORMAT     JMP   FORMAT
 :INIT       JSR   INIT
+            BCS   :DONE       ; init failure
             BRA   :CMD
 
 
@@ -234,7 +235,7 @@ DRIVER      CLD
 
             DS    \           ; fill with zeroes
             DS    -4          ; locate to $xxFC
-            DW    $0000       ; use status request
+            DW    $FFFF       ; 65535 blocks
             DB    $17         ; Status bits
             DB    #<DRIVER    ; LSB of driver
 
@@ -247,7 +248,7 @@ DRIVER      CLD
 *   Set   - Error
 * A $00   - No error
 *   $27   - I/O error - Init failed
-*   $28   - No card inserted
+*   $2F   - No card inserted
 *
 ********************************
 
@@ -351,8 +352,7 @@ INIT        CLD
             CMP   #$00
             BNE   :IOERROR    ; error!
 
-:END        LDY   SLOT
-            LDA   SS,X
+:END        LDA   SS,X
             ORA   #INITED     ; initialized
             STA   SS,X
             LDA   CTRL,X
@@ -362,7 +362,7 @@ INIT        CLD
             LDY   #0
             BCC   :END1
 :CDERROR    SEC
-            LDY   #$28        ; no card error
+            LDY   #$2F        ; no card error
             BCS   :END1
 :IOERROR    SEC
             LDY   #$27        ; init error
@@ -563,9 +563,8 @@ WRPROT      PHA
 * C Clear - No error
 *   Set   - Error
 * A $00   - No error
-*   $27   - I/O error
-*   $28   - No card inserted / no init
 *   $2B   - Card write protected
+*   $2F   - No card inserted
 * X       - Blocks avail (low byte)
 * Y       - Blocks avail (high byte)
 *
@@ -575,7 +574,12 @@ STATUS      LDA   #0          ; no error
             LDX   #$FF        ; 32 MB partition
             LDY   #$FF
 
-            JSR   WRPROT
+            JSR   CARDDET
+            BCC   :WRPROT
+            LDA   #$2F        ; no card inserted
+            BRA   :DONE
+
+:WRPROT     JSR   WRPROT
             BCC   :DONE
             LDA   #$2B        ; card write protected
 
