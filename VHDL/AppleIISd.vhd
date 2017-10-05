@@ -38,12 +38,11 @@ entity AppleIISd is
 Port (
         data : inout  STD_LOGIC_VECTOR (7 downto 0);
         nrw : in  STD_LOGIC;
-        nirq : out  STD_LOGIC;
         nreset : in  STD_LOGIC;
         addr : in  STD_LOGIC_VECTOR (1 downto 0);
-        nphi2 : in  STD_LOGIC;
+        clk_phi0 : in  STD_LOGIC;
         ndev_sel : in  STD_LOGIC;
-        extclk : in  STD_LOGIC;
+        clk_7m : in  STD_LOGIC;
         spi_miso: in std_logic;
         spi_mosi : out  STD_LOGIC;
         spi_sclk : out  STD_LOGIC;
@@ -73,7 +72,6 @@ architecture Behavioral of AppleIISd is
     -- interface signals
     signal selected: std_logic;
     signal reset: std_logic;
-    signal int_out: std_logic;
     signal is_read: std_logic;
     signal int_din: std_logic_vector (7 downto 0);
     signal int_dout: std_logic_vector (7 downto 0);
@@ -86,16 +84,11 @@ architecture Behavioral of AppleIISd is
     -- internal state
     signal spidatain: std_logic_vector (7 downto 0);
     signal spidataout: std_logic_vector (7 downto 0);
-    signal spiint: std_logic;   -- spi interrupt state
     signal inited: std_logic;   -- card initialized
     signal inited_set: std_logic;
-    signal inited_reset: std_logic;
-    signal inited_int: std_logic;
-    signal inited_intff: std_logic;
     
     -- spi register flags
     signal tc: std_logic;       -- transmission complete; cleared on spi data read
-    signal ier: std_logic;      -- enable general SPI interrupts
     signal bsy: std_logic;      -- SPI busy
     signal frx: std_logic;      -- fast receive mode
     signal tmo: std_logic;      -- tri-state mosi
@@ -104,9 +97,7 @@ architecture Behavioral of AppleIISd is
     signal cpha: std_logic;     -- shift clock phase; 0=leading edge, 1=rising edge
     
     signal divisor: std_logic_vector(DIV_WIDTH-1 downto 0);
-    
     signal slavesel: std_logic;     -- slave select output (0=selected)
-    signal slaveinten: std_logic;   -- slave interrupt enable (1=enabled)
     
     --------------------------
     -- helper signals
@@ -118,7 +109,7 @@ architecture Behavioral of AppleIISd is
     signal shiftcnt: std_logic_vector(3 downto 0);          -- shift counter (5 bit)
     
     -- spi clock
-    signal clksrc: std_logic;                                   -- clock source (phi2 or extclk)
+    signal clksrc: std_logic;                                   -- clock source (phi2 or clk_7m)
     -- TODO divcnt is not used at all??
     signal divcnt: std_logic_vector(DIV_WIDTH-1 downto 0);          -- divisor counter
     signal shiftclk : std_logic;
@@ -132,19 +123,11 @@ architecture Behavioral of AppleIISd is
         NDEV_SEL : in std_logic;
         NIO_SEL : in    std_logic; 
         NIO_STB : in    std_logic; 
+        RNW  : in    std_logic;
         B8   : out   std_logic; 
         B9   : out   std_logic; 
         B10  : out   std_logic; 
         NOE     : out   std_logic
-    );
-    end component;
-    
-    component SR_Latch
-    port (
-        S,R : in std_logic;
-        Q, Q_n : inout std_logic;
-        Reset : in std_logic;
-        Clk : in std_logic
     );
     end component;
     
@@ -154,28 +137,29 @@ begin
         A8 => a8,      
         A9 => a9,
         A10 => a10,
-        CLK => extclk,
+        CLK => clk_7m,
         NDEV_SEL => ndev_sel,
         NIO_SEL => nio_sel,
         NIO_STB => nio_stb,
+        RNW => nrw,
         B8 => b8,
         B9 => b9,
         B10 => b10,
         NOE => noe);
     
-    sr_inited : SR_Latch
-    port map (
-        S => inited_set,
-        R => inited_reset,
-        Q => inited,
-        Q_n => open,
-        Reset => reset,
-        Clk => extclk);
-    
-    led <= not (bsy or not slavesel);
+    led <= not (inited_set);
+    --led <= not (bsy or not slavesel);
     ng <=  ndev_sel and nio_sel and nio_stb;
-    inited_reset <= card;
     bsy <= start_shifting or shifting2;
+    
+    process(clk_7m, reset, card, inited_set)
+    begin
+        if(reset = '1' or card = '1') then
+            inited <= '0';
+        elsif rising_edge(inited_set) then
+            inited <= '1';
+        end if;
+    end process;
     
     process(start_shifting, shiftdone, shiftclk)
     begin
@@ -275,7 +259,7 @@ begin
     --------------------------
     -- spiclk - spi clock generation
     -- spiclk is still 2 times the freq. than sclk
-    clksrc <= nphi2 when (ece = '0') else extclk;
+    clksrc <= clk_phi0 when (ece = '0') else clk_7m;
     
     -- is a pulse signal to allow for divisor==0
     --shiftclk <= clksrc when divcnt = "000000" else '0';
@@ -295,25 +279,28 @@ begin
     end process;
     
     --------------------------
-    -- interrupt generation
-    int_out <= spiint and slaveinten;
-
-    --------------------------
     -- interface section
     -- inputs
     reset <= not (nreset);
     selected <= not(ndev_sel);
-    is_read <= selected and nphi2 and nrw;
-    int_din <= data;    
-
+    int_din <= data;   
     int_miso <= (spi_miso and not slavesel);
+    
+    process(selected, clk_7m)
+    begin
+        if(selected = '0') then
+            is_read <= '0';
+        elsif(rising_edge(clk_7m) and selected = '1' and clk_phi0 = '1' and  nrw = '1') then
+            is_read <= '1';
+        end if;
+    end process;
     
     -- outputs
     data <= int_dout when (is_read='1') else (others => 'Z');       -- data bus tristate
-    nirq <= '0' when (int_out='1') else 'Z';            -- wired-or
     spi_sclk <= int_sclk;
     spi_mosi <= int_mosi when tmo='0' else 'Z';     -- mosi tri-state
     spi_Nsel <= slavesel;
+
     
     tc_proc: process (selected, shiftdone) 
     begin
@@ -324,29 +311,12 @@ begin
         end if;
     end process;
     
-    spiint <= tc and ier;
-
-
-    -- inited_set pulse
-    process(extclk, reset)
-    begin
-        if(reset = '1') then
-            inited_set <= '0';
-        elsif falling_edge(extclk) then
-            inited_intff <= inited_int;     -- one cycle delayed version
-            inited_set <= '0';              -- default value
-            if (inited_int = '1') and (inited_intff = '0') then
-                inited_set <= '1';
-            end if;
-        end if;
-    end process;
-    
     --------------------------
     -- cpu register section
     -- cpu read
     cpu_read: process (is_read, addr, 
-            spidatain, tc, ier, bsy, frx, tmo, ece, cpol, cpha, divisor,
-            slavesel, slaveinten, wp, card, inited)
+            spidatain, tc, bsy, frx, tmo, ece, cpol, cpha, divisor,
+            slavesel, wp, card, inited)
     begin
         if (is_read = '1') then 
             case addr is
@@ -359,15 +329,14 @@ begin
                     int_dout(3) <= tmo;
                     int_dout(4) <= frx;
                     int_dout(5) <= bsy;
-                    int_dout(6) <= ier;
+                    int_dout(6) <= '0';
                     int_dout(7) <= tc;
                 when "10" =>        -- read sclk divisor
                     int_dout(DIV_WIDTH-1 downto 0) <= divisor;
                     int_dout(7 downto 3) <= (others => '0');
                 when "11" =>        -- read slave select / slave interrupt state
                     int_dout(0) <= slavesel;
-                    int_dout(3 downto 1) <= (others => '0');
-                    int_dout(4) <= slaveinten;
+                    int_dout(4 downto 1) <= (others => '0');
                     int_dout(5) <= wp;
                     int_dout(6) <= card;
                     int_dout(7) <= inited;
@@ -380,7 +349,7 @@ begin
     end process;
 
     -- cpu write 
-    cpu_write: process(reset, selected, nrw, addr, int_din)
+    cpu_write: process(reset, selected, nrw, addr, int_din, card, inited)
     begin
         if (reset = '1') then
             cpha <= '0';
@@ -388,11 +357,12 @@ begin
             ece <= '0';
             tmo <= '0';
             frx <= '0';
-            ier <= '0';
             slavesel <= '1';
-            slaveinten <= '0';
             divisor <= (others => '0');
             spidataout <= (others => '1');
+            inited_set <= '0';
+        elsif (card = '1') then
+            inited_set <= '0';
         elsif (falling_edge(selected) and nrw = '0') then
             case addr is
                 when "00" =>        -- write SPI data out (see other process above)
@@ -403,15 +373,13 @@ begin
                     ece <= int_din(2);
                     tmo <= int_din(3);
                     frx <= int_din(4);
-                    -- no bit 5
-                    ier <= int_din(6);
-                    -- no bit 7;
+                    -- no bit 5 - 7
                 when "10" =>        -- write divisor
                     divisor <= int_din(DIV_WIDTH-1 downto 0);
                 when "11" =>        -- write slave select / slave interrupt enable
                     slavesel <= int_din(0);
-                    slaveinten <= int_din(4);
-                    inited_int <= int_din(7);
+                    -- no bit 1 - 6
+                    inited_set <= int_din(7);
                 when others =>
             end case;
         end if;
