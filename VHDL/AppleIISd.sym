@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<symbol version="7" name="AppleIISd">
+    <symboltype>BLOCK</symboltype>
+    <timestamp>2017-10-8T19:42:44</timestamp>
+    <pin polarity="Input" x="0" y="-304" name="is_read" />
+    <pin polarity="Input" x="0" y="-240" name="reset" />
+    <pin polarity="Input" x="0" y="-816" name="phi0" />
+    <pin polarity="Input" x="0" y="-176" name="selected" />
+    <pin polarity="Input" x="0" y="-768" name="clk" />
+    <pin polarity="Input" x="0" y="-704" name="miso" />
+    <pin polarity="Input" x="0" y="-480" name="wp" />
+    <pin polarity="Input" x="0" y="-416" name="card" />
+    <pin polarity="Input" x="0" y="-112" name="data_in(7:0)" />
+    <pin polarity="Input" x="0" y="-368" name="addr(1:0)" />
+    <pin polarity="Output" x="384" y="-816" name="mosi" />
+    <pin polarity="Output" x="384" y="-752" name="sclk" />
+    <pin polarity="Output" x="384" y="-688" name="nsel" />
+    <pin polarity="Output" x="384" y="-560" name="led" />
+    <pin polarity="Output" x="384" y="-512" name="data_out(7:0)" />
+    <graph>
+        <attrtext style="alignment:BCENTER;fontsize:56;fontname:Arial" attrname="SymbolName" x="192" y="-904" type="symbol" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="72" y="-304" type="pin is_read" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="72" y="-240" type="pin reset" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="68" y="-816" type="pin phi0" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="72" y="-176" type="pin selected" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="72" y="-768" type="pin clk" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="72" y="-704" type="pin miso" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="72" y="-480" type="pin wp" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="72" y="-416" type="pin card" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="72" y="-112" type="pin data_in(7:0)" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="72" y="-368" type="pin addr(1:0)" />
+        <attrtext style="alignment:RIGHT;fontsize:24;fontname:Arial" attrname="PinName" x="312" y="-816" type="pin mosi" />
+        <attrtext style="alignment:RIGHT;fontsize:24;fontname:Arial" attrname="PinName" x="312" y="-752" type="pin sclk" />
+        <attrtext style="alignment:RIGHT;fontsize:24;fontname:Arial" attrname="PinName" x="312" y="-688" type="pin nsel" />
+        <attrtext style="alignment:RIGHT;fontsize:24;fontname:Arial" attrname="PinName" x="312" y="-560" type="pin led" />
+        <attrtext style="alignment:RIGHT;fontsize:24;fontname:Arial" attrname="PinName" x="312" y="-512" type="pin data_out(7:0)" />
+        <line x2="0" y1="-480" y2="-480" x1="64" />
+        <line x2="0" y1="-416" y2="-416" x1="64" />
+        <rect width="256" x="64" y="-896" height="860" />
+        <line x2="64" y1="-816" y2="-816" x1="0" />
+        <line x2="0" y1="-304" y2="-304" x1="64" />
+        <line x2="0" y1="-240" y2="-240" x1="64" />
+        <line x2="0" y1="-176" y2="-176" x1="64" />
+        <rect width="64" x="0" y="-124" height="24" />
+        <line x2="0" y1="-112" y2="-112" x1="64" />
+        <rect width="64" x="0" y="-380" height="24" />
+        <line x2="0" y1="-368" y2="-368" x1="64" />
+        <line x2="0" y1="-768" y2="-768" x1="64" />
+        <line x2="0" y1="-704" y2="-704" x1="64" />
+        <line x2="384" y1="-752" y2="-752" x1="320" />
+        <line x2="384" y1="-688" y2="-688" x1="320" />
+        <line x2="384" y1="-816" y2="-816" x1="320" />
+        <rect width="64" x="320" y="-524" height="24" />
+        <line x2="384" y1="-512" y2="-512" x1="320" />
+        <line x2="384" y1="-560" y2="-560" x1="320" />
+    </graph>
+</symbol>
