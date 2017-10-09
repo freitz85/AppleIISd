@@ -127,10 +127,15 @@ BEGIN
       wait for 100 ns;	
       reset <= '1';
       wait for 100 ns;
+      reset <= '0';
       wait for clk_period*10;
-
       -- insert stimulus here 
-
+      selected <= '1';
+      data_in <= (others => '1');
+      wait for clk_period * 7;
+      selected <= '0';
+      wait for clk_period * 10;
+      
       wait;
    end process;
 

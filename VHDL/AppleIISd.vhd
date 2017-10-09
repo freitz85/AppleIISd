@@ -91,8 +91,7 @@ architecture Behavioral of AppleIISd is
     
 begin    
     --led <= not (inited);
-    led <= not bsy;
-    --led <= not (bsy or not slavesel);
+    led <= not (bsy or not slavesel);
     bsy <= start_shifting or shifting2;
     
     process(start_shifting, shiftdone, shiftclk)
