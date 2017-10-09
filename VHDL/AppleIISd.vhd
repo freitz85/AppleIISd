@@ -72,14 +72,14 @@ architecture Behavioral of AppleIISd is
     signal ece: std_logic;      -- external clock enable; 0=phi2, 1=external clock
     
     signal divisor: std_logic_vector(DIV_WIDTH-1 downto 0);
-    signal slavesel: std_logic;     -- slave select output (0=selected)
+    signal slavesel: std_logic := '1';     -- slave select output (0=selected)
     signal int_miso: std_logic;
     --------------------------
     -- helper signals
 
     -- shift engine
-    signal start_shifting: std_logic;   -- shifting data
-    signal shifting2: std_logic;    -- shifting data
+    signal start_shifting: std_logic := '0';   -- shifting data
+    signal shifting2: std_logic := '0';    -- shifting data
     signal shiftdone: std_logic;    -- shifting data done
     signal shiftcnt: std_logic_vector(3 downto 0);          -- shift counter (5 bit)
     

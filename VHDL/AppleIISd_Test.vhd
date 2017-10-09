@@ -61,7 +61,7 @@ ARCHITECTURE behavior OF AppleIISd_Test IS
     
 
    --Inputs
-   signal data_in : std_logic_vector(7 downto 0) := (others => '0');
+   signal data_in : std_logic_vector(7 downto 0) := (others => '1');
    signal is_read : std_logic := '0';
    signal reset : std_logic := '0';
    signal addr : std_logic_vector(1 downto 0) := (others => '0');
@@ -112,30 +112,36 @@ BEGIN
 		wait for clk_period/2;
    end process; 
    
-   phi0_process :process
+   phi0_process :process(clk)
+   variable counter : integer range 0 to 7;
    begin
-        phi0 <= '1';
-        wait for clk_period/14;
-        phi0 <= '0';
-        wait for clk_period/14;
+        if rising_edge(clk) or falling_edge(clk) then
+            counter := counter + 1;
+            if counter = 7 then
+                phi0 <= not phi0;
+                counter := 0;
+            end if;
+        end if;
    end process;
 
    -- Stimulus process
    stim_proc: process
    begin		
-      -- hold reset state for 100 ns.
-      wait for 100 ns;	
+      -- hold reset state.
+      wait for clk_period * 20;	
       reset <= '1';
-      wait for 100 ns;
+      wait for clk_period * 20;
       reset <= '0';
-      wait for clk_period*10;
+      wait for clk_period * 5;
+      wait until rising_edge(phi0);
       -- insert stimulus here 
       selected <= '1';
-      data_in <= (others => '1');
-      wait for clk_period * 7;
+      wait for clk_period;
+      data_in <= (others => '0');
+      wait until falling_edge(phi0);
       selected <= '0';
-      wait for clk_period * 10;
-      
+      wait for clk_period;
+      data_in <= (others => '1');
       wait;
    end process;
 
