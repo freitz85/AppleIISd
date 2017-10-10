@@ -77,10 +77,10 @@ Port (
         data_in : in std_logic_vector (7 downto 0);
         data_out : out std_logic_vector (7 downto 0);
         is_read : in  std_logic;
-        reset : in  std_logic;
+        nreset : in  std_logic;
         addr : in  std_logic_vector (1 downto 0);
         phi0 : in  std_logic;
-        selected : in  std_logic;
+        ndev_sel : in  std_logic;
         clk : in  std_logic;
         miso: in std_logic;
         mosi : out  std_logic;
@@ -115,10 +115,10 @@ begin
         data_in => data_in,
         data_out => data_out,
         is_read => rnw_int,
-        reset => not NRESET,
+        nreset => NRESET,
         addr => addr_low_int,
         phi0 => PHI0,
-        selected => not ndev_sel_int,
+        ndev_sel => ndev_sel_int,
         clk => CLK,
         miso => miso_int,
         mosi => MOSI,

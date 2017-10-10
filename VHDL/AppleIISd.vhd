@@ -39,10 +39,10 @@ Port (
         data_in : in STD_LOGIC_VECTOR (7 downto 0);
         data_out : out STD_LOGIC_VECTOR (7 downto 0);
         is_read : in  STD_LOGIC;
-        reset : in  STD_LOGIC;
+        nreset : in  STD_LOGIC;
         addr : in  STD_LOGIC_VECTOR (1 downto 0);
         phi0 : in  STD_LOGIC;
-        selected : in  STD_LOGIC;
+        ndev_sel : in  STD_LOGIC;
         clk : in  STD_LOGIC;
         miso: in std_logic;
         mosi : out  STD_LOGIC;
@@ -105,9 +105,9 @@ begin
         end if; 
     end process;
 
-    process(shiftcnt, reset, shiftclk) 
+    process(shiftcnt, nreset, shiftclk) 
     begin
-        if (reset = '1') then
+        if (nreset = '0') then
             shiftdone <= '0';
         elsif (rising_edge(shiftclk)) then
             if (shiftcnt = "1111") then
@@ -118,9 +118,9 @@ begin
         end if;
     end process;
     
-    process(reset, shifting2, shiftcnt, shiftclk)
+    process(nreset, shifting2, shiftcnt, shiftclk)
     begin
-        if (reset='1') then
+        if (nreset = '0') then
             shiftcnt <= (others => '0');
         elsif (rising_edge(shiftclk)) then
             if (shifting2 = '1') then
@@ -132,9 +132,9 @@ begin
         end if;
     end process;
 
-    inproc: process(reset, shifting2, shiftcnt, shiftclk, spidatain, miso)
+    inproc: process(nreset, shifting2, shiftcnt, shiftclk, spidatain, miso)
     begin
-        if (reset='1') then
+        if (nreset = '0') then
             spidatain <= (others => '0');
         elsif (rising_edge(shiftclk)) then
             if (shifting2 = '1' and shiftcnt(0) = '1') then
@@ -145,9 +145,9 @@ begin
         end if;
     end process;
 
-    outproc: process(reset, shifting2, spidataout, shiftcnt, shiftclk)
+    outproc: process(nreset, shifting2, spidataout, shiftcnt, shiftclk)
     begin
-        if (reset='1') then
+        if (nreset = '0') then
             mosi <= '1';
             sclk <= '0';
         else
@@ -177,12 +177,12 @@ begin
 
 
     -- shift operation enable
-    shiften: process(reset, selected, is_read, addr, frx, shiftdone)
+    shiften: process(nreset, ndev_sel, is_read, addr, frx, shiftdone)
     begin
         -- start shifting
-        if (reset='1' or shiftdone='1') then
+        if (nreset = '0' or shiftdone = '1') then
             start_shifting <= '0';
-        elsif (falling_edge(selected) and addr="00" and (frx='1' or is_read='0')) then
+        elsif (rising_edge(ndev_sel) and addr="00" and (frx='1' or is_read='0')) then
             -- access to register 00, either write (is_read=0) or fast receive bit set (frx)
             -- then both types of access (write but also read)
             start_shifting <= '1';
@@ -198,9 +198,9 @@ begin
     --shiftclk <= clksrc when divcnt = "000000" else '0';
     shiftclk <= clksrc when bsy = '1' else '0';
     
---    clkgen: process(reset, divisor, clksrc)
+--    clkgen: process(nreset, divisor, clksrc)
 --    begin
---        if (reset='1') then
+--        if (nreset = '0') then
 --            divcnt <= divisor;
 --        elsif (falling_edge(clksrc)) then
 --            if (shiftclk = '1') then
@@ -219,11 +219,11 @@ begin
     -- outputs
     nsel <= slavesel;
 
-    tc_proc: process (selected, shiftdone) 
+    tc_proc: process (ndev_sel, shiftdone) 
     begin
         if (shiftdone = '1') then
             tc <= '1';
-        elsif (falling_edge(selected) and addr="00") then
+        elsif (rising_edge(ndev_sel) and addr="00") then
             tc <= '0';
         end if;
     end process;
@@ -261,9 +261,9 @@ begin
     end process;
 
     -- cpu write 
-    cpu_write: process(reset, selected, is_read, addr, data_in, card, inited)
+    cpu_write: process(nreset, ndev_sel, is_read, addr, data_in, card, inited)
     begin
-        if (reset = '1') then
+        if (nreset = '0') then
             ece <= '0';
             frx <= '0';
             slavesel <= '1';
@@ -272,7 +272,7 @@ begin
             inited <= '0';
         elsif (card = '1') then
             inited <= '0';
-        elsif (falling_edge(selected) and is_read = '0') then
+        elsif (rising_edge(ndev_sel) and is_read = '0') then
             case addr is
                 when "00" =>        -- write SPI data out (see other process above)
                     spidataout <= data_in;

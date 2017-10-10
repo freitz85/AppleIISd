@@ -103,6 +103,16 @@ ARCHITECTURE behavior OF IO_Test IS
 
    -- Clock period definitions
    constant CLK_period : time := 142 ns;
+   
+   -- Bus timings
+   -- worst case
+   constant ADD_valid : time := 300 ns;     -- II+
+   constant DATA_valid : time := 200 ns;    -- II+
+   constant ADD_hold : time := 15 ns;       -- IIgs
+   --best case
+   --constant ADD_valid : time := 100 ns;     -- IIgs
+   --constant DATA_valid : time := 30 ns;     -- IIgs
+   --constant ADD_hold : time := 15 ns;       -- IIgs
  
 BEGIN
  
@@ -169,8 +179,9 @@ BEGIN
       
       -- read reg 0
       DATA <= (others => 'Z');
+      ADD_LOW <= (others => 'U');
       wait until falling_edge(PHI0);
-      wait for 300 ns;
+      wait for ADD_valid;
       ADD_LOW <= (others => '0');
       RNW <= '1';
       DATA <= (others => 'U');
@@ -179,12 +190,12 @@ BEGIN
       DATA <= (others => 'Z');
       wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
-      wait for 15 ns;
+      wait for ADD_hold;
       ADD_LOW <= (others => 'U');
       
       -- read reg 3
       wait until falling_edge(PHI0);
-      wait for 300 ns;
+      wait for ADD_valid;
       ADD_LOW <= (others => '1');
       RNW <= '1';
       DATA <= (others => 'U');
@@ -193,23 +204,23 @@ BEGIN
       DATA <= (others => 'Z');
       wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
-      wait for 15 ns;
+      wait for ADD_hold;
       ADD_LOW <= (others => 'U');
       
       -- send data
       wait until falling_edge(PHI0);
-      wait for 300 ns;
+      wait for ADD_valid;
       ADD_LOW <= (others => '0');
       RNW <= '0';
       DATA <= (others => 'U');
       wait until rising_edge(PHI0);
       NDEV_SEL <= '0';
       DATA <= (others => 'Z');
-      wait for 200 ns;
+      wait for DATA_valid;
       DATA <= (others => '0');
       wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
-      wait for 15 ns;
+      wait for ADD_hold;
       --wait for CLK_period;
       ADD_LOW <= (others => 'U');
       RNW <= '1';
