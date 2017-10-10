@@ -165,26 +165,12 @@ BEGIN
    stim_proc: process
    begin		
       -- hold reset state.
-      wait for CLK_period * 20;	
+      wait for CLK_period * 10;	
       NRESET <= '0';
       wait for CLK_period * 20;
       NRESET <= '1';
       wait for CLK_period * 10;
-      
-      -- read reg 0
       DATA <= (others => 'Z');
-      ADD_LOW <= (others => 'U');
-      wait until falling_edge(PHI0);
-      wait for ADD_valid;
-      ADD_LOW <= (others => '0');
-      RNW <= '1';
-      DATA <= (others => 'U');
-      wait until rising_edge(PHI0);
-      NDEV_SEL <= '0';
-      DATA <= (others => 'Z');
-      wait until falling_edge(PHI0);
-      NDEV_SEL <= '1';
-      wait for ADD_hold;
       ADD_LOW <= (others => 'U');
       
       -- read reg 3
@@ -215,10 +201,50 @@ BEGIN
       wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
       wait for ADD_hold;
-      wait for CLK_period;
+      --wait for CLK_period;
       ADD_LOW <= (others => 'U');
       RNW <= '1';
       DATA <= (others => 'Z');
+      
+      -- write ece
+      wait for 20 us;
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= "01";
+      RNW <= '0';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NDEV_SEL <= '0';
+      DATA <= (others => 'Z');
+      wait for DATA_valid;
+      DATA <= x"04";
+      wait until falling_edge(PHI0);
+      NDEV_SEL <= '1';
+      wait for ADD_hold;
+      --wait for CLK_period;
+      ADD_LOW <= (others => 'U');
+      RNW <= '1';
+      DATA <= (others => 'Z');
+      
+      -- send data
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= (others => '0');
+      RNW <= '0';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NDEV_SEL <= '0';
+      DATA <= (others => 'Z');
+      wait for DATA_valid;
+      DATA <= (others => '0');
+      wait until falling_edge(PHI0);
+      NDEV_SEL <= '1';
+      wait for ADD_hold;
+      --wait for CLK_period;
+      ADD_LOW <= (others => 'U');
+      RNW <= '1';
+      DATA <= (others => 'Z');
+      
       wait;
    end process;
 

@@ -70,7 +70,6 @@ architecture Behavioral of AppleIISd is
     signal card_int : std_logic;
     signal miso_int : std_logic;
     
-    signal ndev_sel_int : std_logic;
     signal rnw_int : std_logic;
     signal data_en : std_logic;
         
@@ -117,7 +116,7 @@ begin
         nreset => NRESET,
         addr => addr_low_int,
         phi0 => PHI0,
-        ndev_sel => ndev_sel_int,
+        ndev_sel => NDEV_SEL,
         clk => CLK,
         miso => miso_int,
         mosi => MOSI,
@@ -144,13 +143,11 @@ begin
     ctrl_latch: process(CLK, NRESET)
     begin
         if(NRESET = '0') then
-            ndev_sel_int <= '1';
             rnw_int <= '1';
             wp_int <= '1';
             card_int <= '1';
             miso_int <= '1';
-        elsif rising_edge(CLK) then
-            ndev_sel_int <= NDEV_SEL;
+        elsif falling_edge(CLK) then
             rnw_int <= RNW;
             wp_int <= WP;
             card_int <= CARD;
@@ -161,25 +158,17 @@ begin
     DATA <= data_out when (data_en = '1') else (others => 'Z');      -- data bus tristate
     
     -- synthesis translate_off
-    --data_dbg <= data_in;
-    --add_dbg <= addr_low_int;
+    data_dbg <= data_in;
+    add_dbg <= addr_low_int;
     -- synthesis translate_on
     
     data_latch: process(CLK)
     begin
-        --if(rising_edge(CLK) and NDEV_SEL = '0') and (RNW = '0')) then
-        --if rising_edge(CLK) and (NDEV_SEL = '0') then
-        if rising_edge(CLK) then
+        if falling_edge(CLK) then
             if (NDEV_SEL = '0') then
                 data_in <= DATA;
+                addr_low_int <= ADD_LOW;
             end if;
-        end if;
-    end process;
-    
-    add_latch: process(NDEV_SEL)
-    begin
-        if falling_edge(NDEV_SEL) then
-            addr_low_int <= ADD_LOW;
         end if;
     end process;
 
