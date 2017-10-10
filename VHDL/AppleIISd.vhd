@@ -72,6 +72,7 @@ architecture Behavioral of AppleIISd is
     
     signal rnw_int : std_logic;
     signal data_en : std_logic;
+    signal ndev_sel_int : std_logic;
         
 component SpiController is
 Port (
@@ -131,7 +132,7 @@ begin
         A => ADD_HIGH,
         B => B,
         RNW => RNW,
-        NDEV_SEL => NDEV_SEL,
+        NDEV_SEL => ndev_sel_int,
         NIO_SEL => NIO_SEL,
         NIO_STB => NIO_STB,
         NRESET => NRESET,
@@ -152,6 +153,15 @@ begin
             wp_int <= WP;
             card_int <= CARD;
             miso_int <= MISO;
+        end if;
+    end process;
+    
+    process(CLK, NRESET)
+    begin
+        if(NRESET = '0') then
+            ndev_sel_int <= '1';
+        elsif rising_edge(CLK) then
+            ndev_sel_int <= NDEV_SEL;
         end if;
     end process;
     

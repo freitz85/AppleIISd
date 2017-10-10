@@ -54,7 +54,9 @@ begin
     DATA_EN <= RNW and not NDEV_SEL;
     NG <= NDEV_SEL and noe_int;
     NOE <= noe_int;
-    noe_int <= not RNW or not NDEV_SEL or NIO_STB or ncs;
+    noe_int <= not RNW or not NDEV_SEL
+            or (NIO_SEL and NIO_STB)
+            or (NIO_SEL and ncs);
     
     cfxx <= A(8) and A(9) and A(10) and not NIO_STB;
     
