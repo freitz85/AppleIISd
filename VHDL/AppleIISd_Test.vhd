@@ -2,15 +2,15 @@
 -- Company: 
 -- Engineer:
 --
--- Create Date:   20:21:20 10/09/2017
+-- Create Date:   00:42:59 10/10/2017
 -- Design Name:   
--- Module Name:   U:/AppleIISd/VHDL/AppleIISd_Test.vhd
+-- Module Name:   U:/AppleIISd/VHDL/IO_Test.vhd
 -- Project Name:  AppleIISd
 -- Target Device:  
 -- Tool versions:  
 -- Description:   
 -- 
--- VHDL Test Bench Created by ISE for module: AppleIISd
+-- VHDL Test Bench Created by ISE for module: IO
 -- 
 -- Dependencies:
 -- 
@@ -41,107 +41,184 @@ ARCHITECTURE behavior OF AppleIISd_Test IS
  
     COMPONENT AppleIISd
     PORT(
-         data_in : IN  std_logic_vector(7 downto 0);
-         data_out : OUT  std_logic_vector(7 downto 0);
-         is_read : IN  std_logic;
-         reset : IN  std_logic;
-         addr : IN  std_logic_vector(1 downto 0);
-         phi0 : IN  std_logic;
-         selected : IN  std_logic;
-         clk : IN  std_logic;
-         miso : IN  std_logic;
-         mosi : OUT  std_logic;
-         sclk : OUT  std_logic;
-         nsel : OUT  std_logic;
-         wp : IN  std_logic;
-         card : IN  std_logic;
-         led : OUT  std_logic
+         ADD_HIGH : IN  std_logic_vector(10 downto 8);
+         ADD_LOW : IN  std_logic_vector(1 downto 0);
+         B : OUT  std_logic_vector(10 downto 8);
+         CARD : IN  std_logic;
+         DATA : INOUT  std_logic_vector(7 downto 0);
+         CLK : IN  std_logic;
+         LED : OUT  std_logic;
+         NDEV_SEL : IN  std_logic;
+         NG : OUT  std_logic;
+         NIO_SEL : IN  std_logic;
+         NIO_STB : IN  std_logic;
+         NOE : OUT  std_logic;
+         PHI0 : IN  std_logic;
+         NRESET : IN  std_logic;
+         RNW : IN  std_logic;
+         MISO : IN  std_logic;
+         MOSI : OUT  std_logic;
+         NSEL : OUT  std_logic;
+         SCLK : OUT  std_logic;
+         WP : IN  std_logic;
+         
+         data_dbg : out std_logic_vector (7 downto 0);
+         add_dbg : out std_logic_vector (1 downto 0)
         );
     END COMPONENT;
     
 
    --Inputs
-   signal data_in : std_logic_vector(7 downto 0) := (others => '1');
-   signal is_read : std_logic := '0';
-   signal reset : std_logic := '0';
-   signal addr : std_logic_vector(1 downto 0) := (others => '0');
-   signal phi0 : std_logic := '1';
-   signal selected : std_logic := '0';
-   signal clk : std_logic := '0';
-   signal miso : std_logic := '0';
-   signal wp : std_logic := '0';
-   signal card : std_logic := '0';
+   signal ADD_HIGH : std_logic_vector(10 downto 8) := (others => 'U');
+   signal ADD_LOW : std_logic_vector(1 downto 0) := (others => 'U');
+   signal CARD : std_logic := '0';
+   signal CLK : std_logic := '0';
+   signal NDEV_SEL : std_logic := '1';
+   signal NIO_SEL : std_logic := '1';
+   signal NIO_STB : std_logic := '1';
+   signal PHI0 : std_logic := '0';
+   signal NRESET : std_logic := '1';
+   signal RNW : std_logic := '1';
+   signal MISO : std_logic := '1';
+   signal WP : std_logic := '0';
+
+	--BiDirs
+   signal DATA : std_logic_vector(7 downto 0) := (others => 'Z');
 
  	--Outputs
-   signal data_out : std_logic_vector(7 downto 0);
-   signal mosi : std_logic;
-   signal sclk : std_logic;
-   signal nsel : std_logic;
-   signal led : std_logic;
+   signal B : std_logic_vector(10 downto 8);
+   signal LED : std_logic;
+   signal NG : std_logic;
+   signal NOE : std_logic;
+   signal MOSI : std_logic;
+   signal NSEL : std_logic;
+   signal SCLK : std_logic;
+   
+   signal data_dbg : std_logic_vector (7 downto 0);
+   signal add_dbg : std_logic_vector (1 downto 0);
 
    -- Clock period definitions
-   constant clk_period : time := 142 ns;    -- 7MHz
+   constant CLK_period : time := 142 ns;
+   
+   -- Bus timings
+   -- worst case
+   constant ADD_valid : time := 300 ns;     -- II+
+   constant DATA_valid : time := 200 ns;    -- II+
+   constant ADD_hold : time := 15 ns;       -- IIgs
+   --best case
+   --constant ADD_valid : time := 100 ns;     -- IIgs
+   --constant DATA_valid : time := 30 ns;     -- IIgs
+   --constant ADD_hold : time := 15 ns;       -- IIgs
  
 BEGIN
  
 	-- Instantiate the Unit Under Test (UUT)
    uut: AppleIISd PORT MAP (
-          data_in => data_in,
-          data_out => data_out,
-          is_read => is_read,
-          reset => reset,
-          addr => addr,
-          phi0 => phi0,
-          selected => selected,
-          clk => clk,
-          miso => miso,
-          mosi => mosi,
-          sclk => sclk,
-          nsel => nsel,
-          wp => wp,
-          card => card,
-          led => led
+          ADD_HIGH => ADD_HIGH,
+          ADD_LOW => ADD_LOW,
+          B => B,
+          CARD => CARD,
+          DATA => DATA,
+          CLK => CLK,
+          LED => LED,
+          NDEV_SEL => NDEV_SEL,
+          NG => NG,
+          NIO_SEL => NIO_SEL,
+          NIO_STB => NIO_STB,
+          NOE => NOE,
+          PHI0 => PHI0,
+          NRESET => NRESET,
+          RNW => RNW,
+          MISO => MISO,
+          MOSI => MOSI,
+          NSEL => NSEL,
+          SCLK => SCLK,
+          WP => WP,
+          
+          data_dbg => data_dbg,
+          add_dbg => add_dbg
         );
 
    -- Clock process definitions
-   clk_process :process
+   CLK_process :process
    begin
-		clk <= '0';
-		wait for clk_period/2;
-		clk <= '1';
-		wait for clk_period/2;
-   end process; 
-   
-   phi0_process :process(clk)
+		CLK <= '0';
+		wait for CLK_period/2;
+		CLK <= '1';
+		wait for CLK_period/2;
+   end process;
+ 
+   PHI0_process :process(CLK)
    variable counter : integer range 0 to 7;
    begin
-        if rising_edge(clk) or falling_edge(clk) then
+        if rising_edge(CLK) or falling_edge(CLK) then
             counter := counter + 1;
             if counter = 7 then
-                phi0 <= not phi0;
+                PHI0 <= not PHI0;
                 counter := 0;
             end if;
         end if;
    end process;
+ 
 
    -- Stimulus process
    stim_proc: process
    begin		
       -- hold reset state.
-      wait for clk_period * 20;	
-      reset <= '1';
-      wait for clk_period * 20;
-      reset <= '0';
-      wait for clk_period * 5;
-      wait until rising_edge(phi0);
-      -- insert stimulus here 
-      selected <= '1';
-      wait for clk_period;
-      data_in <= (others => '0');
-      wait until falling_edge(phi0);
-      selected <= '0';
-      wait for clk_period;
-      data_in <= (others => '1');
+      wait for CLK_period * 20;	
+      NRESET <= '0';
+      wait for CLK_period * 20;
+      NRESET <= '1';
+      wait for CLK_period * 10;
+      
+      -- read reg 0
+      DATA <= (others => 'Z');
+      ADD_LOW <= (others => 'U');
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= (others => '0');
+      RNW <= '1';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NDEV_SEL <= '0';
+      DATA <= (others => 'Z');
+      wait until falling_edge(PHI0);
+      NDEV_SEL <= '1';
+      wait for ADD_hold;
+      ADD_LOW <= (others => 'U');
+      
+      -- read reg 3
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= (others => '1');
+      RNW <= '1';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NDEV_SEL <= '0';
+      DATA <= (others => 'Z');
+      wait until falling_edge(PHI0);
+      NDEV_SEL <= '1';
+      wait for ADD_hold;
+      ADD_LOW <= (others => 'U');
+      
+      -- send data
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= (others => '0');
+      RNW <= '0';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NDEV_SEL <= '0';
+      DATA <= (others => 'Z');
+      wait for DATA_valid;
+      DATA <= (others => '0');
+      wait until falling_edge(PHI0);
+      NDEV_SEL <= '1';
+      wait for ADD_hold;
+      wait for CLK_period;
+      ADD_LOW <= (others => 'U');
+      RNW <= '1';
+      DATA <= (others => 'Z');
       wait;
    end process;
 
