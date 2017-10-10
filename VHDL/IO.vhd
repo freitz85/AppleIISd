@@ -52,10 +52,14 @@ Port (
     MOSI : out std_logic;
     NSEL : out std_logic;
     SCLK : out std_logic;
-    WP : in std_logic;
+    WP : in std_logic
     
+    -- synthesis translate_off
+    ;
     data_dbg : out std_logic_vector (7 downto 0);
     add_dbg : out std_logic_vector (1 downto 0)
+    -- synthesis translate_on
+    
     );
 end IO;
 
@@ -163,8 +167,11 @@ begin
     end process;
     
     DATA <= data_out when (data_en = '1') else (others => 'Z');      -- data bus tristate
-    data_dbg <= data_in;
-    add_dbg <= addr_low_int;
+    
+    -- synthesis translate_off
+    --data_dbg <= data_in;
+    --add_dbg <= addr_low_int;
+    -- synthesis translate_on
     
     data_latch: process(CLK)
     begin
