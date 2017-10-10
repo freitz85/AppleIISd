@@ -52,7 +52,10 @@ Port (
     MOSI : out std_logic;
     NSEL : out std_logic;
     SCLK : out std_logic;
-    WP : in std_logic
+    WP : in std_logic;
+    
+    data_dbg : out std_logic_vector (7 downto 0);
+    add_dbg : out std_logic_vector (1 downto 0)
     );
 end IO;
 
@@ -160,17 +163,23 @@ begin
     end process;
     
     DATA <= data_out when (data_en = '1') else (others => 'Z');      -- data bus tristate
+    data_dbg <= data_in;
+    add_dbg <= addr_low_int;
     
-    data_latch: process(ndev_sel)
+    data_latch: process(CLK)
     begin
-        if(rising_edge(ndev_sel) and (rnw_int = '0')) then
-            data_in <= DATA;
+        --if(rising_edge(CLK) and NDEV_SEL = '0') and (RNW = '0')) then
+        --if rising_edge(CLK) and (NDEV_SEL = '0') then
+        if rising_edge(CLK) then
+            if (NDEV_SEL = '0') then
+                data_in <= DATA;
+            end if;
         end if;
     end process;
     
-    add_latch: process(ndev_sel)
+    add_latch: process(NDEV_SEL)
     begin
-        if falling_edge(ndev_sel) then
+        if falling_edge(NDEV_SEL) then
             addr_low_int <= ADD_LOW;
         end if;
     end process;

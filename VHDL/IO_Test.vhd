@@ -62,7 +62,10 @@ ARCHITECTURE behavior OF IO_Test IS
          MOSI : OUT  std_logic;
          NSEL : OUT  std_logic;
          SCLK : OUT  std_logic;
-         WP : IN  std_logic
+         WP : IN  std_logic;
+         
+         data_dbg : out std_logic_vector (7 downto 0);
+         add_dbg : out std_logic_vector (1 downto 0)
         );
     END COMPONENT;
     
@@ -94,6 +97,9 @@ ARCHITECTURE behavior OF IO_Test IS
    signal MOSI : std_logic;
    signal NSEL : std_logic;
    signal SCLK : std_logic;
+   
+   signal data_dbg : std_logic_vector (7 downto 0);
+   signal add_dbg : std_logic_vector (1 downto 0);
 
    -- Clock period definitions
    constant CLK_period : time := 142 ns;
@@ -123,7 +129,10 @@ BEGIN
           MOSI => MOSI,
           NSEL => NSEL,
           SCLK => SCLK,
-          WP => WP
+          WP => WP,
+          
+          data_dbg => data_dbg,
+          add_dbg => add_dbg
         );
 
    -- Clock process definitions
@@ -159,6 +168,7 @@ BEGIN
       wait for CLK_period * 10;
       
       -- read reg 0
+      DATA <= (others => 'Z');
       wait until falling_edge(PHI0);
       wait for 300 ns;
       ADD_LOW <= (others => '0');
@@ -191,12 +201,16 @@ BEGIN
       wait for 300 ns;
       ADD_LOW <= (others => '0');
       RNW <= '0';
+      DATA <= (others => 'U');
       wait until rising_edge(PHI0);
       NDEV_SEL <= '0';
+      DATA <= (others => 'Z');
+      wait for 200 ns;
       DATA <= (others => '0');
       wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
-      wait for CLK_period;
+      wait for 15 ns;
+      --wait for CLK_period;
       ADD_LOW <= (others => 'U');
       RNW <= '1';
       DATA <= (others => 'Z');
