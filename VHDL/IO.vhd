@@ -33,9 +33,7 @@ entity IO is
 Port (
     ADD_HIGH : in std_logic_vector(10 downto 8);
     ADD_LOW : in std_logic_vector(1 downto 0);
-    B10 : out std_logic;
-    B9 : out std_logic;
-    B8 : out std_logic;
+    B : out std_logic_vector(10 downto 8);
     CARD : in std_logic;
     DATA : inout std_logic_vector (7 downto 0);
     CLK : in std_logic;
@@ -97,22 +95,19 @@ Port (
 end component;
 
 component AddressDecoder
-    port ( 
-        A8 : in std_logic; 
-        A9 : in std_logic; 
-        A10 : in std_logic; 
-        NDEV_SEL : in std_logic;
-        NIO_SEL : in std_logic; 
-        NIO_STB : in std_logic; 
-        RNW : in std_logic;
-        B8 : out std_logic; 
-        B9 : out std_logic; 
-        B10 : out std_logic; 
-        NOE : out std_logic;
-        NG : out std_logic;
-        DATA_EN : out std_logic
-    );
-    end component;
+Port ( 
+        A : in  std_logic_vector (10 downto 8);
+        B : out  std_logic_vector (10 downto 8);
+        RNW : in  std_logic;
+        NDEV_SEL : in  std_logic;
+        NIO_SEL : in  std_logic;
+        NIO_STB : in  std_logic;
+        NRESET : in std_logic;
+        DATA_EN : out  std_logic;
+        NG : out  std_logic;
+        NOE : out  std_logic
+      );
+end component;
 
 begin
     spi: AppleIISd port map(
@@ -134,19 +129,16 @@ begin
     );
     
     addDec: AddressDecoder port map(
-        A8 => ADD_HIGH(8),
-        A9 => ADD_HIGH(9),
-        A10 => ADD_HIGH(10),
+        A => ADD_HIGH,
+        B => B,
+        RNW => RNW,
         NDEV_SEL => NDEV_SEL,
         NIO_SEL => NIO_SEL,
         NIO_STB => NIO_STB,
-        RNW => RNW,
-        B8 => B8,
-        B9 => B9,
-        B10 => B10,
+        NRESET => NRESET,
+        DATA_EN => data_en,
         NOE => NOE,
-        NG => NG,
-        DATA_EN => data_en
+        NG => NG
     );
     
     ctrl_latch: process(CLK, NRESET)

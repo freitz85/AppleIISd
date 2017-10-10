@@ -43,9 +43,7 @@ ARCHITECTURE behavior OF IO_Test IS
     PORT(
          ADD_HIGH : IN  std_logic_vector(10 downto 8);
          ADD_LOW : IN  std_logic_vector(1 downto 0);
-         B10 : OUT  std_logic;
-         B9 : OUT  std_logic;
-         B8 : OUT  std_logic;
+         B : OUT  std_logic_vector(10 downto 8);
          CARD : IN  std_logic;
          DATA : INOUT  std_logic_vector(7 downto 0);
          CLK : IN  std_logic;
@@ -88,9 +86,7 @@ ARCHITECTURE behavior OF IO_Test IS
    signal DATA : std_logic_vector(7 downto 0) := (others => 'Z');
 
  	--Outputs
-   signal B10 : std_logic;
-   signal B9 : std_logic;
-   signal B8 : std_logic;
+   signal B : std_logic_vector(10 downto 8);
    signal LED : std_logic;
    signal NG : std_logic;
    signal NOE : std_logic;
@@ -120,9 +116,7 @@ BEGIN
    uut: IO PORT MAP (
           ADD_HIGH => ADD_HIGH,
           ADD_LOW => ADD_LOW,
-          B10 => B10,
-          B9 => B9,
-          B8 => B8,
+          B => B,
           CARD => CARD,
           DATA => DATA,
           CLK => CLK,
