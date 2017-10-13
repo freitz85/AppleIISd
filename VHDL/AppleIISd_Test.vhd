@@ -76,7 +76,7 @@ ARCHITECTURE behavior OF AppleIISd_Test IS
    signal NDEV_SEL : std_logic := '1';
    signal NIO_SEL : std_logic := '1';
    signal NIO_STB : std_logic := '1';
-   signal PHI0 : std_logic := '0';
+   signal PHI0 : std_logic := '1';
    signal NRESET : std_logic := '1';
    signal RNW : std_logic := '1';
    signal MISO : std_logic := '1';

@@ -70,9 +70,7 @@ architecture Behavioral of AppleIISd is
     signal card_int : std_logic;
     signal miso_int : std_logic;
     
-    signal rnw_int : std_logic;
     signal data_en : std_logic;
-    signal ndev_sel_int : std_logic;
         
 component SpiController is
 Port (
@@ -98,6 +96,8 @@ component AddressDecoder
 Port ( 
         A : in  std_logic_vector (10 downto 8);
         B : out  std_logic_vector (10 downto 8);
+        CLK : in std_logic;
+        PHI0 : in std_logic;
         RNW : in  std_logic;
         NDEV_SEL : in  std_logic;
         NIO_SEL : in  std_logic;
@@ -113,7 +113,7 @@ begin
     spi: SpiController port map(
         data_in => data_in,
         data_out => data_out,
-        is_read => rnw_int,
+        is_read => RNW,
         nreset => NRESET,
         addr => addr_low_int,
         phi0 => PHI0,
@@ -131,8 +131,10 @@ begin
     addDec: AddressDecoder port map(
         A => ADD_HIGH,
         B => B,
+        CLK => CLK,
+        PHI0 => PHI0,
         RNW => RNW,
-        NDEV_SEL => ndev_sel_int,
+        NDEV_SEL => NDEV_SEL,
         NIO_SEL => NIO_SEL,
         NIO_STB => NIO_STB,
         NRESET => NRESET,
@@ -144,24 +146,13 @@ begin
     ctrl_latch: process(CLK, NRESET)
     begin
         if(NRESET = '0') then
-            rnw_int <= '1';
             wp_int <= '1';
             card_int <= '1';
             miso_int <= '1';
         elsif falling_edge(CLK) then
-            rnw_int <= RNW;
             wp_int <= WP;
             card_int <= CARD;
             miso_int <= MISO;
-        end if;
-    end process;
-    
-    process(CLK, NRESET)
-    begin
-        if(NRESET = '0') then
-            ndev_sel_int <= '1';
-        elsif rising_edge(CLK) then
-            ndev_sel_int <= NDEV_SEL;
         end if;
     end process;
     
@@ -175,9 +166,9 @@ begin
     data_latch: process(CLK)
     begin
         if falling_edge(CLK) then
+            addr_low_int <= ADD_LOW;
             if (NDEV_SEL = '0') then
                 data_in <= DATA;
-                addr_low_int <= ADD_LOW;
             end if;
         end if;
     end process;

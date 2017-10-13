@@ -43,6 +43,8 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
     PORT(
          A : IN  std_logic_vector(10 downto 8);
          B : OUT  std_logic_vector(10 downto 8);
+         CLK : IN std_logic;
+         PHI0 : IN std_logic;
          RNW : IN  std_logic;
          NDEV_SEL : IN  std_logic;
          NIO_SEL : IN  std_logic;
@@ -62,12 +64,17 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
    signal NIO_SEL : std_logic := '1';
    signal NIO_STB : std_logic := '1';
    signal NRESET : std_logic := '1';
+   signal CLK : std_logic := '0';
+   signal PHI0 : std_logic := '1';
 
  	--Outputs
    signal B : std_logic_vector(10 downto 8);
    signal DATA_EN : std_logic;
    signal NG : std_logic;
    signal NOE : std_logic;
+   
+   -- Clock period definitions
+   constant CLK_period : time := 142 ns;
  
 BEGIN
  
@@ -75,6 +82,8 @@ BEGIN
    uut: AddressDecoder PORT MAP (
           A => A,
           B => B,
+          CLK => CLK,
+          PHI0 => PHI0,
           RNW => RNW,
           NDEV_SEL => NDEV_SEL,
           NIO_SEL => NIO_SEL,
@@ -85,50 +94,77 @@ BEGIN
           NOE => NOE
         );
  
+   -- Clock process definitions
+   CLK_process :process
+   begin
+		CLK <= '0';
+		wait for CLK_period/2;
+		CLK <= '1';
+		wait for CLK_period/2;
+   end process;
+ 
+   PHI0_process :process(CLK)
+   variable counter : integer range 0 to 7;
+   begin
+        if rising_edge(CLK) or falling_edge(CLK) then
+            counter := counter + 1;
+            if counter = 7 then
+                PHI0 <= not PHI0;
+                counter := 0;
+            end if;
+        end if;
+   end process;
 
    -- Stimulus process
    stim_proc: process
    begin		
-      -- hold reset state for 100 ns.
-      wait for 50 ns;	
+      -- hold reset state.
+      wait for CLK_period * 10;
       NRESET <= '0';
-      wait for 50 ns;
+      wait for CLK_period * 20;
       NRESET <= '1';
-      wait for 50 ns;
+      wait for CLK_period * 10;
 
       -- insert stimulus here 
       -- CPLD access
+      wait until rising_edge(PHI0);
       NDEV_SEL <= '0';
-      wait for 10 ns;
+      wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
-      wait for 20 ns;
+      wait until rising_edge(PHI0);
+      wait until rising_edge(PHI0);
       -- CnXX access
       NIO_SEL <= '0';
-      wait for 10 ns;
+      wait until falling_edge(PHI0);
       NIO_SEL <= '1';
-      wait for 20 ns;
+      wait until rising_edge(PHI0);
+      wait until rising_edge(PHI0);
       -- C8xx access, selected
       NIO_STB <= '0';
-      wait for 10 ns;
+      wait until falling_edge(PHI0);
       NIO_STB <= '1';
-      wait for 20 ns;
+      wait until rising_edge(PHI0);
+      wait until rising_edge(PHI0);
       -- CPLD access
       NDEV_SEL <= '0';
-      wait for 10 ns;
+      wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
-      wait for 20 ns;
+      wait until rising_edge(PHI0);
+      wait until rising_edge(PHI0);
       -- CFFF access
       A <= "111";
       NIO_STB <= '0';
-      wait for 10 ns;
+      wait until falling_edge(PHI0);
       A <= "000";
       NIO_STB <= '1';
-      wait for 20 ns;
+      wait until rising_edge(PHI0);
+      wait until rising_edge(PHI0);
       -- C8xx access, unselected
       NIO_STB <= '0';
-      wait for 10 ns;
+      wait until falling_edge(PHI0);
       NIO_STB <= '1';
-      wait for 20 ns;
+      wait until rising_edge(PHI0);
+      wait until rising_edge(PHI0);
 
       wait;
    end process;
