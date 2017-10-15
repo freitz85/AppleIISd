@@ -1,7 +1,7 @@
 ********************************
 *
 * Apple][Sd Firmware
-* Version 0.6
+* Version 0.7
 *
 * (c) Florian Reitz, 2017
 *
@@ -27,6 +27,10 @@ WORK        =     $3C
 SLOT        =     $3D         ; $0s
 CMDLO       =     $40
 CMDHI       =     $41
+
+DCMD        =     $42         ; Command code
+BUFFER      =     $44         ; Buffer address
+BLOCK       =     $46         ; Block number
 
 CURSLOT     =     $07F8       ; $Cs
 DATA        =     $C080
@@ -64,7 +68,6 @@ INITED      =     $80
             LDA   #$C4
             STA   CURSLOT
             LDA   #$40
-            STA   SLOT16
 
             ELSE
             JSR   $FF58
@@ -77,9 +80,9 @@ INITED      =     $80
             ASL   A
             ASL   A
             ASL   A
-            STA   SLOT16      ; $s0
             FIN
 
+            STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
             BIT   $CFFF
             JSR   CARDDET
@@ -151,15 +154,14 @@ BOOT        CMP   #0          ; check for error
             BRK
 
 :BOOT1      LDA   #$01
-            STA   $42         ; load command
-            LDA   SLOT16
-            TAX
+            STA   DCMD        ; load command
+            LDX   SLOT16
             STA   $43         ; slot number
-            STZ   $44         ; buffer lo
+            STZ   BUFFER      ; buffer lo
             LDA   #$08
-            STA   $45         ; buffer hi
-            STZ   $46         ; block lo
-            STZ   $47         ; block hi
+            STA   BUFFER+1    ; buffer hi
+            STZ   BLOCK       ; block lo
+            STZ   BLOCK+1     ; block hi
             BIT   $CFFF
             JSR   READ        ; call driver
             JMP   $801        ; goto bootloader
@@ -181,7 +183,6 @@ DRIVER      CLD
             LDA   #$C4
             STA   CURSLOT
             LDA   #$40
-            STA   SLOT16
 
             ELSE
             JSR   $FF58       ; find slot nr
@@ -194,9 +195,9 @@ DRIVER      CLD
             ASL   A
             ASL   A
             ASL   A
-            STA   SLOT16      ; $s0
             FIN
 
+            STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
             BIT   $CFFF
             JSR   CARDDET
@@ -208,7 +209,7 @@ DRIVER      CLD
             BIT   SS,X
             BEQ   :INIT
 
-:CMD        LDA   $42         ; get command
+:CMD        LDA   DCMD        ; get command
             CMP   #0
             BEQ   :STATUS
             CMP   #1
@@ -217,6 +218,10 @@ DRIVER      CLD
             BEQ   :WRITE
             CMP   #3
             BEQ   :FORMAT
+            DO    DEBUG
+            CMP   #$FF
+            BEQ   :TEST
+            FIN
             LDA   #1          ; unknown command
 
 :DONE       SEC
@@ -229,6 +234,10 @@ DRIVER      CLD
 :INIT       JSR   INIT
             BCS   :DONE       ; init failure
             BRA   :CMD
+
+            DO    DEBUG
+:TEST       JMP   TEST        ; do device test
+            FIN
 
 
 * Signature bytes
@@ -461,12 +470,12 @@ GETR3       JSR   GETR1       ; get R1 first
 *
 ********************************
 
-BLOCK       PHX               ; save X
+GETBLOCK    PHX               ; save X
             PHY               ; save Y
             LDX   SLOT
-            LDA   $46         ; store block num
+            LDA   BLOCK       ; store block num
             STA   R33,X       ; in R30-R33
-            LDA   $47
+            LDA   BLOCK+1
             STA   R32,X
             LDA   #0
             STA   R31,X
@@ -604,7 +613,7 @@ STATUS      LDA   #0          ; no error
 READ        JSR   CARDDET
             BCS   :ERROR      ; no card inserted
 
-            JSR   BLOCK       ; calc block address
+            JSR   GETBLOCK    ; calc block address
 
             LDA   SS,X        ; enable /CS
             AND   #$FF!SS0
@@ -629,10 +638,10 @@ READ        JSR   CARDDET
             STA   DATA,X
 :LOOPY      STZ   WORK
 :LOOPW      LDA   DATA,X
-            STA   ($44)
-            INC   $44
+            STA   (BUFFER)
+            INC   BUFFER
             BNE   :INW
-            INC   $45         ; inc msb on page boundary
+            INC   BUFFER+1    ; inc msb on page boundary
 :INW        INC   WORK
             BNE   :LOOPW
             DEY
@@ -683,7 +692,7 @@ WRITE       JSR   CARDDET
             JSR   WRPROT
             BCS   :WPERROR    ; card write protected
 
-            JSR   BLOCK       ; calc block address
+            JSR   GETBLOCK    ; calc block address
 
             LDA   SS,X        ; enable /CS
             AND   #$FF!SS0
@@ -701,11 +710,11 @@ WRITE       JSR   CARDDET
 
             LDY   #2          ; send data to card
 :LOOPY      STZ   WORK
-:LOOPW      LDA   ($44)
+:LOOPW      LDA   (BUFFER)
             STA   DATA,X
-            INC   $44
+            INC   BUFFER
             BNE   :INW
-            INC   $45         ; inc msb on page boundary
+            INC   BUFFER+1    ; inc msb on page boundary
 :INW        INC   WORK
             BNE   :LOOPW
             DEY
@@ -757,6 +766,93 @@ WRITE       JSR   CARDDET
 FORMAT      SEC
             LDA   #$01        ; invalid command
             RTS
+
+
+********************************
+*
+* Test routine
+*
+********************************
+
+            DO    DEBUG
+TEST
+
+* get buffer
+            LDA   #2          ; get 512 byte buffer
+            JSR   $BEF5       ; call GETBUFR
+            BCS   :ERROR
+            STA   BUFADD+1
+            STA   BUFFER+1
+            STZ   BUFADD
+            STZ   BUFFER
+
+* fill buffer
+            LDY   #0
+:LOOP       TYA
+            STA   (BUFFER),Y
+            INY
+            BNE   :LOOP
+            INC   BUFFER+1
+:LOOP1      TYA
+            STA   (BUFFER),Y
+            INY
+            BNE   :LOOP1
+
+* write to card
+            LDA   #2          ; write cmd
+            STA   DCMD
+            LDA   BUFADD      ; buffer address
+            STA   BUFFER
+            LDA   BUFADD+1
+            STA   BUFFER+1
+            STZ   BLOCK       ; block number
+            STZ   BLOCK+1
+            LDX   SLOT16
+            JSR   DRIVER
+            BCS   :ERROR
+
+* read from card
+            LDA   #1          ; read cmd
+            STA   DCMD
+            LDA   BUFADD      ; buffer address
+            STA   BUFFER
+            LDA   BUFADD+1
+            STA   BUFFER+1
+            STZ   BLOCK       ; block number
+            STZ   BLOCK+1
+            LDX   SLOT16
+            JSR   DRIVER
+            BCS   :ERROR
+
+* check for errors
+            LDA   BUFADD      ; buffer address
+            STA   BUFFER
+            LDA   BUFADD+1
+            STA   BUFFER+1
+            LDY   #0
+:LOOP2      TYA
+            CMP   (BUFFER),Y
+            BNE   :ERRCMP     ; error in buffer
+            INY
+            BNE   :LOOP2
+            INC   BUFFER+1
+:LOOP3      TYA
+            CMP   (BUFFER),Y
+            BNE   :ERRCMP
+            INY
+            BNE   :LOOP3
+
+* free buffer
+            JSR   $BEF8       ; call FREEBUFR
+            CLC
+            LDA   #0
+            RTS
+
+:ERROR      BRK
+:ERRCMP     BRK
+
+BUFADD      DW    0
+            FIN
 
 
 CMD0        HEX   400000
