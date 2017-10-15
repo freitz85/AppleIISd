@@ -55,7 +55,8 @@ Port (
     -- synthesis translate_off
     ;
     data_dbg : out std_logic_vector (7 downto 0);
-    add_dbg : out std_logic_vector (1 downto 0)
+    add_dbg : out std_logic_vector (1 downto 0);
+    data_en_dbg : out std_logic
     -- synthesis translate_on
     
     );
@@ -161,6 +162,7 @@ begin
     -- synthesis translate_off
     data_dbg <= data_in;
     add_dbg <= addr_low_int;
+    data_en_dbg <= data_en;
     -- synthesis translate_on
     
     data_latch: process(CLK)

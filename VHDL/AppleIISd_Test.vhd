@@ -63,7 +63,8 @@ ARCHITECTURE behavior OF AppleIISd_Test IS
          WP : IN  std_logic;
          
          data_dbg : out std_logic_vector (7 downto 0);
-         add_dbg : out std_logic_vector (1 downto 0)
+         add_dbg : out std_logic_vector (1 downto 0);
+         data_en_dbg : out std_logic
         );
     END COMPONENT;
     
@@ -96,6 +97,7 @@ ARCHITECTURE behavior OF AppleIISd_Test IS
    
    signal data_dbg : std_logic_vector (7 downto 0);
    signal add_dbg : std_logic_vector (1 downto 0);
+   signal data_en_dbg : std_logic;
 
    -- Clock period definitions
    constant CLK_period : time := 142 ns;
@@ -136,7 +138,8 @@ BEGIN
           WP => WP,
           
           data_dbg => data_dbg,
-          add_dbg => add_dbg
+          add_dbg => add_dbg,
+          data_en_dbg => data_en_dbg
         );
 
    -- Clock process definitions
@@ -197,7 +200,7 @@ BEGIN
       NDEV_SEL <= '0';
       DATA <= (others => 'Z');
       wait for DATA_valid;
-      DATA <= (others => '0');
+      DATA <= X"AA";
       wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
       wait for ADD_hold;
@@ -236,7 +239,7 @@ BEGIN
       NDEV_SEL <= '0';
       DATA <= (others => 'Z');
       wait for DATA_valid;
-      DATA <= (others => '0');
+      DATA <= X"AA";
       wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
       wait for ADD_hold;
@@ -244,6 +247,56 @@ BEGIN
       ADD_LOW <= (others => 'U');
       RNW <= '1';
       DATA <= (others => 'Z');
+      
+      -- read eprom low
+      wait for 3 us;
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= (others => '0');
+      ADD_HIGH <= (others => '0');
+      RNW <= '1';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NIO_SEL <= '0';
+      DATA <= (others => 'Z');
+      wait until falling_edge(PHI0);
+      NIO_SEL <= '1';
+      wait for ADD_hold;
+      ADD_LOW <= (others => 'U');
+      ADD_HIGH <= (others => 'U');
+      
+      -- read $CFFF
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= (others => '1');
+      ADD_HIGH <= (others => '1');
+      RNW <= '1';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NIO_STB <= '0';
+      DATA <= (others => 'Z');
+      wait until falling_edge(PHI0);
+      NIO_STB <= '1';
+      wait for ADD_hold;
+      ADD_LOW <= (others => 'U');
+      ADD_HIGH <= (others => 'U');
+      
+      -- read eprom high
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= (others => '0');
+      ADD_HIGH <= "101";
+      RNW <= '1';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NIO_SEL <= '0';
+      DATA <= (others => 'Z');
+      wait until falling_edge(PHI0);
+      NIO_SEL <= '1';
+      wait for ADD_hold;
+      ADD_LOW <= (others => 'U');
+      ADD_HIGH <= (others => 'U');
+      
       
       wait;
    end process;
