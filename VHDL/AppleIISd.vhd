@@ -31,7 +31,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity AppleIISd is
 Port (
-    ADD_HIGH : in std_logic_vector(10 downto 8);
+    ADD_HIGH : in std_logic_vector(11 downto 8);
     ADD_LOW : in std_logic_vector(1 downto 0);
     B : out std_logic_vector(10 downto 8);
     CARD : in std_logic;
@@ -95,7 +95,7 @@ end component;
 
 component AddressDecoder
 Port ( 
-        A : in  std_logic_vector (10 downto 8);
+        A : in  std_logic_vector (11 downto 8);
         B : out  std_logic_vector (10 downto 8);
         CLK : in std_logic;
         PHI0 : in std_logic;

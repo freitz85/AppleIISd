@@ -30,7 +30,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity AddressDecoder is
-    Port ( A : in  std_logic_vector (10 downto 8);
+    Port ( A : in  std_logic_vector (11 downto 8);
            B : out  std_logic_vector (10 downto 8); -- to EPROM
            CLK : in std_logic;
            PHI0 : in std_logic;
@@ -61,18 +61,15 @@ begin
     -- only from the first rising edge of 7M when any select
     -- line is low (Phi0 high) to the falling edge of Phi0
     
-    B <= A when (NIO_STB = '0') else (others => '0');
+    B(8) <= A(8) or not A(11);
+    B(9) <= A(9) or not A(11);
+    B(10) <= A(10) or not A(11);
     DATA_EN <= RNW and not ndev_sel_int and PHI0;
-    --NG <= (ndev_sel_int and noe_int) or not PHI0;
-    --NOE <= noe_int or not PHI0;
-    --noe_int <= not RNW or not ndev_sel_int
-    --        or (nio_sel_int and nio_stb_int)
-    --        or (nio_sel_int and ncs);
-            
-    NG <= (NDEV_SEL and NIO_SEL and NIO_STB)
-        or (ncs and NDEV_SEL and NIO_SEL);
-    NOE <= not RNW or not NDEV_SEL
-        or (not NIO_STB and ncs);
+    NG <= (ndev_sel_int and noe_int) or not PHI0;
+    NOE <= noe_int or not PHI0;
+    noe_int <= not RNW or not ndev_sel_int
+            or (nio_sel_int and nio_stb_int)
+            or (nio_sel_int and ncs);
     
     cfxx <= A(8) and A(9) and A(10) and not nio_stb_int;
     

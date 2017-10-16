@@ -3,6 +3,7 @@ NET "DATA<2>"  BUFG = DATA_GATE ;
 NET "DATA<3>"  BUFG = DATA_GATE ;
 NET "DATA<4>"  BUFG = DATA_GATE ;
 #PACE: Start of PACE I/O Pin Assignments
+NET "ADD_HIGH<11>"  LOC = "P44"  ;
 NET "ADD_HIGH<10>"  LOC = "P38"  ;
 NET "ADD_HIGH<8>"  LOC = "P36"  ;
 NET "ADD_HIGH<9>"  LOC = "P37"  ;

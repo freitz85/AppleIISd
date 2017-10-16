@@ -41,7 +41,7 @@ ARCHITECTURE behavior OF AppleIISd_Test IS
  
     COMPONENT AppleIISd
     PORT(
-         ADD_HIGH : IN  std_logic_vector(10 downto 8);
+         ADD_HIGH : IN  std_logic_vector(11 downto 8);
          ADD_LOW : IN  std_logic_vector(1 downto 0);
          B : OUT  std_logic_vector(10 downto 8);
          CARD : IN  std_logic;
@@ -70,7 +70,7 @@ ARCHITECTURE behavior OF AppleIISd_Test IS
     
 
    --Inputs
-   signal ADD_HIGH : std_logic_vector(10 downto 8) := (others => 'U');
+   signal ADD_HIGH : std_logic_vector(11 downto 8) := (others => '0');
    signal ADD_LOW : std_logic_vector(1 downto 0) := (others => 'U');
    signal CARD : std_logic := '0';
    signal CLK : std_logic := '0';
@@ -253,7 +253,7 @@ BEGIN
       wait until falling_edge(PHI0);
       wait for ADD_valid;
       ADD_LOW <= (others => '0');
-      ADD_HIGH <= (others => '0');
+      ADD_HIGH <= "0100";   -- must become "111"
       RNW <= '1';
       DATA <= (others => 'U');
       wait until rising_edge(PHI0);
@@ -265,27 +265,11 @@ BEGIN
       ADD_LOW <= (others => 'U');
       ADD_HIGH <= (others => 'U');
       
-      -- read eprom low
+      -- read eprom high, selected
       wait until falling_edge(PHI0);
       wait for ADD_valid;
       ADD_LOW <= (others => '0');
-      ADD_HIGH <= "101";
-      RNW <= '1';
-      DATA <= (others => 'U');
-      wait until rising_edge(PHI0);
-      NIO_SEL <= '0';
-      DATA <= (others => 'Z');
-      wait until falling_edge(PHI0);
-      NIO_SEL <= '1';
-      wait for ADD_hold;
-      ADD_LOW <= (others => 'U');
-      ADD_HIGH <= (others => 'U');
-      
-      -- read eprom high
-      wait until falling_edge(PHI0);
-      wait for ADD_valid;
-      ADD_LOW <= (others => '0');
-      ADD_HIGH <= "101";
+      ADD_HIGH <= "1001";   -- must become "001"
       RNW <= '1';
       DATA <= (others => 'U');
       wait until rising_edge(PHI0);
@@ -301,7 +285,7 @@ BEGIN
       wait until falling_edge(PHI0);
       wait for ADD_valid;
       ADD_LOW <= (others => '1');
-      ADD_HIGH <= (others => '1');
+      ADD_HIGH <= "1111";
       RNW <= '1';
       DATA <= (others => 'U');
       wait until rising_edge(PHI0);
@@ -313,11 +297,11 @@ BEGIN
       ADD_LOW <= (others => 'U');
       ADD_HIGH <= (others => 'U');
       
-      -- read eprom high
+      -- read eprom high, deselected
       wait until falling_edge(PHI0);
       wait for ADD_valid;
       ADD_LOW <= (others => '0');
-      ADD_HIGH <= "101";
+      ADD_HIGH <= "1101";   -- must become "101"
       RNW <= '1';
       DATA <= (others => 'U');
       wait until rising_edge(PHI0);

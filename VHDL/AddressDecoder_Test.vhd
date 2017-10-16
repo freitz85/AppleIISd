@@ -41,7 +41,7 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
  
     COMPONENT AddressDecoder
     PORT(
-         A : IN  std_logic_vector(10 downto 8);
+         A : IN  std_logic_vector(11 downto 8);
          B : OUT  std_logic_vector(10 downto 8);
          CLK : IN std_logic;
          PHI0 : IN std_logic;
@@ -58,7 +58,7 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
     
 
    --Inputs
-   signal A : std_logic_vector(10 downto 8) := "101";
+   signal A : std_logic_vector(11 downto 8) := "0101";
    signal RNW : std_logic := '1';
    signal NDEV_SEL : std_logic := '1';
    signal NIO_SEL : std_logic := '1';
@@ -126,44 +126,60 @@ BEGIN
       wait for CLK_period * 10;
 
       -- insert stimulus here 
-      -- CPLD access
+      -- C0nX access
+      A <= "0000";  -- must become "111"
       wait until rising_edge(PHI0);
       NDEV_SEL <= '0';
       wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
       wait until rising_edge(PHI0);
-      wait until rising_edge(PHI0);
+      
       -- CnXX access
+      A <= "0100";  -- must become "111"     
+      wait until rising_edge(PHI0);
       NIO_SEL <= '0';
       wait until falling_edge(PHI0);
       NIO_SEL <= '1';
       wait until rising_edge(PHI0);
-      wait until rising_edge(PHI0);
+      
       -- C8xx access, selected
+      A <= "1000";  -- must become "000"      
+      wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
+      
+      -- C9xx access, selected
+      A <= "1001";  -- must become "001"      
       wait until rising_edge(PHI0);
+      NIO_STB <= '0';
+      wait until falling_edge(PHI0);
+      NIO_STB <= '1';
+      wait until rising_edge(PHI0);
+      
       -- CPLD access
+      A <= "0101";  -- must become "111"      
+      wait until rising_edge(PHI0);
       NDEV_SEL <= '0';
       wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
       wait until rising_edge(PHI0);
-      wait until rising_edge(PHI0);
+      
       -- CFFF access
-      A <= "111";
+      A <= "1111";  -- must become "111"      
+      wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
-      A <= "000";
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
-      wait until rising_edge(PHI0);
+      
       -- C8xx access, unselected
+      A <= "1000"; -- must become "000"      
+      wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
       NIO_STB <= '1';
-      wait until rising_edge(PHI0);
       wait until rising_edge(PHI0);
 
       wait;
