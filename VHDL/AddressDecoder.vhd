@@ -63,11 +63,16 @@ begin
     
     B <= A when (NIO_STB = '0') else (others => '0');
     DATA_EN <= RNW and not ndev_sel_int and PHI0;
-    NG <= (ndev_sel_int and noe_int) or not PHI0;
-    NOE <= noe_int or not PHI0;
-    noe_int <= not RNW or not ndev_sel_int
-            or (nio_sel_int and nio_stb_int)
-            or (nio_sel_int and ncs);
+    --NG <= (ndev_sel_int and noe_int) or not PHI0;
+    --NOE <= noe_int or not PHI0;
+    --noe_int <= not RNW or not ndev_sel_int
+    --        or (nio_sel_int and nio_stb_int)
+    --        or (nio_sel_int and ncs);
+            
+    NG <= (NDEV_SEL and NIO_SEL and NIO_STB)
+        or (ncs and NDEV_SEL and NIO_SEL);
+    NOE <= not RNW or not NDEV_SEL
+        or (not NIO_STB and ncs);
     
     cfxx <= A(8) and A(9) and A(10) and not nio_stb_int;
     

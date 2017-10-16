@@ -265,6 +265,38 @@ BEGIN
       ADD_LOW <= (others => 'U');
       ADD_HIGH <= (others => 'U');
       
+      -- read eprom low
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= (others => '0');
+      ADD_HIGH <= "101";
+      RNW <= '1';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NIO_SEL <= '0';
+      DATA <= (others => 'Z');
+      wait until falling_edge(PHI0);
+      NIO_SEL <= '1';
+      wait for ADD_hold;
+      ADD_LOW <= (others => 'U');
+      ADD_HIGH <= (others => 'U');
+      
+      -- read eprom high
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= (others => '0');
+      ADD_HIGH <= "101";
+      RNW <= '1';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NIO_STB <= '0';
+      DATA <= (others => 'Z');
+      wait until falling_edge(PHI0);
+      NIO_STB <= '1';
+      wait for ADD_hold;
+      ADD_LOW <= (others => 'U');
+      ADD_HIGH <= (others => 'U');
+      
       -- read $CFFF
       wait until falling_edge(PHI0);
       wait for ADD_valid;
@@ -289,14 +321,13 @@ BEGIN
       RNW <= '1';
       DATA <= (others => 'U');
       wait until rising_edge(PHI0);
-      NIO_SEL <= '0';
+      NIO_STB <= '0';
       DATA <= (others => 'Z');
       wait until falling_edge(PHI0);
-      NIO_SEL <= '1';
+      NIO_STB <= '1';
       wait for ADD_hold;
       ADD_LOW <= (others => 'U');
       ADD_HIGH <= (others => 'U');
-      
       
       wait;
    end process;
