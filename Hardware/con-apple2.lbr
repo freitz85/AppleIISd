@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.7.0">
+<eagle version="8.2.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -485,7 +485,7 @@ This is the, default, 50-pin connector for slot #1 to #7
 &lt;br /&gt;
 Pins are laid out as seen from the top of the slot</description>
 <gates>
-<gate name="_-12V@2" symbol="ATPIN" x="-5.08" y="-38.1" addlevel="always"/>
+<gate name="_+12V" symbol="ATPIN" x="-5.08" y="-38.1" addlevel="always"/>
 <gate name="_D0" symbol="ATPIN" x="-5.08" y="-35.56" addlevel="always"/>
 <gate name="_D1" symbol="ATPIN" x="-5.08" y="-33.02" addlevel="always"/>
 <gate name="_D2" symbol="ATPIN" x="-5.08" y="-30.48" addlevel="always"/>
@@ -502,7 +502,7 @@ Pins are laid out as seen from the top of the slot</description>
 <gate name="_7M" symbol="ATPIN" x="-5.08" y="-2.54" addlevel="always"/>
 <gate name="_NC@2" symbol="ATPIN" x="-5.08" y="0" addlevel="always"/>
 <gate name="_-5V" symbol="ATPIN" x="-5.08" y="2.54" addlevel="always"/>
-<gate name="_-12V@1" symbol="ATPIN" x="-5.08" y="5.08" addlevel="always"/>
+<gate name="_-12V" symbol="ATPIN" x="-5.08" y="5.08" addlevel="always"/>
 <gate name="_INH\" symbol="ATPIN" x="-5.08" y="7.62" addlevel="always"/>
 <gate name="_RES\" symbol="ATPIN" x="-5.08" y="10.16" addlevel="always"/>
 <gate name="_IRQ\" symbol="ATPIN" x="-5.08" y="12.7" addlevel="always"/>
@@ -539,9 +539,9 @@ Pins are laid out as seen from the top of the slot</description>
 <devices>
 <device name="SLOT1-3" package="A2-50PIN-SL1-3">
 <connects>
+<connect gate="_+12V" pin="P" pad="50"/>
 <connect gate="_+5V" pin="P" pad="25"/>
-<connect gate="_-12V@1" pin="P" pad="33"/>
-<connect gate="_-12V@2" pin="P" pad="50"/>
+<connect gate="_-12V" pin="P" pad="33"/>
 <connect gate="_-5V" pin="P" pad="34"/>
 <connect gate="_00" pin="P" pad="40"/>
 <connect gate="_01" pin="P" pad="38"/>
@@ -596,9 +596,9 @@ Pins are laid out as seen from the top of the slot</description>
 </device>
 <device name="SLOT4-7" package="A2-50PIN-SL4-7">
 <connects>
+<connect gate="_+12V" pin="P" pad="50"/>
 <connect gate="_+5V" pin="P" pad="25"/>
-<connect gate="_-12V@1" pin="P" pad="33"/>
-<connect gate="_-12V@2" pin="P" pad="50"/>
+<connect gate="_-12V" pin="P" pad="33"/>
 <connect gate="_-5V" pin="P" pad="34"/>
 <connect gate="_00" pin="P" pad="40"/>
 <connect gate="_01" pin="P" pad="38"/>
