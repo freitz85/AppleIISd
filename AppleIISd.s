@@ -17,7 +17,7 @@ DEBUG       =     0
             DO    DEBUG
             ORG   $8000
             ELSE
-            ORG   $C800       ; Expansion ROM
+            ORG   $C700       ; Expansion ROM
             FIN
 
 * Memory defines
@@ -41,6 +41,8 @@ R30         =     $0478
 R31         =     $04F8
 R32         =     $0578
 R33         =     $05F8
+RAM0        =     $0678
+RAM1        =     $06F8
 
 * Constants
 
@@ -52,6 +54,196 @@ WP          =     $20
 CD          =     $40
 INITED      =     $80
 
+
+* signature bytes
+
+            LDX   #$20
+            LDY   #$00
+            LDX   #$03
+            LDY   #$FF        ; neither 5.25 nor Smartport
+
+* find slot nr
+
+            DO    DEBUG
+            LDA   #$04
+            STA   SLOT
+            LDA   #$C4
+            STA   CURSLOT
+            LDA   #$40
+
+            ELSE
+            JSR   $FF58
+            TSX
+            LDA   $0100,X
+            STA   CURSLOT     ; $Cs
+            AND   #$0F
+            STA   SLOT        ; $0s
+            ASL   A
+            ASL   A
+            ASL   A
+            ASL   A
+            FIN
+
+            STA   SLOT16      ; $s0
+            TAX               ; X holds now SLOT16
+            BIT   $CFFF
+            JSR   CARDDET
+            BCC   :INIT
+            LDA   #$2F        ; no card inserted
+            BRK
+
+:INIT       JSR   INIT
+
+
+********************************
+*
+* Install SD card driver
+*
+********************************
+
+            DO    DEBUG
+
+* see if slot has a driver already
+
+            LDX   $BF31       ; get devcnt
+INSTALL     LDA   $BF32,X     ; get a devnum
+            AND   #$70        ; isolate slot
+            CMP   SLOT16      ; slot?
+            BEQ   :INSOUT     ; yes, skip it
+            DEX
+            BPL   INSTALL     ; keep up the search
+
+* restore the devnum to the list
+
+            LDX   $BF31       ; get devcnt again
+            CPX   #$0D        ; device table full?
+            BNE   :INST2
+
+            JSR   $FF3A       ; bell
+            JMP   :INSOUT     ; do something!
+
+:INST2      LDA   $BF32-1,X   ; move all entries down
+            STA   $BF32,X     ; to make room at front
+            DEX               ; for a new entry
+            BNE   :INST2
+            LDA   #$04        ; ProFile type device
+            ORA   SLOT16
+            STA   $BF32       ; slot, drive 1 at top of list
+            INC   $BF31       ; update devcnt
+
+* now insert the device driver vector
+
+            LDA   SLOT
+            ASL
+            TAX
+            LDA   #<DRIVER
+            STA   $BF10,X     ; write to driver table
+            LDA   #>DRIVER
+            STA   $BF11,X
+:INSOUT     RTS
+
+
+********************************
+*
+* Boot from SD card
+*
+********************************
+
+            ELSE
+
+BOOT        CMP   #0          ; check for error
+            BEQ   :BOOT1
+            BRK
+
+:BOOT1      LDA   #$01
+            STA   DCMD        ; load command
+            LDX   SLOT16
+            STA   $43         ; slot number
+            STZ   BUFFER      ; buffer lo
+            LDA   #$08
+            STA   BUFFER+1    ; buffer hi
+            STZ   BLOCK       ; block lo
+            STZ   BLOCK+1     ; block hi
+            BIT   $CFFF
+            JSR   READ        ; call driver
+            JMP   $801        ; goto bootloader
+
+            FIN
+
+
+********************************
+*
+* Jump table
+*
+********************************
+
+DRIVER      CLD
+
+            DO    DEBUG
+            LDA   #$04
+            STA   SLOT
+            LDA   #$C4
+            STA   CURSLOT
+            LDA   #$40
+
+            ELSE
+            JSR   $FF58       ; find slot nr
+            TSX
+            LDA   $0100,X
+            STA   CURSLOT     ; $Cs
+            AND   #$0F
+            STA   SLOT        ; $0s
+            ASL   A
+            ASL   A
+            ASL   A
+            ASL   A
+            FIN
+
+            STA   SLOT16      ; $s0
+            TAX               ; X holds now SLOT16
+            BIT   $CFFF
+            JSR   CARDDET
+            BCC   :INITED
+            LDA   #$2F        ; no card inserted
+            BRA   :DONE
+
+:INITED     LDA   #INITED     ; check for init
+            BIT   SS,X
+            BEQ   :INIT
+
+:CMD        LDA   DCMD        ; get command
+            CMP   #0
+            BEQ   :STATUS
+            CMP   #1
+            BEQ   :READ
+            CMP   #2
+            BEQ   :WRITE
+            CMP   #3
+            BEQ   :FORMAT
+            CMP   #$FF
+            BEQ   :TEST
+            LDA   #1          ; unknown command
+
+:DONE       SEC
+            RTS
+
+:STATUS     JMP   STATUS
+:READ       JMP   READ
+:WRITE      JMP   WRITE
+:FORMAT     JMP   FORMAT
+:TEST       JMP   TEST        ; do device test
+:INIT       JSR   INIT
+            BCS   :DONE       ; init failure
+            BRA   :CMD
+
+
+* Signature bytes
+
+            DS    \           ; fill with zeroes
+            DS    -4          ; locate to $xxFC
+            DW    $FFFF       ; 65535 blocks
+            DB    $17         ; Status bits
+            DB    #<DRIVER    ; LSB of driver
 
 ********************************
 *
@@ -174,9 +366,6 @@ INIT        CLD
             CLC               ; all ok
             LDY   #0
             BCC   :END1
-:CDERROR    SEC
-            LDY   #$2F        ; no card error
-            BCS   :END1
 :IOERROR    SEC
             LDY   #$27        ; init error
 :END1       LDA   SS,X        ; set CS high
@@ -387,12 +576,7 @@ STATUS      LDA   #0          ; no error
             LDX   #$FF        ; 32 MB partition
             LDY   #$FF
 
-            JSR   CARDDET
-            BCC   :WRPROT
-            LDA   #$2F        ; no card inserted
-            BRA   :DONE
-
-:WRPROT     JSR   WRPROT
+            JSR   WRPROT
             BCC   :DONE
             LDA   #$2B        ; card write protected
 
@@ -410,14 +594,10 @@ STATUS      LDA   #0          ; no error
 *   Set   - Error
 * A $00   - No error
 *   $27   - Bad block number
-*   $28   - No card inserted
 *
 ********************************
 
-READ        JSR   CARDDET
-            BCS   :ERROR      ; no card inserted
-
-            JSR   GETBLOCK    ; calc block address
+READ        JSR   GETBLOCK    ; calc block address
 
             LDA   SS,X        ; enable /CS
             AND   #$FF!SS0
@@ -490,10 +670,7 @@ READ        JSR   CARDDET
 *
 ********************************
 
-WRITE       JSR   CARDDET
-            BCS   :IOERROR    ; no card inserted
-
-            JSR   WRPROT
+WRITE       JSR   WRPROT
             BCS   :WPERROR    ; card write protected
 
             JSR   GETBLOCK    ; calc block address
@@ -578,17 +755,18 @@ FORMAT      SEC
 *
 ********************************
 
-            DO    DEBUG
 TEST
 
 * get buffer
+            LDY   SLOT
             LDA   #2          ; get 512 byte buffer
             JSR   $BEF5       ; call GETBUFR
             BCS   :ERROR
-            STA   BUFADD+1
+            STA   RAM1,Y
             STA   BUFFER+1
-            STZ   BUFADD
-            STZ   BUFFER
+            LDA   #0
+            STA   RAM0,Y
+            STA   BUFFER
 
 * fill buffer
             LDY   #0
@@ -604,10 +782,11 @@ TEST
 
 * write to card
             LDA   #2          ; write cmd
+            LDY   SLOT
             STA   DCMD
-            LDA   BUFADD      ; buffer address
+            LDA   RAM0        ; buffer address
             STA   BUFFER
-            LDA   BUFADD+1
+            LDA   RAM1,Y
             STA   BUFFER+1
             STZ   BLOCK       ; block number
             STZ   BLOCK+1
@@ -617,10 +796,11 @@ TEST
 
 * read from card
             LDA   #1          ; read cmd
+            LDY   SLOT
             STA   DCMD
-            LDA   BUFADD      ; buffer address
+            LDA   RAM0,Y      ; buffer address
             STA   BUFFER
-            LDA   BUFADD+1
+            LDA   RAM1,Y
             STA   BUFFER+1
             STZ   BLOCK       ; block number
             STZ   BLOCK+1
@@ -629,9 +809,10 @@ TEST
             BCS   :ERROR
 
 * check for errors
-            LDA   BUFADD      ; buffer address
+            LDY   SLOT
+            LDA   RAM0,Y      ; buffer address
             STA   BUFFER
-            LDA   BUFADD+1
+            LDA   RAM1,Y
             STA   BUFFER+1
             LDY   #0
 :LOOP2      TYA
@@ -655,9 +836,6 @@ TEST
 :ERROR      BRK
 :ERRCMP     BRK
 
-BUFADD      DW    0
-            FIN
-
 
 CMD0        HEX   400000
             HEX   000095
@@ -673,214 +851,4 @@ ACMD4140    HEX   694000
             HEX   000077
 ACMD410     HEX   690000
             HEX   0000FF
-
-
-********************************
-*
-* This region is mapped to
-* the $CsXX space. On the ROM
-* it must appear at address $700
-*
-********************************
-
-            DO    DEBUG-1
-            DS    \
-            DS    $400
-            ERR   *-1/$CF00   ; must be at $CF00
-            FIN
-
-* signature bytes
-
-START       LDX   #$20
-            LDY   #$00
-            LDX   #$03
-            LDY   #$FF        ; neither 5.25 nor Smartport
-
-* find slot nr
-
-            DO    DEBUG
-            LDA   #$04
-            STA   SLOT
-            LDA   #$C4
-            STA   CURSLOT
-            LDA   #$40
-
-            ELSE
-            JSR   $FF58
-            TSX
-            LDA   $0100,X
-            STA   CURSLOT     ; $Cs
-            AND   #$0F
-            STA   SLOT        ; $0s
-            ASL   A
-            ASL   A
-            ASL   A
-            ASL   A
-            FIN
-
-            STA   SLOT16      ; $s0
-            TAX               ; X holds now SLOT16
-            BIT   $CFFF
-            JSR   CARDDET
-            BCC   :INIT
-            LDA   #$27        ; no card inserted
-            BRK
-
-:INIT       JSR   INIT
-
-
-********************************
-*
-* Install SD card driver
-*
-********************************
-
-            DO    DEBUG
-
-* see if slot has a driver already
-
-            LDX   $BF31       ; get devcnt
-INSTALL     LDA   $BF32,X     ; get a devnum
-            AND   #$70        ; isolate slot
-            CMP   SLOT16      ; slot?
-            BEQ   :INSOUT     ; yes, skip it
-            DEX
-            BPL   INSTALL     ; keep up the search
-
-* restore the devnum to the list
-
-            LDX   $BF31       ; get devcnt again
-            CPX   #$0D        ; device table full?
-            BNE   :INST2
-
-            JSR   $FF3A       ; bell
-            JMP   :INSOUT     ; do something!
-
-:INST2      LDA   $BF32-1,X   ; move all entries down
-            STA   $BF32,X     ; to make room at front
-            DEX               ; for a new entry
-            BNE   :INST2
-            LDA   #$04        ; ProFile type device
-            ORA   SLOT16
-            STA   $BF32       ; slot, drive 1 at top of list
-            INC   $BF31       ; update devcnt
-
-* now insert the device driver vector
-
-            LDA   SLOT
-            ASL
-            TAX
-            LDA   #<DRIVER
-            STA   $BF10,X     ; write to driver table
-            LDA   #>DRIVER
-            STA   $BF11,X
-:INSOUT     RTS
-
-
-********************************
-*
-* Boot from SD card
-*
-********************************
-
-            ELSE
-
-BOOT        CMP   #0          ; check for error
-            BEQ   :BOOT1
-            BRK
-
-:BOOT1      LDA   #$01
-            STA   DCMD        ; load command
-            LDX   SLOT16
-            STA   $43         ; slot number
-            STZ   BUFFER      ; buffer lo
-            LDA   #$08
-            STA   BUFFER+1    ; buffer hi
-            STZ   BLOCK       ; block lo
-            STZ   BLOCK+1     ; block hi
-            BIT   $CFFF
-            JSR   READ        ; call driver
-            JMP   $801        ; goto bootloader
-
-            FIN
-
-
-********************************
-*
-* Jump table
-*
-********************************
-
-DRIVER      CLD
-
-            DO    DEBUG
-            LDA   #$04
-            STA   SLOT
-            LDA   #$C4
-            STA   CURSLOT
-            LDA   #$40
-
-            ELSE
-            JSR   $FF58       ; find slot nr
-            TSX
-            LDA   $0100,X
-            STA   CURSLOT     ; $Cs
-            AND   #$0F
-            STA   SLOT        ; $0s
-            ASL   A
-            ASL   A
-            ASL   A
-            ASL   A
-            FIN
-
-            STA   SLOT16      ; $s0
-            TAX               ; X holds now SLOT16
-            BIT   $CFFF
-            JSR   CARDDET
-            BCC   :INITED
-            LDA   #$27        ; no card inserted
-            BRA   :DONE
-
-:INITED     LDA   #INITED     ; check for init
-            BIT   SS,X
-            BEQ   :INIT
-
-:CMD        LDA   DCMD        ; get command
-            CMP   #0
-            BEQ   :STATUS
-            CMP   #1
-            BEQ   :READ
-            CMP   #2
-            BEQ   :WRITE
-            CMP   #3
-            BEQ   :FORMAT
-            DO    DEBUG
-            CMP   #$FF
-            BEQ   :TEST
-            FIN
-            LDA   #1          ; unknown command
-
-:DONE       SEC
-            RTS
-
-:STATUS     JMP   STATUS
-:READ       JMP   READ
-:WRITE      JMP   WRITE
-:FORMAT     JMP   FORMAT
-:INIT       JSR   INIT
-            BCS   :DONE       ; init failure
-            BRA   :CMD
-
-            DO    DEBUG
-:TEST       JMP   TEST        ; do device test
-            FIN
-
-
-* Signature bytes
-
-            DS    \           ; fill with zeroes
-            DS    -4          ; locate to $xxFC
-            DW    $FFFF       ; 65535 blocks
-            DB    $17         ; Status bits
-            DB    #<DRIVER    ; LSB of driver
 
