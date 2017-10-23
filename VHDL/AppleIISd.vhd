@@ -67,9 +67,6 @@ architecture Behavioral of AppleIISd is
     signal data_in : std_logic_vector (7 downto 0);
     signal data_out : std_logic_vector (7 downto 0);
     signal addr_low_int : std_logic_vector (1 downto 0);
-    signal wp_int : std_logic;
-    signal card_int : std_logic;
-    signal miso_int : std_logic;
     
     signal data_en : std_logic;
         
@@ -106,7 +103,8 @@ Port (
         NRESET : in std_logic;
         DATA_EN : out  std_logic;
         NG : out  std_logic;
-        NOE : out  std_logic
+        NOE : out  std_logic;
+        LED : out std_logic
       );
 end component;
 
@@ -120,12 +118,12 @@ begin
         phi0 => PHI0,
         ndev_sel => NDEV_SEL,
         clk => CLK,
-        miso => miso_int,
+        miso => MISO,
         mosi => MOSI,
         sclk => SCLK,
         nsel => NSEL,
-        wp => wp_int,
-        card => card_int,
+        wp => WP,
+        card => CARD,
         led => LED
     );
     
@@ -142,20 +140,8 @@ begin
         DATA_EN => data_en,
         NOE => NOE,
         NG => NG
+        --LED => LED
     );
-    
-    ctrl_latch: process(CLK, NRESET)
-    begin
-        if(NRESET = '0') then
-            wp_int <= '1';
-            card_int <= '1';
-            miso_int <= '1';
-        elsif falling_edge(CLK) then
-            wp_int <= WP;
-            card_int <= CARD;
-            miso_int <= MISO;
-        end if;
-    end process;
     
     DATA <= data_out when (data_en = '1') else (others => 'Z');      -- data bus tristate
     

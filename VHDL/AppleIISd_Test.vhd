@@ -190,6 +190,25 @@ BEGIN
       wait for ADD_hold;
       ADD_LOW <= (others => 'U');
       
+      -- select card
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= (others => '1');
+      RNW <= '0';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NDEV_SEL <= '0';
+      DATA <= (others => 'Z');
+      wait for DATA_valid;
+      DATA <= X"00";
+      wait until falling_edge(PHI0);
+      NDEV_SEL <= '1';
+      wait for ADD_hold;
+      --wait for CLK_period;
+      ADD_LOW <= (others => 'U');
+      RNW <= '1';
+      DATA <= (others => 'Z');
+      
       -- send data
       wait until falling_edge(PHI0);
       wait for ADD_valid;
@@ -208,9 +227,28 @@ BEGIN
       ADD_LOW <= (others => 'U');
       RNW <= '1';
       DATA <= (others => 'Z');
+      wait for 20 us;
+      
+      -- deselect card
+      wait until falling_edge(PHI0);
+      wait for ADD_valid;
+      ADD_LOW <= (others => '1');
+      RNW <= '0';
+      DATA <= (others => 'U');
+      wait until rising_edge(PHI0);
+      NDEV_SEL <= '0';
+      DATA <= (others => 'Z');
+      wait for DATA_valid;
+      DATA <= X"01";
+      wait until falling_edge(PHI0);
+      NDEV_SEL <= '1';
+      wait for ADD_hold;
+      --wait for CLK_period;
+      ADD_LOW <= (others => 'U');
+      RNW <= '1';
+      DATA <= (others => 'Z');
       
       -- write ece
-      wait for 20 us;
       wait until falling_edge(PHI0);
       wait for ADD_valid;
       ADD_LOW <= "01";

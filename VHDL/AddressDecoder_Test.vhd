@@ -52,7 +52,8 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
          NRESET : IN  std_logic;
          DATA_EN : OUT  std_logic;
          NG : OUT  std_logic;
-         NOE : OUT  std_logic
+         NOE : OUT  std_logic;
+         LED : OUT  std_logic
         );
     END COMPONENT;
     
@@ -72,6 +73,7 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
    signal DATA_EN : std_logic;
    signal NG : std_logic;
    signal NOE : std_logic;
+   signal LED : std_logic;
    
    -- Clock period definitions
    constant CLK_period : time := 142 ns;
@@ -91,7 +93,8 @@ BEGIN
           NRESET => NRESET,
           DATA_EN => DATA_EN,
           NG => NG,
-          NOE => NOE
+          NOE => NOE,
+          LED => LED
         );
  
    -- Clock process definitions
@@ -127,7 +130,7 @@ BEGIN
 
       -- insert stimulus here 
       -- C0nX access
-      A <= "0000";  -- must become "111"
+      A <= "0000";  -- must become "000"
       wait until rising_edge(PHI0);
       NDEV_SEL <= '0';
       wait until falling_edge(PHI0);
@@ -135,7 +138,7 @@ BEGIN
       wait until rising_edge(PHI0);
       
       -- CnXX access
-      A <= "0100";  -- must become "111"     
+      A <= "0100";  -- must become "000"     
       wait until rising_edge(PHI0);
       NIO_SEL <= '0';
       wait until falling_edge(PHI0);
@@ -143,7 +146,7 @@ BEGIN
       wait until rising_edge(PHI0);
       
       -- C8xx access, selected
-      A <= "1000";  -- must become "000"      
+      A <= "1000";  -- must become "001"      
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
@@ -151,7 +154,7 @@ BEGIN
       wait until rising_edge(PHI0);
       
       -- C9xx access, selected
-      A <= "1001";  -- must become "001"      
+      A <= "1001";  -- must become "010"      
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
@@ -159,7 +162,7 @@ BEGIN
       wait until rising_edge(PHI0);
       
       -- CPLD access
-      A <= "0101";  -- must become "111"      
+      A <= "0101";  -- must become "000"      
       wait until rising_edge(PHI0);
       NDEV_SEL <= '0';
       wait until falling_edge(PHI0);
@@ -175,7 +178,7 @@ BEGIN
       wait until rising_edge(PHI0);
       
       -- C8xx access, unselected
-      A <= "1000"; -- must become "000"      
+      A <= "1000"; -- must become "001"      
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);

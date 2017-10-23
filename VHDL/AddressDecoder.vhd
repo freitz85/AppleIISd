@@ -41,17 +41,18 @@ entity AddressDecoder is
            NRESET : in std_logic;
            DATA_EN : out  std_logic;    -- to CPLD
            NG : out  std_logic;         -- to bus transceiver
-           NOE : out  std_logic);       -- to EPROM
+           NOE : out  std_logic;
+           LED : out  std_logic);       -- to EPROM
 end AddressDecoder;
 
 architecture Behavioral of AddressDecoder is
 
     signal cfxx : std_logic;            -- $C800 - $CFFF disable
-    signal noe_int : std_logic;
     signal ndev_sel_int : std_logic;
     signal nio_sel_int : std_logic;
     signal nio_stb_int : std_logic;
     signal ncs : std_logic;             -- $C800 - $CFFF enabled
+    signal a_int : std_logic_vector (11 downto 8);
 
 begin
 
@@ -61,17 +62,27 @@ begin
     -- only from the first rising edge of 7M when any select
     -- line is low (Phi0 high) to the falling edge of Phi0
     
-    B(8) <= A(8) or not A(11);
-    B(9) <= A(9) or not A(11);
-    B(10) <= A(10) or not A(11);
-    DATA_EN <= RNW and not ndev_sel_int and PHI0;
-    NG <= (ndev_sel_int and noe_int) or not PHI0;
-    NOE <= noe_int or not PHI0;
-    noe_int <= not RNW or not ndev_sel_int
-            or (nio_sel_int and nio_stb_int)
-            or (nio_sel_int and ncs);
+    -- $C0xx to $C7xx is mapped to EEPROM bank 0
+    -- $C8xx to $CExx is mapped to banks 1 to 7
     
-    cfxx <= A(8) and A(9) and A(10) and not nio_stb_int;
+    LED <= ncs;
+    B(8) <= (a_int(11) and not a_int(8))
+         or (a_int(11) and a_int(10) and a_int(9));
+    B(9) <= (a_int(11) and not a_int(9) and a_int(8))
+         or (a_int(11) and a_int(9) and not a_int(8))
+         or (a_int(11) and a_int(10) and a_int(9));
+    B(10) <= (a_int(11) and a_int(10))
+         or (a_int(11) and a_int(9) and a_int(8));
+         
+    DATA_EN <= RNW and not NDEV_SEL;
+    NG   <= (ndev_sel_int and nio_sel_int and nio_stb_int)
+         or (ndev_sel_int and nio_sel_int and ncs)
+         or not PHI0;
+    NOE  <= not RNW 
+         or not NDEV_SEL
+         or (not NIO_STB and ncs);
+    
+    cfxx <= a_int(8) and a_int(9) and a_int(10) and not nio_stb_int;
     
     process(NRESET, nio_sel_int, cfxx)
     begin
@@ -88,10 +99,12 @@ begin
             ndev_sel_int <= '1';
             nio_sel_int <= '1';
             nio_stb_int <= '1';
+            a_int <= "0000";
         elsif rising_edge(CLK) then
             ndev_sel_int <= NDEV_SEL;
             nio_sel_int <= NIO_SEL;
             nio_stb_int <= NIO_STB;
+            a_int <= A;
         end if;
     end process;
     
