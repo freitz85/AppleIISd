@@ -1,32 +1,7 @@
 ----------------------------------------------------------------------------------
--- Company: n/a
--- Engineer: A. Fachat
--- 
--- Create Date:    12:37:11 05/07/2011 
--- Design Name:    SPI65B
--- Module Name:    SPI6502B - Behavioral 
--- Project Name:   CS/A NETUSB 2.0
--- Target Devices: CS/A NETUSB 2.0
--- Tool versions: 
--- Description:      An SPI interface for 6502-based computers (or compatible).
---                   modelled after the SPI65 interface by Daryl Rictor 
---                   (see http://sbc.rictor.org/io/65spi.html )
---                   This implementation here, however, is a complete reimplementation
---                   as the ABEL language of the original implementation is not supported
---                   by ISE anymore. 
---                   Also I added the interrupt input handling, replacing four of the 
---                   original SPI select outputs with four interrupt inputs
---                   Also folded out the single MISO input into one input for each of the
---                   four supported devices, reducing external parts count again by one.
 --
--- Dependencies: 
---
--- Revision: 
--- Revision 0.01 - File Created
--- Revision 0.02 - removed spiclk and replaced with clksrc and clkcnt_is_zero combination,
---                 to drive up SPI clock to half of input clock (and not one fourth only as before)
---                 unfortunately that costed one divisor bit to fit into the CPLD
--- Additional Comments: 
+-- Spi controller for 6502 systems
+-- based on a design by A. Fachat
 --
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -149,13 +124,13 @@ begin
     begin
         if (nreset = '0') then
             mosi <= '1';
-            sclk <= '0';
+            sclk <= '1';
         else
             -- clock is sync'd
             if (rising_edge(shiftclk)) then
                 if (shifting2='0' or shiftdone = '1') then
                     mosi <= '1';
-                    sclk <= '0';
+                    sclk <= '1';
                 else
                     -- output data directly from output register
                     case shiftcnt(3 downto 1) is
@@ -169,7 +144,7 @@ begin
                         when "111" => mosi <= spidataout(0);
                         when others => mosi <= '1';
                     end case;
-                    sclk <= '0' xor '0' xor shiftcnt(0);
+                    sclk <= shiftcnt(0);
                 end if;
             end if;
         end if;
