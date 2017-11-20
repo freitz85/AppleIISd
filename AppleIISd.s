@@ -57,7 +57,7 @@ INITED      =     $80
             LDX   #$20
             LDY   #$00
             LDX   #$03
-            LDY   #$FF        ; neither 5.25 nor Smartport
+            LDY   #$3C
 
 * find slot nr
 
@@ -148,13 +148,20 @@ INSTALL     LDA   $BF32,X     ; get a devnum
 
             ELSE
 
-BOOT        BEQ   :BOOT1      ; check for error
+BOOT        BEQ   :DRAW       ; check for error
             BRK
+
+:DRAW       LDY   #0          ; display copyright message
+:DRAW1      LDA   TEXT,Y
+            BEQ   :BOOT1      ; check for NULL
+            STA   $07D0,Y     ; put on last line
+            INY
+            BPL   :DRAW1
 
 :BOOT1      LDA   #$01
             STA   DCMD        ; load command
             LDX   SLOT16
-            STA   $43         ; slot number
+            STX   $43         ; slot number
             LDA   #$08
             STA   BUFFER+1    ; buffer hi
             STZ   BUFFER      ; buffer lo
@@ -162,6 +169,20 @@ BOOT        BEQ   :BOOT1      ; check for error
             STZ   BLOCK       ; block lo
             BIT   $CFFF
             JSR   READ        ; call driver
+
+            LDA   #$01
+            STA   DCMD        ; load command
+            LDX   SLOT16
+            STX   $43         ; slot number
+            LDA   #$0A
+            STA   BUFFER+1    ; buffer hi
+            STZ   BUFFER      ; buffer lo
+            STZ   BLOCK+1     ; block hi
+            LDA   #$01
+            STA   BLOCK       ; block lo
+            BIT   $CFFF
+            JSR   READ        ; call driver
+            LDX   SLOT16
             JMP   $801        ; goto bootloader
 
             FIN
@@ -264,8 +285,8 @@ DRIVER      CLD
 
             DS    \           ; fill with zeroes
             DS    -4          ; locate to $xxFC
-            DW    $FFFF       ; 65535 blocks
-            DB    $17         ; Status bits
+            DW    $0          ; use status call
+            DB    $07         ; Status bits
             DB    #<DRIVER    ; LSB of driver
 
 ********************************
@@ -839,6 +860,8 @@ TEST        LDA   SLOT16
 :ERROR      BRK
 :ERRCMP     BRK
 
+
+TEXT        ASC   "Apple][Sd (c)2017 Florian Reitz",00
 
 CMD0        HEX   400000
             HEX   000095
