@@ -38,6 +38,7 @@ architecture Behavioral of SpiController is
     -- internal state
     signal spidatain: std_logic_vector (7 downto 0);
     signal spidataout: std_logic_vector (7 downto 0);
+    signal sdhc: std_logic;     -- is SDHC card
     signal inited: std_logic;   -- card initialized
     
     -- spi register flags
@@ -207,7 +208,7 @@ begin
     -- cpu register section
     -- cpu read
     cpu_read: process(addr, spidatain, tc, bsy, frx, 
-            ece, divisor, slavesel, wp, card, inited)
+            ece, divisor, slavesel, wp, card, sdhc, inited)
     begin
         case addr is
             when "00" =>        -- read SPI data in
@@ -226,7 +227,8 @@ begin
                 data_out(7 downto 3) <= (others => '0');
             when "11" =>        -- read slave select / slave interrupt state
                 data_out(0) <= slavesel;
-                data_out(4 downto 1) <= (others => '0');
+                data_out(3 downto 1) <= (others => '0');
+                data_out(4) <= sdhc;
                 data_out(5) <= wp;
                 data_out(6) <= card;
                 data_out(7) <= inited;
@@ -236,7 +238,7 @@ begin
     end process;
 
     -- cpu write 
-    cpu_write: process(nreset, ndev_sel, is_read, addr, data_in, card, inited)
+    cpu_write: process(nreset, ndev_sel, is_read, addr, data_in, card)
     begin
         if (nreset = '0') then
             ece <= '0';
@@ -244,8 +246,10 @@ begin
             slavesel <= '1';
             divisor <= (others => '0');
             spidataout <= (others => '1');
+            sdhc <= '0';
             inited <= '0';
         elsif (card = '1') then
+            sdhc <= '0';
             inited <= '0';
         elsif (rising_edge(ndev_sel) and is_read = '0') then
             case addr is
@@ -259,7 +263,9 @@ begin
                     divisor <= data_in(DIV_WIDTH-1 downto 0);
                 when "11" =>        -- write slave select / slave interrupt enable
                     slavesel <= data_in(0);
-                    -- no bit 1 - 6
+                    -- no bit 1 - 3
+                    sdhc <= data_in(4);
+                    -- no bit 5 - 6
                     inited <= data_in(7);
                 when others =>
             end case;
