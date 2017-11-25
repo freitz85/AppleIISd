@@ -3,6 +3,41 @@
 Thumbs.db
 .DS_Store
 
+#Ignore files build by Visual Studio
+*.obj
+*.exe
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+[Bb]in
+[Dd]ebug*/
+*.lib
+*.sbr
+obj/
+[Rr]elease*/
+_ReSharper*/
+[Tt]est[Rr]esult*
+
+*.opendb
+**/Debug
+*.db
+*.dbg
+*.lbl
+*.map
+Makefile\.options
+
 # Ignore list for Eagle, a PCB layout tool
 
 # Backup files
@@ -177,3 +212,4 @@ Hardware/SD_A2\.b\$1
 *.nga
 
 *.tspec
+

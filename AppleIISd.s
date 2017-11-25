@@ -10,10 +10,9 @@
 ;
 ;*******************************
 
-            ;.pc02             ; enable 65C02 code
-DEBUG       :=    0
+;DEBUG       :=    0
             
-;Memory defines
+; Memory defines
 
 SLOT16      :=    $2B         ; $s0 -> slot * 16
 SLOT        :=    $3D         ; $0s
@@ -34,7 +33,7 @@ R31         :=    $04F8
 R32         :=    $0578
 R33         :=    $05F8
 
-; Constants :
+; Constants
 
 DUMMY       =     $FF
 FRX         =     $10         ; CTRL register
@@ -50,13 +49,13 @@ INITED      =     $80
 
             .segment "SLOTROM"
             LDX   #$20
-            LDY   #$00
+            LDX   #$00
             LDX   #$03
-            LDY   #$3C
+            LDX   #$01       ; neither Smartport nor 5.25
 
 ; find slot nr
 
-            .if   DEBUG
+            .ifdef DEBUG
             LDA   #$04
             STA   SLOT
             LDA   #$C4
@@ -93,7 +92,7 @@ INITED      =     $80
 ;
 ;*******************************
 
-            .if   DEBUG
+            .ifdef DEBUG
 
 ; see if slot has a driver already
 
@@ -150,6 +149,7 @@ BOOT:       BEQ   @DRAW       ; check for error
 @DRAW:      LDY   #0          ; display copyright message
 @DRAW1:     LDA   TEXT,Y
             BEQ   @BOOT1      ; check for NULL
+            ORA   #$80
             STA   $07D0,Y     ; put on last line
             INY
             BPL   @DRAW1
@@ -203,7 +203,7 @@ DRIVER:     CLD
             LDA   CMDHI
             PHA
 
-            .if   DEBUG
+            .ifdef DEBUG
             LDA   #$04
             STA   SLOT
             LDA   #$C4
@@ -245,8 +245,10 @@ DRIVER:     CLD
             BEQ   @WRITE
             CMP   #3
             BEQ   @FORMAT
+            .ifdef DEBUG
             CMP   #$FF
             BEQ   @TEST
+            .endif
             LDA   #1          ; unknown command
             SEC
             BRA   @RESTZP
@@ -259,8 +261,10 @@ DRIVER:     CLD
             BRA   @RESTZP
 @FORMAT:    JSR   FORMAT
             BRA   @RESTZP
+            .ifdef DEBUG
 @TEST:      JSR   TEST        ; do device test
             BRA   @RESTZP
+            .endif
 @INIT:      JSR   INIT
             BCC   @CMD        ; init ok
 
@@ -803,6 +807,7 @@ FORMAT:     SEC
 ;
 ;*******************************
 
+            .ifdef DEBUG
 TEST:       LDA   SLOT16
             PHA
             LDA   SLOT
@@ -867,9 +872,10 @@ TEST:       LDA   SLOT16
 
 @ERROR:     BRK
 @ERRCMP:    BRK
+            .endif
 
 
-TEXT:       .asciiz "Apple][Sd (c)2017 Florian Reitz"
+TEXT:       .asciiz "Apple][Sd v0.8 (c)2017 Florian Reitz"
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95
