@@ -63,7 +63,9 @@ INITED      =     $80
             LDA   #$40
 
             .else
-            JSR   $FF58
+            SEI
+            BIT   $CFFF
+            JSR   KNOWNRTS
             TSX
             LDA   $0100,X
             STA   CURSLOT     ; $Cs
@@ -77,11 +79,11 @@ INITED      =     $80
 
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
-            BIT   $CFFF
+            ;BIT   $CFFF
             JSR   CARDDET
             BCC   @INIT
             LDA   #$2F        ; no card inserted
-            BRK
+            RTS
 
 @INIT:      JSR   INIT
 
@@ -144,7 +146,7 @@ INSTALL:    LDA   $BF32,X     ; get a devnum
 
             .if   0
 BOOT:       BEQ   @DRAW       ; check for error
-            BRK
+            RTS
 
 @DRAW:      LDY   #0          ; display copyright message
 @DRAW1:     LDA   TEXT,Y
@@ -211,7 +213,8 @@ DRIVER:     CLD
             LDA   #$40
 
             .else
-            JSR   $FF58       ; find slot nr
+            BIT   $CFFF
+            JSR   KNOWNRTS    ; find slot nr
             TSX
             LDA   $0100,X
             STA   CURSLOT     ; $Cs
@@ -225,7 +228,7 @@ DRIVER:     CLD
 
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
-            BIT   $CFFF
+            ;BIT   $CFFF
             JSR   CARDDET
             BCC   @INITED
             LDA   #$2F        ; no card inserted
@@ -798,7 +801,7 @@ WRITE:      JSR   WRPROT
 
 FORMAT:     SEC
             LDA   #$01        ; invalid command
-            RTS
+KNOWNRTS:   RTS
 
 
 ;*******************************
