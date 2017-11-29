@@ -63,13 +63,16 @@ INITED      =     $80
             LDA   #$40
 
             .else
+            PHP
             SEI
-            BIT   $CFFF
-            JSR   KNOWNRTS
+            LDA   #$60        ; opcode for RTS
+            STA   SLOT
+            JSR   SLOT
             TSX
             LDA   $0100,X
             STA   CURSLOT     ; $Cs
             AND   #$0F
+            PLP
             STA   SLOT        ; $0s
             ASL   A
             ASL   A
@@ -79,7 +82,7 @@ INITED      =     $80
 
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
-            ;BIT   $CFFF
+            BIT   $CFFF
             JSR   CARDDET
             BCC   @INIT
             LDA   #$2F        ; no card inserted
@@ -213,12 +216,16 @@ DRIVER:     CLD
             LDA   #$40
 
             .else
-            BIT   $CFFF
-            JSR   KNOWNRTS    ; find slot nr
+            PHP
+            SEI
+            LDA   #$60        ; opcode for RTS
+            STA   SLOT
+            JSR   SLOT
             TSX
             LDA   $0100,X
             STA   CURSLOT     ; $Cs
             AND   #$0F
+            PLP
             STA   SLOT        ; $0s
             ASL   A
             ASL   A
@@ -228,11 +235,10 @@ DRIVER:     CLD
 
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
-            ;BIT   $CFFF
+            BIT   $CFFF
             JSR   CARDDET
             BCC   @INITED
             LDA   #$2F        ; no card inserted
-            SEC
             BRA   @RESTZP
 
 @INITED:    LDA   #INITED     ; check for init
@@ -240,14 +246,11 @@ DRIVER:     CLD
             BEQ   @INIT
 
 @CMD:       LDA   DCMD        ; get command
-            CMP   #0
-            BEQ   @STATUS
+            BEQ   @STATUS     ; branch if cmd is 0
             CMP   #1
             BEQ   @READ
             CMP   #2
             BEQ   @WRITE
-            CMP   #3
-            BEQ   @FORMAT
             .ifdef DEBUG
             CMP   #$FF
             BEQ   @TEST
@@ -262,12 +265,11 @@ DRIVER:     CLD
             BRA   @RESTZP
 @WRITE:     JSR   WRITE
             BRA   @RESTZP
-@FORMAT:    JSR   FORMAT
-            BRA   @RESTZP
             .ifdef DEBUG
 @TEST:      JSR   TEST        ; do device test
             BRA   @RESTZP
             .endif
+
 @INIT:      JSR   INIT
             BCC   @CMD        ; init ok
 
@@ -288,8 +290,8 @@ DRIVER:     CLD
 ; Signature bytes
 
             .segment "SLOTID"
-            .dbyt  $FFFF       ; 65535 blocks
-            .byt   $87         ; Status bits
+            .dbyt  $FFFF      ; 65535 blocks
+            .byt   $97        ; Status bits
             .byt   <DRIVER    ; LSB of driver
 
 ;*******************************
@@ -305,8 +307,7 @@ DRIVER:     CLD
 ;*******************************
 
             .segment "EXTROM"
-INIT:       CLD
-            LDA   #$03        ; set SPI mode 3
+INIT:       LDA   #$03        ; set SPI mode 3
             STA   CTRL,X
             LDA   SS,X
             ORA   #SS0        ; set CS high
@@ -417,6 +418,7 @@ INIT:       CLD
             CLC               ; all ok
             LDY   #0
             BCC   @END1
+
 @IOERROR:   SEC
             LDY   #$27        ; init error
 @END1:      LDA   SS,X        ; set CS high
@@ -527,7 +529,7 @@ GETBLOCK:   PHX               ; save X
             STA   R30,X
 
             LDA   #$80        ; drive number
-            BIT   $43
+            AND   $43
             BEQ   @SDHC       ; D1
             LDA   #1          ; D2
             STA   R31,X
@@ -790,18 +792,6 @@ WRITE:      JSR   WRPROT
             LDA   #$2B
             BRA   @DONE
 
-
-
-;*******************************
-;
-; Format
-; not supported!
-;
-;*******************************
-
-FORMAT:     SEC
-            LDA   #$01        ; invalid command
-KNOWNRTS:   RTS
 
 
 ;*******************************
