@@ -13,7 +13,7 @@ TARGETS := apple2enh
 
 # Name of the final, single-file executable.
 # Default: name of the current dir with target name appended
-PROGRAM := appleiisd
+PROGRAM := AppleIISd
 
 # Path(s) to additional libraries required for linking the program
 # Use only if you don't want to place copies of the libraries in SRCDIR
@@ -23,7 +23,7 @@ LIBS    :=
 # Custom linker configuration file
 # Use only if you don't want to place it in SRCDIR
 # Default: none
-CONFIG  := appleiisd.cfg
+CONFIG  :=
 
 # Additional C compiler flags and options.
 # Default: none
@@ -39,7 +39,7 @@ LDFLAGS =
 
 # Path to the directory containing C and ASM sources.
 # Default: src
-SRCDIR := .
+SRCDIR :=
 
 # Path to the directory where object files are to be stored (inside respective target subdirectories).
 # Default: obj

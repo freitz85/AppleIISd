@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="makefile" />
+    <None Include="src\AppleIISd.cfg">
+      <Filter>src</Filter>
+    </None>
+    <None Include="src\AppleIISd.s">
+      <Filter>src</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d301b76d-0aac-4430-a25a-193e6e572e60}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
