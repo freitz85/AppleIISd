@@ -23,15 +23,16 @@ DCMD        :=    $42         ; Command code
 BUFFER      :=    $44         ; Buffer address
 BLOCK       :=    $46         ; Block number
 
-CURSLOT     :=    $07F8       ; $Cs
-DATA        :=    $C080
-CTRL        :=    DATA+1
-DIV         :=    DATA+2
-SS          :=    DATA+3
 R30         :=    $0478
 R31         :=    $04F8
 R32         :=    $0578
 R33         :=    $05F8
+CURSLOT     :=    $07F8       ; $Cs
+OAPPLE      :=    $C061       ; open apple key
+DATA        :=    $C080
+CTRL        :=    DATA+1
+DIV         :=    DATA+2
+SS          :=    DATA+3
 
 ; Constants
 
@@ -51,7 +52,7 @@ INITED      =     $80
             LDX   #$20
             LDX   #$00
             LDX   #$03
-            LDX   #$01       ; neither Smartport nor 5.25
+            LDX   #$3C
 
 ; find slot nr
 
@@ -83,10 +84,25 @@ INITED      =     $80
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
             BIT   $CFFF
+            LDY   #0          ; display copyright message
+@DRAW:      LDA   TEXT,Y
+            BEQ   @OAPPLE     ; check for NULL
+            ORA   #$80
+            STA   $0750,Y     ; put second to last line
+            INY
+            BPL   @DRAW
+
+@OAPPLE:    BIT   OAPPLE      ; check for OA key
+            BMI   @NEXTSLOT   ; and skip boot if pressed
+
             JSR   CARDDET
             BCC   @INIT
-            LDA   #$2F        ; no card inserted
-            RTS
+
+@NEXTSLOT:  LDA   CURSLOT     ; skip boot when no card
+            DEC   A
+            STA   CMDHI
+            STZ   CMDLO
+            JMP   (CMDLO)
 
 @INIT:      JSR   INIT
 
@@ -102,12 +118,12 @@ INITED      =     $80
 ; see if slot has a driver already
 
             LDX   $BF31       ; get devcnt
-INSTALL:    LDA   $BF32,X     ; get a devnum
+@INSTALL:   LDA   $BF32,X     ; get a devnum
             AND   #$70        ; isolate slot
             CMP   SLOT16      ; slot?
             BEQ   @INSOUT     ; yes, skip it
             DEX
-            BPL   INSTALL     ; keep up the search
+            BPL   @INSTALL    ; keep up the search
 
 ; restore the devnum to the list
 
@@ -146,21 +162,7 @@ INSTALL:    LDA   $BF32,X     ; get a devnum
 ;*******************************
 
             .else
-
-            .if   0
-BOOT:       BEQ   @DRAW       ; check for error
-            RTS
-
-@DRAW:      LDY   #0          ; display copyright message
-@DRAW1:     LDA   TEXT,Y
-            BEQ   @BOOT1      ; check for NULL
-            ORA   #$80
-            STA   $07D0,Y     ; put on last line
-            INY
-            BPL   @DRAW1
-            .endif
-
-@BOOT1:     LDA   #$01
+@BOOT:      LDA   #$01
             STA   DCMD        ; load command
             LDX   SLOT16
             STX   $43         ; slot number
@@ -186,7 +188,6 @@ BOOT:       BEQ   @DRAW       ; check for error
             JSR   READ        ; call driver
             LDX   SLOT16
             JMP   $801        ; goto bootloader
-
             .endif
 
 
@@ -868,7 +869,7 @@ TEST:       LDA   SLOT16
             .endif
 
 
-TEXT:       .asciiz "Apple][Sd v0.8 (c)2017 Florian Reitz"
+TEXT:       .asciiz "  Apple][Sd v0.8 (c)2017 Florian Reitz"
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95
