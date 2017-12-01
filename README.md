@@ -1,23 +1,40 @@
-# Apple][Sd
-SD card based ProFile replacement for enhanced Apple IIe computers
+# AppleIISd
+SD card based ProFile replacement for enhanced Apple IIe and IIgs computers
 
-The **Apple][Sd** is a SD card based replaced for the ProFile harddrive. In contrast to other SD card based devices, this card does not replace a Disk II drive. Data is saved directly onto the SD card, not via images on a FAT system, like on other cards. The SD card is accessable with [CiderPress](http://a2ciderpress.com/).
+The **AppleIISd** is a SD card based replaced for the ProFile harddrive. In contrast to other SD card based devices, this card does not replace a Disk II drive. Data is saved directly onto the SD card, not via images on a FAT system, like on other cards. The SD card is accessable with [CiderPress](http://a2ciderpress.com/).
 
 A Xilinx CPLD is used as a SPI controller and translates, together with the ROM driver, SD card data to/from the Apple IIe. The VHDL source is based on [SPI65/B](http://www.6502.org/users/andre/spi65b) by André Fachat.
 
-The assembler sources were written in Merlin-8. The [schematics](AppleIISd.pdf) are available as PDF.
+The assembler sources are written for CC65. The [schematics](AppleIISd.pdf) are available as PDF.
 
 ## Features
+* works with ProDOS and GS/OS
 * up to 64MB storage space (2x 65535 blocks)
 * ProDOS driver in ROM
 * Auto boot
 * Access LED
 * Card detect and write protect sensing
+* Skip boot when Open-Apple key is pressed
 
 ## Requirements
-The Apple][Sd requires and has been tested on an enhanced IIe computer. The ROM code uses some 65c02 opcodes and will therefore not work on a II, II+ or unenhanced IIe. ProDOS versions 1.1 to 2.4.1 seem to work. 
+The AppleIISd requires an enhanced IIe or IIgs computer. The ROM code uses some 65c02 opcodes and will therefore not work on a II, II+ or unenhanced IIe. It has been tested in the following combinations:
+* Apple IIgs Rom 01, GS/OS 6.0.4
+* Apple IIgs Rom 01, Prodos 2.4.1
+* Apple IIgs Rom 01, Prodos 1.9
+* Apple IIe enhanced, 128k, Prodos 2.4.1
+* Apple IIe enhanced, 128k, Prodos 1.9
+* Apple IIe enhanced, 64k, Prodos 1.9
 
 When a 2732 type ROM is used, the binary image has to be programmed at offset 0x800, because A11 is always high for compatibility with 2716 type ROMs.
+
+## Building the sources
+Be sure to have the newest version of CC65 (V2.16) and some kind of Make instaled, then type one of the following comands:
+```
+make                            # generate binaries
+make OPTIONS=mapfile,listing    # generate mapfile and listing, too
+make clean                      # delete binaries
+```
+Alternatively use the VisualStudio solution.
 
 ## Timing
 The clock of the SPI bus *SCK* may be derived from either *Phi0* or the *7M* clock. Additionally, the divisor may be 2 to 8.
@@ -56,12 +73,11 @@ LDA $C0C0
 ## TODOs
 * Much more testing
 * SRAM option (may never work, though)
-* Find a use for the IRQ pin
+* Enable 4 or 6 volumes under GS/OS
 * Use 28 pin socket to support other EPROMS than 2716 and 2732
 
 ## Known Bugs
-* Does not always boot in slot 7 (may be a faulty connector, though)
-* Does not work, when a Z80 card is present
+* Does not work with some Z80 cards present
 
 
 ![Front_Img](Images/Card%20Front.jpg)

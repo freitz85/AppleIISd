@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="makefile" />
+    <None Include="obj\AppleIISd.lst" />
+    <None Include="README.md" />
     <None Include="src\AppleIISd.cfg" />
     <None Include="src\AppleIISd.s" />
   </ItemGroup>

@@ -1,7 +1,7 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 0.8
+; Version 1.0
 ;
 ; (c) Florian Reitz, 2017
 ;
@@ -10,7 +10,7 @@
 ;
 ;*******************************
 
-;DEBUG       :=    0
+.define DEBUG 0
             
 ; Memory defines
 
@@ -56,7 +56,7 @@ INITED      =     $80
 
 ; find slot nr
 
-            .ifdef DEBUG
+            .if DEBUG
             LDA   #$04
             STA   SLOT
             LDA   #$C4
@@ -113,7 +113,7 @@ INITED      =     $80
 ;
 ;*******************************
 
-            .ifdef DEBUG
+            .if DEBUG
 
 ; see if slot has a driver already
 
@@ -209,7 +209,7 @@ DRIVER:     CLD
             LDA   CMDHI
             PHA
 
-            .ifdef DEBUG
+            .if DEBUG
             LDA   #$04
             STA   SLOT
             LDA   #$C4
@@ -252,7 +252,7 @@ DRIVER:     CLD
             BEQ   @READ
             CMP   #2
             BEQ   @WRITE
-            .ifdef DEBUG
+            .if DEBUG
             CMP   #$FF
             BEQ   @TEST
             .endif
@@ -266,7 +266,7 @@ DRIVER:     CLD
             BRA   @RESTZP
 @WRITE:     JSR   WRITE
             BRA   @RESTZP
-            .ifdef DEBUG
+            .if DEBUG
 @TEST:      JSR   TEST        ; do device test
             BRA   @RESTZP
             .endif
@@ -801,7 +801,7 @@ WRITE:      JSR   WRPROT
 ;
 ;*******************************
 
-            .ifdef DEBUG
+            .if DEBUG
 TEST:       LDA   SLOT16
             PHA
             LDA   SLOT
@@ -869,7 +869,7 @@ TEST:       LDA   SLOT16
             .endif
 
 
-TEXT:       .asciiz "  Apple][Sd v0.8 (c)2017 Florian Reitz"
+TEXT:       .asciiz "  Apple][Sd v1.0 (c)2017 Florian Reitz"
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95

@@ -8,6 +8,8 @@
     <None Include="src\AppleIISd.s">
       <Filter>src</Filter>
     </None>
+    <None Include="README.md" />
+    <None Include="obj\AppleIISd.lst" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
