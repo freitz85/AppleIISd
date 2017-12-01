@@ -16907,7 +16907,9 @@ Program CPLD</text>
 <instance part="GND9" gate="1" x="325.12" y="162.56" rot="R180"/>
 <instance part="R11" gate="G$1" x="281.94" y="154.94"/>
 <instance part="C1" gate="G$1" x="96.52" y="20.32"/>
-<instance part="P+6" gate="1" x="81.28" y="40.64"/>
+<instance part="P+6" gate="1" x="81.28" y="40.64" smashed="yes">
+<attribute name="VALUE" x="78.74" y="35.56" size="1.778" layer="96" rot="R90"/>
+</instance>
 <instance part="P-1" gate="1" x="81.28" y="25.4" smashed="yes" rot="R180">
 <attribute name="VALUE" x="78.74" y="20.32" size="1.778" layer="96" rot="R90"/>
 </instance>
