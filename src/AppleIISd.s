@@ -10,41 +10,17 @@
 ;
 ;*******************************
 
+.import COMMAND
+.import SDCMD
+.import GETBLOCK
+.import CARDDET
+.import WRPROT
+.import GETR1
+.import GETR3
+
+.include "AppleIISd.inc"
+
 .define DEBUG 0
-            
-; Memory defines
-
-SLOT16      :=    $2B         ; $s0 -> slot * 16
-SLOT        :=    $3D         ; $0s
-CMDLO       :=    $40
-CMDHI       :=    $41
-
-DCMD        :=    $42         ; Command code
-BUFFER      :=    $44         ; Buffer address
-BLOCK       :=    $46         ; Block number
-
-R30         :=    $0478
-R31         :=    $04F8
-R32         :=    $0578
-R33         :=    $05F8
-CURSLOT     :=    $07F8       ; $Cs
-OAPPLE      :=    $C061       ; open apple key
-DATA        :=    $C080
-CTRL        :=    DATA+1
-DIV         :=    DATA+2
-SS          :=    DATA+3
-
-; Constants
-
-DUMMY       =     $FF
-FRX         =     $10         ; CTRL register
-ECE         =     $04
-SS0         =     $01         ; SS register
-SDHC        =     $10
-WP          =     $20
-CD          =     $40
-INITED      =     $80
-
 
 ; signature bytes
 
@@ -433,190 +409,6 @@ INIT:       LDA   #$03        ; set SPI mode 3
 
 ;*******************************
 ;
-; Send SD command
-; Call with command in CMDHI and CMDLO
-;
-;*******************************
-
-SDCMD:      PHY
-            LDY   #0
-@LOOP:      LDA   (CMDLO),Y
-            STA   DATA,X
-@WAIT:      BIT   CTRL,X      ; TC is in N
-            BPL   @WAIT
-            INY
-            CPY   #6
-            BCC   @LOOP
-            PLY
-            RTS
-
-
-;*******************************
-;
-; Get R1
-; R1 is in A
-;
-;*******************************
-
-GETR1:      LDA   #DUMMY
-            STA   DATA,X
-@WAIT:      BIT   CTRL,X
-            BPL   @WAIT
-            LDA   DATA,X      ; get response
-            BIT   #$80
-            BNE   GETR1       ; wait for MSB=0
-            PHA
-            LDA   #DUMMY
-            STA   DATA,X      ; send another dummy
-            PLA               ; restore R1
-            RTS
-
-;*******************************
-;
-; Get R3
-; R1 is in A
-; R3 is in scratchpad ram
-;
-;*******************************
-
-GETR3:      JSR   GETR1       ; get R1 first
-            PHA               ; save R1
-            PHY               ; save Y
-            LDY   #04         ; load counter
-@LOOP:      LDA   #DUMMY      ; send dummy
-            STA   DATA,X
-@WAIT:      BIT   CTRL,X
-            BPL   @WAIT
-            LDA   DATA,X
-            PHA
-            DEY
-            BNE   @LOOP       ; do 4 times
-            LDY   SLOT
-            PLA
-            STA   R33,Y       ; save R3
-            PLA
-            STA   R32,Y
-            PLA
-            STA   R31,Y
-            PLA
-            STA   R30,Y
-            PLY               ; restore Y
-            LDA   #DUMMY
-            STA   DATA,X      ; send another dummy
-            PLA               ; restore R1
-            RTS
-
-
-;*******************************
-;
-; Calculate block address
-; Unit number is in $43 DSSS0000
-; Block no is in $46-47
-; Address is in R30-R33
-;
-;*******************************
-
-GETBLOCK:   PHX               ; save X
-            PHY               ; save Y
-            TXA
-            TAY               ; SLOT16 is now in Y
-            LDX   SLOT
-            LDA   BLOCK       ; store block num
-            STA   R33,X       ; in R30-R33
-            LDA   BLOCK+1
-            STA   R32,X
-            LDA   #0
-            STA   R31,X
-            STA   R30,X
-
-            LDA   #$80        ; drive number
-            AND   $43
-            BEQ   @SDHC       ; D1
-            LDA   #1          ; D2
-            STA   R31,X
-
-@SDHC:      LDA   #SDHC
-            AND   SS,Y        ; if card is SDHC,
-            BNE   @END        ; use block addressing
-            
-            LDY   #9          ; ASL can't be used with Y
-@LOOP:      ASL   R33,X       ; mul block num
-            ROL   R32,X       ; by 512 to get
-            ROL   R31,X       ; real address
-            ROL   R30,X
-            DEY
-            BNE   @LOOP
-  
- @END:      PLY               ; restore Y
-            PLX               ; restore X
-            RTS
-
-
-;*******************************
-;
-; Send SD command
-; Cmd is in A
-;
-;*******************************
-
-COMMAND:    PHY               ; save Y
-            LDY   SLOT
-            STA   DATA,X      ; send command
-            LDA   R30,Y       ; get arg from R30 on
-            STA   DATA,X
-            LDA   R31,Y
-            STA   DATA,X
-            LDA   R32,Y
-            STA   DATA,X
-            LDA   R33,Y
-            STA   DATA,X
-            LDA   #DUMMY
-            STA   DATA,X      ; dummy crc
-            JSR   GETR1
-            PLY               ; restore Y
-            RTS
-
-
-;*******************************
-;
-; Check for card detect
-;
-; C Clear - card in slot
-;   Set   - no card in slot
-;
-;*******************************
-
-CARDDET:    PHA
-            LDA   #CD         ; 0: card in
-            BIT   SS,X        ; 1: card out
-            CLC
-            BEQ   @DONE       ; card is in
-            SEC               ; card is out
-@DONE:      PLA
-            RTS
-
-
-;*******************************
-;
-; Check for write protect
-;
-; C Clear - card not protected
-;   Set   - card write protected
-;
-;*******************************
-
-WRPROT:     PHA
-            LDA   #WP         ; 0: write enabled
-            BIT   SS,X        ; 1: write disabled
-            CLC
-            BEQ   @DONE
-            SEC
-@DONE:      PLA
-            RTS
-
-
-;*******************************
-;
 ; Status request
 ; $43    Unit number DSSS000
 ; $44-45 Unused
@@ -885,4 +677,3 @@ ACMD4140:   .byt $69, $40, $00
             .byt $00, $00, $77
 ACMD410:    .byt $69, $00, $00
             .byt $00, $00, $FF
-
