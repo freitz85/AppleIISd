@@ -1,7 +1,7 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.0
+; Version 1.1
 ;
 ; (c) Florian Reitz, 2017
 ;
@@ -162,6 +162,8 @@ INITED      =     $80
 ;*******************************
 
             .else
+;@BOOT:     CMP   #0
+;           BNE   @NEXTSLOT   ; init not successful
 @BOOT:      LDA   #$01
             STA   DCMD        ; load command
             LDX   SLOT16
@@ -288,12 +290,23 @@ DRIVER:     CLD
             RTS
 
 
+;*******************************
+;
 ; Signature bytes
+;
+; 65535 blocks
+; Removable media
+; Non-interruptable
+; 2 drives
+; Read, write and status allowed
+;
+;*******************************
 
             .segment "SLOTID"
             .dbyt  $FFFF      ; 65535 blocks
             .byt   $97        ; Status bits
             .byt   <DRIVER    ; LSB of driver
+
 
 ;*******************************
 ;
@@ -341,18 +354,22 @@ INIT:       LDA   #$03        ; set SPI mode 3
             LDA   #>CMD8
             STA   CMDHI
             JSR   SDCMD
-            JSR   GETR3
+            JSR   GETR3       ; R7 is also 1+4 bytes
             CMP   #$01
             BNE   @SDV1       ; may be SD Ver. 1
 
-; check for $01aa match!
+            LDY   SLOT        ; check for $aa in R33
+            LDA   R33,Y
+            CMP   #$AA
+            BNE   @ERROR1     ; error!
+
 @SDV2:      LDA   #<CMD55
             STA   CMDLO
             LDA   #>CMD55
             STA   CMDHI
             JSR   SDCMD
             JSR   GETR1
-            LDA   #<ACMD4140
+            LDA   #<ACMD4140  ; enable SDHC support
             STA   CMDLO
             LDA   #>ACMD4140
             STA   CMDHI
@@ -362,12 +379,25 @@ INIT:       LDA   #$03        ; set SPI mode 3
             BEQ   @SDV2       ; wait for ready
             CMP   #0
             BNE   @ERROR1     ;  error!
-; send CMD58
+
 ; SD Ver. 2 initialized!
-            LDA   SS,X
+            LDA   #<CMD58     ; check for SDHC
+            STA   CMDLO
+            LDA   #>CMD58
+            STA   CMDHI
+            JSR   SDCMD
+            JSR   GETR3
+            CMP   #0
+            BNE   @ERROR1     ; error!
+            LDY   SLOT
+            LDA   R30,Y
+            AND   #$40        ; check CCS
+            BEQ   @BLOCKSZ
+
+            LDA   SS,X        ; card is SDHC
             ORA   #SDHC
             STA   SS,X
-            JMP   @BLOCKSZ
+            JMP   @END
 
 @ERROR1:    JMP   @IOERROR    ; needed for far jump
 
@@ -473,7 +503,7 @@ GETR1:      LDA   #DUMMY
 
 ;*******************************
 ;
-; Get R3
+; Get R3 or R7
 ; R1 is in A
 ; R3 is in scratchpad ram
 ;
@@ -483,6 +513,7 @@ GETR3:      JSR   GETR1       ; get R1 first
             PHA               ; save R1
             PHY               ; save Y
             LDY   #04         ; load counter
+            JMP   @WAIT       ; first byte is already there
 @LOOP:      LDA   #DUMMY      ; send dummy
             STA   DATA,X
 @WAIT:      BIT   CTRL,X
@@ -499,7 +530,7 @@ GETR3:      JSR   GETR1       ; get R1 first
             PLA
             STA   R31,Y
             PLA
-            STA   R30,Y
+            STA   R30,Y       ; R30 is MSB
             PLY               ; restore Y
             LDA   #DUMMY
             STA   DATA,X      ; send another dummy
@@ -869,7 +900,7 @@ TEST:       LDA   SLOT16
             .endif
 
 
-TEXT:       .asciiz "  Apple][Sd v1.0 (c)2017 Florian Reitz"
+TEXT:       .asciiz "  Apple][Sd v1.1 (c)2017 Florian Reitz"
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95
@@ -880,7 +911,9 @@ CMD8:       .byt $48, $00, $00
 CMD16:      .byt $50, $00, $00
             .byt $02, $00, $FF
 CMD55:      .byt $77, $00, $00
-            .byt $00, $00, $65
+            .byt $00, $00, $FF
+CMD58:      .byt $7A, $00, $00
+            .byt $00, $00, $FF
 ACMD4140:   .byt $69, $40, $00
             .byt $00, $00, $77
 ACMD410:    .byt $69, $00, $00
