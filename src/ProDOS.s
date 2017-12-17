@@ -1,7 +1,7 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.1
+; Version 1.2
 ; ProDOS functions
 ;
 ; (c) Florian Reitz, 2017

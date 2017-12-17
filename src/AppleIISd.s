@@ -1,7 +1,7 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.1
+; Version 1.2
 ; Main source
 ;
 ; (c) Florian Reitz, 2017
@@ -29,14 +29,14 @@
 ; 65535 blocks 
 ; Removable media 
 ; Non-interruptable 
-; 2 drives 
+; 4 drives 
 ; Read, write and status allowed 
 ; 
 ;******************************* 
 
             .segment "SLOTID"
             .dbyt  $FFFF      ; 65535 blocks
-            .byt   $97        ; Status bits
+            .byt   $B7        ; Status bits
             .byt   <DRIVER    ; LSB of driver
 
 
@@ -365,7 +365,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             RTS
 
 
-TEXT:       .asciiz "  Apple][Sd v1.1 (c)2017 Florian Reitz"
+TEXT:       .asciiz "  Apple][Sd v1.2 (c)2017 Florian Reitz"
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95

@@ -1,7 +1,7 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.1
+; Version 1.2
 ; Helper functions
 ;
 ; (c) Florian Reitz, 2017
@@ -118,15 +118,28 @@ GETBLOCK:   PHX               ; save X
             STA   R33,X       ; in R30-R33
             LDA   BLOCK+1
             STA   R32,X
-            LDA   #0
-            STA   R31,X
-            STA   R30,X
+            STZ   R31,X
+            STZ   R30,X
 
             LDA   #$80        ; drive number
             AND   $43
-            BEQ   @SDHC       ; D1
+            BEQ   @SLOT       ; D1
             LDA   #1          ; D2
             STA   R31,X
+
+@SLOT:      LDA   SLOT
+            PHA               ; save SLOT
+            LDA   #$70        ; slot number * 16
+            AND   $43
+            STA   SLOT
+            CPY   SLOT
+            BEQ   @RESTORE    ; slot number = real slot?
+            LDA   R31,X       ; is phantom slot
+            INC   A
+            STA   R31,X
+
+@RESTORE:   PLA               ; restore SLOT
+            STA   SLOT
 
 @SDHC:      LDA   #SDHC
             AND   SS,Y        ; if card is SDHC,
