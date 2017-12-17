@@ -1,7 +1,8 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.0
+; Version 1.1
+; Helper functions
 ;
 ; (c) Florian Reitz, 2017
 ;
@@ -64,7 +65,7 @@ GETR1:      LDA   #DUMMY
 
 ;*******************************
 ;
-; Get R3
+; Get R3 or R7
 ; R1 is in A
 ; R3 is in scratchpad ram
 ;
@@ -74,6 +75,7 @@ GETR3:      JSR   GETR1       ; get R1 first
             PHA               ; save R1
             PHY               ; save Y
             LDY   #04         ; load counter
+            JMP   @WAIT       ; first byte is already there 
 @LOOP:      LDA   #DUMMY      ; send dummy
             STA   DATA,X
 @WAIT:      BIT   CTRL,X
@@ -90,7 +92,7 @@ GETR3:      JSR   GETR1       ; get R1 first
             PLA
             STA   R31,Y
             PLA
-            STA   R30,Y
+            STA   R30,Y       ; R30 is MSB
             PLY               ; restore Y
             LDA   #DUMMY
             STA   DATA,X      ; send another dummy
