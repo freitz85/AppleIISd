@@ -2,6 +2,7 @@
 ;
 ; Apple][Sd Firmware
 ; Version 1.1
+; Main source
 ;
 ; (c) Florian Reitz, 2017
 ;
@@ -10,43 +11,42 @@
 ;
 ;*******************************
 
-.define DEBUG 0
-            
-; Memory defines
+.import GETR1
+.import GETR3
+.import SDCMD
+.import CARDDET
+.import STATUS
+.import READ
+.import WRITE
 
-SLOT16      :=    $2B         ; $s0 -> slot * 16
-SLOT        :=    $3D         ; $0s
-CMDLO       :=    $40
-CMDHI       :=    $41
-
-DCMD        :=    $42         ; Command code
-BUFFER      :=    $44         ; Buffer address
-BLOCK       :=    $46         ; Block number
-
-R30         :=    $0478
-R31         :=    $04F8
-R32         :=    $0578
-R33         :=    $05F8
-CURSLOT     :=    $07F8       ; $Cs
-OAPPLE      :=    $C061       ; open apple key
-DATA        :=    $C080
-CTRL        :=    DATA+1
-DIV         :=    DATA+2
-SS          :=    DATA+3
-
-; Constants
-
-DUMMY       =     $FF
-FRX         =     $10         ; CTRL register
-ECE         =     $04
-SS0         =     $01         ; SS register
-SDHC        =     $10
-WP          =     $20
-CD          =     $40
-INITED      =     $80
+.include "AppleIISd.inc"
 
 
-; signature bytes
+;******************************* 
+; 
+; Signature bytes 
+; 
+; 65535 blocks 
+; Removable media 
+; Non-interruptable 
+; 2 drives 
+; Read, write and status allowed 
+; 
+;******************************* 
+
+            .segment "SLOTID"
+            .dbyt  $FFFF      ; 65535 blocks
+            .byt   $97        ; Status bits
+            .byt   <DRIVER    ; LSB of driver
+
+
+;******************************* 
+; 
+; Bootcode
+; 
+; Is executed on boot or PR#
+; 
+;******************************* 
 
             .segment "SLOTROM"
             LDX   #$20
@@ -55,15 +55,6 @@ INITED      =     $80
             LDX   #$3C
 
 ; find slot nr
-
-            .if DEBUG
-            LDA   #$04
-            STA   SLOT
-            LDA   #$C4
-            STA   CURSLOT
-            LDA   #$40
-
-            .else
             PHP
             SEI
             LDA   #$60        ; opcode for RTS
@@ -79,7 +70,6 @@ INITED      =     $80
             ASL   A
             ASL   A
             ASL   A
-            .endif
 
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
@@ -109,61 +99,12 @@ INITED      =     $80
 
 ;*******************************
 ;
-; Install SD card driver
-;
-;*******************************
-
-            .if DEBUG
-
-; see if slot has a driver already
-
-            LDX   $BF31       ; get devcnt
-@INSTALL:   LDA   $BF32,X     ; get a devnum
-            AND   #$70        ; isolate slot
-            CMP   SLOT16      ; slot?
-            BEQ   @INSOUT     ; yes, skip it
-            DEX
-            BPL   @INSTALL    ; keep up the search
-
-; restore the devnum to the list
-
-            LDX   $BF31       ; get devcnt again
-            CPX   #$0D        ; device table full?
-            BNE   @INST2
-
-            JSR   $FF3A       ; bell
-            JMP   @INSOUT     ; do something!
-
-@INST2:     LDA   $BF32-1,X   ; move all entries down
-            STA   $BF32,X     ; to make room at front
-            DEX               ; for a new entry
-            BNE   @INST2
-            LDA   #$04        ; ProFile type device
-            ORA   SLOT16
-            STA   $BF32       ; slot, drive 1 at top of list
-            INC   $BF31       ; update devcnt
-
-; now insert the device driver vector
-
-            LDA   SLOT
-            ASL
-            TAX
-            LDA   #<DRIVER
-            STA   $BF10,X     ; write to driver table
-            LDA   #>DRIVER
-            STA   $BF11,X
-@INSOUT:    RTS
-
-
-;*******************************
-;
 ; Boot from SD card
 ;
 ;*******************************
 
-            .else
-;@BOOT:     CMP   #0
-;           BNE   @NEXTSLOT   ; init not successful
+;@BOOT:     CMP   #0 
+;           BNE   @NEXTSLOT   ; init not successful 
 @BOOT:      LDA   #$01
             STA   DCMD        ; load command
             LDX   SLOT16
@@ -190,7 +131,6 @@ INITED      =     $80
             JSR   READ        ; call driver
             LDX   SLOT16
             JMP   $801        ; goto bootloader
-            .endif
 
 
 ;*******************************
@@ -210,15 +150,6 @@ DRIVER:     CLD
             PHA
             LDA   CMDHI
             PHA
-
-            .if DEBUG
-            LDA   #$04
-            STA   SLOT
-            LDA   #$C4
-            STA   CURSLOT
-            LDA   #$40
-
-            .else
             PHP
             SEI
             LDA   #$60        ; opcode for RTS
@@ -234,7 +165,6 @@ DRIVER:     CLD
             ASL   A
             ASL   A
             ASL   A
-            .endif
 
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
@@ -254,10 +184,6 @@ DRIVER:     CLD
             BEQ   @READ
             CMP   #2
             BEQ   @WRITE
-            .if DEBUG
-            CMP   #$FF
-            BEQ   @TEST
-            .endif
             LDA   #1          ; unknown command
             SEC
             BRA   @RESTZP
@@ -268,10 +194,6 @@ DRIVER:     CLD
             BRA   @RESTZP
 @WRITE:     JSR   WRITE
             BRA   @RESTZP
-            .if DEBUG
-@TEST:      JSR   TEST        ; do device test
-            BRA   @RESTZP
-            .endif
 
 @INIT:      JSR   INIT
             BCC   @CMD        ; init ok
@@ -288,24 +210,6 @@ DRIVER:     CLD
             STA   SLOT16
             PLA               ; get retval
             RTS
-
-
-;*******************************
-;
-; Signature bytes
-;
-; 65535 blocks
-; Removable media
-; Non-interruptable
-; 2 drives
-; Read, write and status allowed
-;
-;*******************************
-
-            .segment "SLOTID"
-            .dbyt  $FFFF      ; 65535 blocks
-            .byt   $97        ; Status bits
-            .byt   <DRIVER    ; LSB of driver
 
 
 ;*******************************
@@ -354,14 +258,14 @@ INIT:       LDA   #$03        ; set SPI mode 3
             LDA   #>CMD8
             STA   CMDHI
             JSR   SDCMD
-            JSR   GETR3       ; R7 is also 1+4 bytes
+            JSR   GETR3       ; R7 is also 1+4 bytes 
             CMP   #$01
             BNE   @SDV1       ; may be SD Ver. 1
 
-            LDY   SLOT        ; check for $aa in R33
-            LDA   R33,Y
-            CMP   #$AA
-            BNE   @ERROR1     ; error!
+            LDY   SLOT        ; check for $aa in R33 
+            LDA   R33,Y 
+            CMP   #$AA 
+            BNE   @ERROR1     ; error! 
 
 @SDV2:      LDA   #<CMD55
             STA   CMDLO
@@ -369,7 +273,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             STA   CMDHI
             JSR   SDCMD
             JSR   GETR1
-            LDA   #<ACMD4140  ; enable SDHC support
+            LDA   #<ACMD4140  ; enable SDHC support 
             STA   CMDLO
             LDA   #>ACMD4140
             STA   CMDHI
@@ -381,20 +285,20 @@ INIT:       LDA   #$03        ; set SPI mode 3
             BNE   @ERROR1     ;  error!
 
 ; SD Ver. 2 initialized!
-            LDA   #<CMD58     ; check for SDHC
-            STA   CMDLO
-            LDA   #>CMD58
-            STA   CMDHI
-            JSR   SDCMD
-            JSR   GETR3
-            CMP   #0
-            BNE   @ERROR1     ; error!
-            LDY   SLOT
-            LDA   R30,Y
-            AND   #$40        ; check CCS
-            BEQ   @BLOCKSZ
-
-            LDA   SS,X        ; card is SDHC
+            LDA   #<CMD58     ; check for SDHC 
+            STA   CMDLO 
+            LDA   #>CMD58 
+            STA   CMDHI 
+            JSR   SDCMD 
+            JSR   GETR3 
+            CMP   #0 
+            BNE   @ERROR1     ; error! 
+            LDY   SLOT 
+            LDA   R30,Y 
+            AND   #$40        ; check CCS 
+            BEQ   @BLOCKSZ 
+ 
+            LDA   SS,X        ; card is SDHC 
             ORA   #SDHC
             STA   SS,X
             JMP   @END
@@ -461,445 +365,6 @@ INIT:       LDA   #$03        ; set SPI mode 3
             RTS
 
 
-;*******************************
-;
-; Send SD command
-; Call with command in CMDHI and CMDLO
-;
-;*******************************
-
-SDCMD:      PHY
-            LDY   #0
-@LOOP:      LDA   (CMDLO),Y
-            STA   DATA,X
-@WAIT:      BIT   CTRL,X      ; TC is in N
-            BPL   @WAIT
-            INY
-            CPY   #6
-            BCC   @LOOP
-            PLY
-            RTS
-
-
-;*******************************
-;
-; Get R1
-; R1 is in A
-;
-;*******************************
-
-GETR1:      LDA   #DUMMY
-            STA   DATA,X
-@WAIT:      BIT   CTRL,X
-            BPL   @WAIT
-            LDA   DATA,X      ; get response
-            BIT   #$80
-            BNE   GETR1       ; wait for MSB=0
-            PHA
-            LDA   #DUMMY
-            STA   DATA,X      ; send another dummy
-            PLA               ; restore R1
-            RTS
-
-;*******************************
-;
-; Get R3 or R7
-; R1 is in A
-; R3 is in scratchpad ram
-;
-;*******************************
-
-GETR3:      JSR   GETR1       ; get R1 first
-            PHA               ; save R1
-            PHY               ; save Y
-            LDY   #04         ; load counter
-            JMP   @WAIT       ; first byte is already there
-@LOOP:      LDA   #DUMMY      ; send dummy
-            STA   DATA,X
-@WAIT:      BIT   CTRL,X
-            BPL   @WAIT
-            LDA   DATA,X
-            PHA
-            DEY
-            BNE   @LOOP       ; do 4 times
-            LDY   SLOT
-            PLA
-            STA   R33,Y       ; save R3
-            PLA
-            STA   R32,Y
-            PLA
-            STA   R31,Y
-            PLA
-            STA   R30,Y       ; R30 is MSB
-            PLY               ; restore Y
-            LDA   #DUMMY
-            STA   DATA,X      ; send another dummy
-            PLA               ; restore R1
-            RTS
-
-
-;*******************************
-;
-; Calculate block address
-; Unit number is in $43 DSSS0000
-; Block no is in $46-47
-; Address is in R30-R33
-;
-;*******************************
-
-GETBLOCK:   PHX               ; save X
-            PHY               ; save Y
-            TXA
-            TAY               ; SLOT16 is now in Y
-            LDX   SLOT
-            LDA   BLOCK       ; store block num
-            STA   R33,X       ; in R30-R33
-            LDA   BLOCK+1
-            STA   R32,X
-            LDA   #0
-            STA   R31,X
-            STA   R30,X
-
-            LDA   #$80        ; drive number
-            AND   $43
-            BEQ   @SDHC       ; D1
-            LDA   #1          ; D2
-            STA   R31,X
-
-@SDHC:      LDA   #SDHC
-            AND   SS,Y        ; if card is SDHC,
-            BNE   @END        ; use block addressing
-            
-            LDY   #9          ; ASL can't be used with Y
-@LOOP:      ASL   R33,X       ; mul block num
-            ROL   R32,X       ; by 512 to get
-            ROL   R31,X       ; real address
-            ROL   R30,X
-            DEY
-            BNE   @LOOP
-  
- @END:      PLY               ; restore Y
-            PLX               ; restore X
-            RTS
-
-
-;*******************************
-;
-; Send SD command
-; Cmd is in A
-;
-;*******************************
-
-COMMAND:    PHY               ; save Y
-            LDY   SLOT
-            STA   DATA,X      ; send command
-            LDA   R30,Y       ; get arg from R30 on
-            STA   DATA,X
-            LDA   R31,Y
-            STA   DATA,X
-            LDA   R32,Y
-            STA   DATA,X
-            LDA   R33,Y
-            STA   DATA,X
-            LDA   #DUMMY
-            STA   DATA,X      ; dummy crc
-            JSR   GETR1
-            PLY               ; restore Y
-            RTS
-
-
-;*******************************
-;
-; Check for card detect
-;
-; C Clear - card in slot
-;   Set   - no card in slot
-;
-;*******************************
-
-CARDDET:    PHA
-            LDA   #CD         ; 0: card in
-            BIT   SS,X        ; 1: card out
-            CLC
-            BEQ   @DONE       ; card is in
-            SEC               ; card is out
-@DONE:      PLA
-            RTS
-
-
-;*******************************
-;
-; Check for write protect
-;
-; C Clear - card not protected
-;   Set   - card write protected
-;
-;*******************************
-
-WRPROT:     PHA
-            LDA   #WP         ; 0: write enabled
-            BIT   SS,X        ; 1: write disabled
-            CLC
-            BEQ   @DONE
-            SEC
-@DONE:      PLA
-            RTS
-
-
-;*******************************
-;
-; Status request
-; $43    Unit number DSSS000
-; $44-45 Unused
-; $46-47 Unused
-;
-; C Clear - No error
-;   Set   - Error
-; A $00   - No error
-;   $2B   - Card write protected
-;   $2F   - No card inserted
-; X       - Blocks avail (low byte)
-; Y       - Blocks avail (high byte)
-;
-;*******************************
-
-STATUS:     LDA   #0          ; no error
-            JSR   WRPROT
-            BCC   @DONE
-            LDA   #$2B        ; card write protected
-
-@DONE:      LDX   #$FF        ; 32 MB partition
-            LDY   #$FF
-            RTS
-
-
-;*******************************
-;
-; Read 512 byte block
-; $43    Unit number DSSS0000
-; $44-45 Address (LO/HI) of buffer
-; $46-47 Block number (LO/HI)
-;
-; C Clear - No error
-;   Set   - Error
-; A $00   - No error
-;   $27   - Bad block number
-;
-;*******************************
-
-READ:       JSR   GETBLOCK    ; calc block address
-
-            LDA   SS,X        ; enable /CS
-            AND   #<~SS0
-            STA   SS,X
-            LDA   #$51        ; send CMD17
-            JSR   COMMAND     ; send command
-            CMP   #0
-            BNE   @ERROR      ; check for error
-
-@GETTOK:    LDA   #DUMMY      ; get data token
-            STA   DATA,X
-            LDA   DATA,X      ; get response
-            CMP   #$FE
-            BNE   @GETTOK     ; wait for $FE
-
-            LDA   CTRL,X      ; enable FRX
-            ORA   #FRX
-            STA   CTRL,X
-            LDA   #DUMMY
-            STA   DATA,X
-
-            LDY   #0
-@LOOP1:     LDA   DATA,X      ; read data from card
-            STA   (BUFFER),Y
-            INY
-            BNE   @LOOP1
-            INC   BUFFER+1    ; inc msb on page boundary
-@LOOP2:     LDA   DATA,X
-            STA   (BUFFER),Y
-            INY
-            BNE   @LOOP2
-            DEC   BUFFER+1
-
-@CRC:       LDA   DATA,X      ; read two bytes crc
-            LDA   DATA,X      ; and ignore
-            LDA   DATA,X      ; read a dummy byte
-
-            LDA   CTRL,X      ; disable FRX
-            AND   #<~FRX
-            STA   CTRL,X
-            CLC               ; no error
-            LDA   #0
-
-@DONE:      PHP
-            PHA
-            LDA   SS,X
-            ORA   #SS0
-            STA   SS,X        ; disable /CS
-            PLA
-            PLP
-            RTS
-
-@ERROR:     SEC               ; an error occured
-            LDA   #$27
-            BRA   @DONE
-
-
-;*******************************
-;
-; Write 512 byte block
-; $43    Unit number DSSS0000
-; $44-45 Address (LO/HI) of buffer
-; $46-47 Block number (LO/HI)
-;
-; C Clear - No error
-;   Set   - Error
-; A $00   - No error
-;   $27   - I/O error or bad block number
-;   $2B   - Card write protected
-;
-;*******************************
-
-WRITE:      JSR   WRPROT
-            BCS   @WPERROR    ; card write protected
-
-            JSR   GETBLOCK    ; calc block address
-
-            LDA   SS,X        ; enable /CS
-            AND   #<~SS0
-            STA   SS,X
-            LDA   #$58        ; send CMD24
-            JSR   COMMAND     ; send command
-            CMP   #0
-            BNE   @IOERROR    ; check for error
-
-            LDA   #DUMMY
-            STA   DATA,X      ; send dummy
-            LDA   #$FE
-            STA   DATA,X      ; send data token
-
-            LDY   #0
-@LOOP1:     LDA   (BUFFER),Y
-            STA   DATA,X
-            INY
-            BNE   @LOOP1
-            INC   BUFFER+1
-@LOOP2:     LDA   (BUFFER),Y
-            STA   DATA,X
-            INY
-            BNE   @LOOP2
-            DEC   BUFFER+1
-
-@CRC:       LDA   #DUMMY
-            STA   DATA,X      ; send 2 dummy crc bytes
-            STA   DATA,X
-
-            STA   DATA,X      ; get data response
-            LDA   DATA,X
-            AND   #$1F
-            CMP   #$05
-            BNE   @IOERROR    ; check for write error
-            CLC               ; no error
-            LDA   #0
-
-@DONE:      PHP
-            PHA
-@WAIT:      LDA   #DUMMY
-            STA   DATA,X      ; wait for write cycle
-            LDA   DATA,X      ; to complete
-            BEQ   @WAIT
-
-            LDA   SS,X        ; disable /CS
-            ORA   #SS0
-            STA   SS,X
-            PLA
-            PLP
-            RTS
-
-@IOERROR:   SEC               ; an error occured
-            LDA   #$27
-            BRA   @DONE
-
-@WPERROR:   SEC
-            LDA   #$2B
-            BRA   @DONE
-
-
-
-;*******************************
-;
-; Test routine
-;
-;*******************************
-
-            .if DEBUG
-TEST:       LDA   SLOT16
-            PHA
-            LDA   SLOT
-            PHA
-
-; get buffer
-            LDA   #2          ; get 512 byte buffer
-            JSR   $BEF5       ; call GETBUFR
-            BCS   @ERROR
-            STA   BUFFER+1
-            STZ   BUFFER
-            PLA
-            STA   SLOT
-            PLA
-            STA   SLOT16
-
-; fill buffer
-            LDY   #0
-@LOOP:      TYA
-            STA   (BUFFER),Y
-            INY
-            BNE   @LOOP
-            INC   BUFFER+1
-@LOOP1:     TYA
-            STA   (BUFFER),Y
-            INY
-            BNE   @LOOP1
-            DEC   BUFFER+1
-
-            STZ   BLOCK       ; block number
-            STZ   BLOCK+1
-            LDX   SLOT16
-
-; write to card
-            JSR   WRITE
-            BCS   @ERROR
-
-; read from card
-            JSR   READ
-            BCS   @ERROR
-
-; check for errors
-            LDY   #0
-@LOOP2:     TYA
-            CMP   (BUFFER),Y
-            BNE   @ERRCMP     ; error in buffer
-            INY
-            BNE   @LOOP2
-            INC   BUFFER+1
-@LOOP3:     TYA
-            CMP   (BUFFER),Y
-            BNE   @ERRCMP
-            INY
-            BNE   @LOOP3
-            DEC   BUFFER+1
-
-; free buffer
-            JSR   $BEF8       ; call FREEBUFR
-            CLC
-            LDA   #0
-            RTS
-
-@ERROR:     BRK
-@ERRCMP:    BRK
-            .endif
-
-
 TEXT:       .asciiz "  Apple][Sd v1.1 (c)2017 Florian Reitz"
 
 CMD0:       .byt $40, $00, $00
@@ -911,11 +376,10 @@ CMD8:       .byt $48, $00, $00
 CMD16:      .byt $50, $00, $00
             .byt $02, $00, $FF
 CMD55:      .byt $77, $00, $00
-            .byt $00, $00, $FF
-CMD58:      .byt $7A, $00, $00
+            .byt $00, $00, $FF 
+CMD58:      .byt $7A, $00, $00 
             .byt $00, $00, $FF
 ACMD4140:   .byt $69, $40, $00
             .byt $00, $00, $77
 ACMD410:    .byt $69, $00, $00
             .byt $00, $00, $FF
-
