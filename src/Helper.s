@@ -122,7 +122,7 @@ GETBLOCK:   PHX               ; save X
             STZ   R30,X
 
             LDA   #$80        ; drive number
-            AND   $43
+            AND   DNUMBER
             BEQ   @SLOT       ; D1
             LDA   #1          ; D2
             STA   R31,X
@@ -130,7 +130,7 @@ GETBLOCK:   PHX               ; save X
 @SLOT:      LDA   SLOT
             PHA               ; save SLOT
             LDA   #$70        ; slot number * 16
-            AND   $43
+            AND   DNUMBER
             STA   SLOT
             CPY   SLOT
             BEQ   @RESTORE    ; slot number = real slot?

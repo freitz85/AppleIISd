@@ -11,22 +11,35 @@
 ;
 ;*******************************
 
-; Memory defines
-
+; ZP equates
 SLOT16      :=    $2B         ; $s0 -> slot * 16
 SLOT        :=    $3D         ; $0s
 CMDLO       :=    $40
 CMDHI       :=    $41
 
+; ProDOS equates
 DCMD        :=    $42         ; Command code
-BUFFER      :=    $44         ; Buffer address
-BLOCK       :=    $46         ; Block number
+DNUMBER     :=    $43         ; drive number
+BUFFER      :=    $44         ; buffer pointer
+BLOCK       :=    $46         ; block number
 
+; Smartport equates
+SMPARAM     :=    $43         ; parameter count
+SMUNIT      :=    $44         ; unit number
+SMBUFF      :=    $45         ; buffer pointer
+SMSTAT      :=    $47         ; status / control code
+SMBLOCK     :=    $47         ; block number
+SMCOUNT     :=    $47         ; byte count
+SMADDR      :=    $49         ; address for read
+
+; Ram equates
 R30         :=    $0478
 R31         :=    $04F8
 R32         :=    $0578
 R33         :=    $05F8
 CURSLOT     :=    $07F8       ; $Cs
+
+; Slot equates
 OAPPLE      :=    $C061       ; open apple key
 DATA        :=    $C080
 CTRL        :=    DATA+1
@@ -34,7 +47,6 @@ DIV         :=    DATA+2
 SS          :=    DATA+3
 
 ; Constants
-
 DUMMY       =     $FF
 FRX         =     $10         ; CTRL register
 ECE         =     $04

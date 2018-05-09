@@ -11,6 +11,7 @@
 ;
 ;*******************************
 
+.import SMARTPORT
 .import GETR1
 .import GETR3
 .import SDCMD
@@ -54,25 +55,8 @@
             LDX   #$03
             LDX   #$3C
 
-; find slot nr
-            PHP
-            SEI
-            LDA   #$60        ; opcode for RTS
-            STA   SLOT
-            JSR   SLOT
-            TSX
-            LDA   $0100,X
-            STA   CURSLOT     ; $Cs
-            AND   #$0F
-            PLP
-            STA   SLOT        ; $0s
-            ASL   A
-            ASL   A
-            ASL   A
-            ASL   A
-
-            STA   SLOT16      ; $s0
-            TAX               ; X holds now SLOT16
+PRODOS:     
+            SEI               ; no interrupts if booting
             BIT   $CFFF
             LDY   #0          ; display copyright message
 @DRAW:      LDA   TEXT,Y
@@ -83,18 +67,13 @@
             BPL   @DRAW
 
 @OAPPLE:    BIT   OAPPLE      ; check for OA key
-            BMI   @NEXTSLOT   ; and skip boot if pressed
-
-            JSR   CARDDET
-            BCC   @INIT
+            BPL   @BOOT       ; and skip boot if pressed
 
 @NEXTSLOT:  LDA   CURSLOT     ; skip boot when no card
             DEC   A
             STA   CMDHI
             STZ   CMDLO
             JMP   (CMDLO)
-
-@INIT:      JSR   INIT
 
 
 ;*******************************
@@ -103,23 +82,20 @@
 ;
 ;*******************************
 
-;@BOOT:     CMP   #0 
-;           BNE   @NEXTSLOT   ; init not successful 
-@BOOT:      LDA   #$01
+@BOOT:      LDA   #$01        ; READ
             STA   DCMD        ; load command
-            LDX   SLOT16
-            STX   $43         ; slot number
             LDA   #$08
             STA   BUFFER+1    ; buffer hi
             STZ   BUFFER      ; buffer lo
             STZ   BLOCK+1     ; block hi
             STZ   BLOCK       ; block lo
-            BIT   $CFFF
-            JSR   READ        ; call driver
+            LDA   #>DRIVER
+            JSR   DRIVER      ; call driver
+            CMP   #0 
+            BNE   @NEXTSLOT   ; init not successful 
 
-            LDA   #$01
+            LDA   #$01        ; READ
             STA   DCMD        ; load command
-            LDX   SLOT16
             STX   $43         ; slot number
             LDA   #$0A
             STA   BUFFER+1    ; buffer hi
@@ -127,8 +103,9 @@
             STZ   BLOCK+1     ; block hi
             LDA   #$01
             STA   BLOCK       ; block lo
-            BIT   $CFFF
-            JSR   READ        ; call driver
+            JSR   DRIVER      ; call driver
+            CMP   #0 
+            BNE   @NEXTSLOT   ; init not successful 
             LDX   SLOT16
             JMP   $801        ; goto bootloader
 
@@ -139,7 +116,8 @@
 ;
 ;*******************************
 
-DRIVER:     CLD
+DRIVER:     BRA   @SAVEZP     ; jump to ProDOS entry
+            BRA   @SMARTPORT  ; jump to Smartport entry
 
 @SAVEZP:    PHA               ; make room for retval
             LDA   SLOT16      ; save all ZP locations
@@ -210,6 +188,8 @@ DRIVER:     CLD
             STA   SLOT16
             PLA               ; get retval
             RTS
+
+@SMARTPORT: JMP   SMARTPORT
 
 
 ;*******************************
