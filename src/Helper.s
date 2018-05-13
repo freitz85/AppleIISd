@@ -4,7 +4,7 @@
 ; Version 1.2
 ; Helper functions
 ;
-; (c) Florian Reitz, 2017
+; (c) Florian Reitz, 2017 - 2018
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -122,7 +122,7 @@ GETBLOCK:   PHX               ; save X
             STZ   R30,X
 
             LDA   #$80        ; drive number
-            AND   DNUMBER
+            AND   DSNUMBER
             BEQ   @SLOT       ; D1
             LDA   #1          ; D2
             STA   R31,X
@@ -130,7 +130,7 @@ GETBLOCK:   PHX               ; save X
 @SLOT:      LDA   SLOT
             PHA               ; save SLOT
             LDA   #$70        ; slot number * 16
-            AND   DNUMBER
+            AND   DSNUMBER
             STA   SLOT
             CPY   SLOT
             BEQ   @RESTORE    ; slot number = real slot?

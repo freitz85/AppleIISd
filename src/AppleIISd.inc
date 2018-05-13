@@ -1,10 +1,10 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.1
+; Version 1.2
 ; Defines
 ;
-; (c) Florian Reitz, 2017
+; (c) Florian Reitz, 2017 - 2018
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -19,7 +19,7 @@ CMDHI       :=    $41
 
 ; ProDOS equates
 DCMD        :=    $42         ; Command code
-DNUMBER     :=    $43         ; drive number
+DSNUMBER    :=    $43         ; drive / slot number
 BUFFER      :=    $44         ; buffer pointer
 BLOCK       :=    $46         ; block number
 
@@ -55,3 +55,17 @@ SDHC        =     $10
 WP          =     $20
 CD          =     $40
 INITED      =     $80
+
+; Error codes
+NO_ERR          =     $00
+ERR_BAD_CMD     =     $01
+ERR_BAD_PCNT    =     $04
+ERR_BUS_ERR     =     $06
+ERR_BAD_UNIT    =     $11
+ERR_BAD_CTL     =     $21
+ERR_BAD_CTL_PARM =    $22
+ERR_IO_ERR      =     $27
+ERR_NO_DRIVE    =     $28
+ERR_NO_WRITE    =     $2B
+ERR_BAD_BLOCK   =     $2D
+ERR_OFF_LINE    =     $2F

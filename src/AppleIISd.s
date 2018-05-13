@@ -4,7 +4,7 @@
 ; Version 1.2
 ; Main source
 ;
-; (c) Florian Reitz, 2017
+; (c) Florian Reitz, 2017 - 2018
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -96,7 +96,7 @@ PRODOS:
 
             LDA   #$01        ; READ
             STA   DCMD        ; load command
-            STX   $43         ; slot number
+            STX   DSNUMBER    ; slot number
             LDA   #$0A
             STA   BUFFER+1    ; buffer hi
             STZ   BUFFER      ; buffer lo
@@ -149,20 +149,21 @@ DRIVER:     BRA   @SAVEZP     ; jump to ProDOS entry
             BIT   $CFFF
             JSR   CARDDET
             BCC   @INITED
-            LDA   #$2F        ; no card inserted
+            LDA   ERR_OFF_LINE; no card inserted
             BRA   @RESTZP
 
 @INITED:    LDA   #INITED     ; check for init
             BIT   SS,X
             BEQ   @INIT
 
+; TODO use jump table
 @CMD:       LDA   DCMD        ; get command
             BEQ   @STATUS     ; branch if cmd is 0
             CMP   #1
             BEQ   @READ
             CMP   #2
             BEQ   @WRITE
-            LDA   #1          ; unknown command
+            LDA   ERR_BAD_CMD ; unknown command
             SEC
             BRA   @RESTZP
 
@@ -210,7 +211,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             LDA   SS,X
             ORA   #SS0        ; set CS high
             STA   SS,X
-            LDA   #7
+            LDA   #7          ; set 400 kHz
             STA   DIV,X
             LDY   #10
             LDA   #DUMMY
@@ -331,11 +332,11 @@ INIT:       LDA   #$03        ; set SPI mode 3
             ORA   #ECE        ; enable 7MHz
             STA   CTRL,X
             CLC               ; all ok
-            LDY   #0
+            LDY   NO_ERR
             BCC   @END1
 
 @IOERROR:   SEC
-            LDY   #$27        ; init error
+            LDY   ERR_IO_ERR  ; init error
 @END1:      LDA   SS,X        ; set CS high
             ORA   #SS0
             STA   SS,X
@@ -345,7 +346,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             RTS
 
 
-TEXT:       .asciiz "  Apple][Sd v1.2 (c)2017 Florian Reitz"
+TEXT:       .asciiz "  Apple][Sd v1.2 (c)2018 Florian Reitz"
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95

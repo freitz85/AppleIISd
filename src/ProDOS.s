@@ -4,7 +4,7 @@
 ; Version 1.2
 ; ProDOS functions
 ;
-; (c) Florian Reitz, 2017
+; (c) Florian Reitz, 2017 - 2018
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -37,16 +37,15 @@
 ;   Set   - Error
 ; A $00   - No error
 ;   $2B   - Card write protected
-;   $2F   - No card inserted
 ; X       - Blocks avail (low byte)
 ; Y       - Blocks avail (high byte)
 ;
 ;*******************************
 
-STATUS:     LDA   #0          ; no error
+STATUS:     LDA   NO_ERR     ; no error
             JSR   WRPROT
             BCC   @DONE
-            LDA   #$2B        ; card write protected
+            LDA   ERR_NO_WRITE; card write protected
 
 @DONE:      LDX   #$FF        ; 32 MB partition
             LDY   #$FF
@@ -109,7 +108,7 @@ READ:       JSR   GETBLOCK    ; calc block address
             AND   #<~FRX
             STA   CTRL,X
             CLC               ; no error
-            LDA   #0
+            LDA   NO_ERR
 
 @DONE:      PHP
             PHA
@@ -121,7 +120,7 @@ READ:       JSR   GETBLOCK    ; calc block address
             RTS
 
 @ERROR:     SEC               ; an error occured
-            LDA   #$27
+            LDA   ERR_IO_ERR
             BRA   @DONE
 
 
@@ -180,7 +179,7 @@ WRITE:      JSR   WRPROT
             CMP   #$05
             BNE   @IOERROR    ; check for write error
             CLC               ; no error
-            LDA   #0
+            LDA   NO_ERR
 
 @DONE:      PHP
             PHA
@@ -197,9 +196,9 @@ WRITE:      JSR   WRPROT
             RTS
 
 @IOERROR:   SEC               ; an error occured
-            LDA   #$27
+            LDA   ERR_IO_ERR
             BRA   @DONE
 
 @WPERROR:   SEC
-            LDA   #$2B
+            LDA   ERR_NO_WRITE
             BRA   @DONE

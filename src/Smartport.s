@@ -4,7 +4,7 @@
 ; Version 1.2
 ; Smartport functions
 ;
-; (c) Florian Reitz, 2017
+; (c) Florian Reitz, 2017 - 2018
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
