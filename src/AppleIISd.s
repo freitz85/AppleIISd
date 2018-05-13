@@ -52,25 +52,26 @@
             LDX   #$20
             LDX   #$00
             LDX   #$03
-            LDX   #$00        ; is Smartport controller
+;            LDX   #$00        ; is Smartport controller
+            LDX   #$3C
 
 PRODOS:     
             SEI               ; no interrupts if booting
             BIT   $CFFF
-            LDY   #0          ; display copyright message
-@DRAW:      LDA   TEXT,Y
-            BEQ   @OAPPLE     ; check for NULL
-            ORA   #$80
-            STA   $0750,Y     ; put second to last line
-            INY
-            BPL   @DRAW
+;            LDY   #0          ; display copyright message
+;@DRAW:      LDA   TEXT,Y
+;            BEQ   @OAPPLE     ; check for NULL
+;            ORA   #$80
+;            STA   $0750,Y     ; put second to last line
+;            INY
+;            BPL   @DRAW
 
 @OAPPLE:    BIT   OAPPLE      ; check for OA key
             BPL   @BOOT       ; and skip boot if pressed
 
 @NEXTSLOT:  LDA   CURSLOT     ; skip boot when no card
             DEC   A
-            STA   CMDHI
+            STA   CMDHI       ; use CMDHI/LO as pointer
             STZ   CMDLO
             JMP   (CMDLO)
 
@@ -115,18 +116,18 @@ PRODOS:
 ;
 ;*******************************
 
-DRIVER:     BRA   @SAVEZP     ; jump to ProDOS entry
-            BRA   @SMARTPORT  ; jump to Smartport entry
+DRIVER:     CLC               ; ProDOS entry
+            BCC   @PRODOS
+            SEC               ; Smartport entry
 
-@SAVEZP:    PHA               ; make room for retval
-            LDA   SLOT16      ; save all ZP locations
+@PRODOS:    PHA               ; make room for retval
+            LDY   PDZPSIZE-1  ; save zeropage area for ProDOS
+@SAVEZP:    LDA   PDZPAREA,Y
             PHA
-            LDA   SLOT
-            PHA
-            LDA   CMDLO
-            PHA
-            LDA   CMDHI
-            PHA
+            DEY
+            BPL   @SAVEZP
+
+            PHP               ; push twice for PD/SP switch
             PHP
             SEI
             LDA   #$60        ; opcode for RTS
@@ -150,30 +151,51 @@ DRIVER:     BRA   @SAVEZP     ; jump to ProDOS entry
             JSR   CARDDET
             BCC   @INITED
             LDA   ERR_OFFLINE ; no card inserted
-            BRA   @RESTZP
+            BRA   @END
 
 @INITED:    LDA   #INITED     ; check for init
             BIT   SS,X
-            BNE   @PD_DISP
+            BNE   @DISP
             JSR   INIT
-            BCS   @RESTZP     ; Init failed
+            BCS   @END        ; Init failed
 
-@PD_DISP:   JSR   PD_DISP     ; ProDOS dispatcher
+@DISP:      PLP               ; get PSW from stack
+            BCS   @SMARTPORT  ; Smartport dispatcher
+            JSR   PRODOS      ; ProDOS dispatcher
 
-@RESTZP:    TSX
-            STA   $105,X      ; save retval on stack
-            PLA               ; restore all ZP locations
-            STA   CMDHI
+@END:       PHX
+            LDX   SLOT        ; X holds $0s
+            STA   R30,X       ; save A
             PLA
-            STA   CMDLO
+            STA   R31,X       ; save X
+            TYA
+            STA   R32,X       ; save Y
+            PHP
             PLA
-            STA   SLOT
-            PLA
-            STA   SLOT16
-            PLA               ; get retval
+            STA   R33,X       ; save P
+            
+            LDY   #0
+@RESTZP:    PLA               ; restore zeropage area
+            STA   PDZPAREA,Y
+            INY
+            CPY   PDZPSIZE
+            BCC   @RESTZP
+            
+            LDA   R33,X       ; get retval
+            PHA
+            LDA   R32,X
+            PHA
+            LDA   R31,X
+            PHA
+            LDA   R30,X        ; restore A
+            PLX                ; restore X
+            PLY                ; restore Y
+            PLP                ; restore P
             RTS
 
-@SMARTPORT: JMP   SMARTPORT
+@SMARTPORT: CLC
+            JSR   SMARTPORT
+            BRA   @END
 
 
 ;*******************************

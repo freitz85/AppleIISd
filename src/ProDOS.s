@@ -11,7 +11,7 @@
 ;
 ;*******************************
 
-.export PD_DISP         
+.export PRODOS         
 .export STATUS
 .export READ
 .export WRITE
@@ -42,7 +42,7 @@
 ;
 ;*******************************
 
-PD_DISP:    LDA   DCMD        ; get command
+PRODOS:     LDA   DCMD        ; get command
             BEQ   @STATUS     ; branch if cmd is 0
             CMP   #1
             BEQ   @READ

@@ -111,8 +111,6 @@ GETR3:      JSR   GETR1       ; get R1 first
 
 GETBLOCK:   PHX               ; save X
             PHY               ; save Y
-            TXA
-            TAY               ; SLOT16 is now in Y
             LDX   SLOT        ; SLOT is now in X
             LDA   BLOCKNUM    ; store block num
             STA   R33,X       ; in R30-R33
@@ -135,6 +133,7 @@ GETBLOCK:   PHX               ; save X
             STA   R31,X
 
 @SDHC:      LDA   #SDHC
+            LDY   SLOT16      ; SLOT16 is now in Y
             AND   SS,Y        ; if card is SDHC,
             BNE   @END        ; use block addressing
             
