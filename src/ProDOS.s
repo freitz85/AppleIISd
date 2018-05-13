@@ -10,7 +10,8 @@
 ; Y register is used for counting or SLOT
 ;
 ;*******************************
-            
+
+.export PD_DISP         
 .export STATUS
 .export READ
 .export WRITE
@@ -24,6 +25,36 @@
 
 .include "AppleIISd.inc"
 .segment "EXTROM"
+
+
+;*******************************
+;
+; ProDOS command dispatcher
+;
+; $42-$47 MLI input locations
+; X Slot*16
+; Y Slot
+;
+; C Clear - No error
+;   Set   - Error
+; A $00   - No error
+;   $01   - Unknown command
+;
+;*******************************
+
+PD_DISP:    LDA   DCMD        ; get command
+            BEQ   @STATUS     ; branch if cmd is 0
+            CMP   #1
+            BEQ   @READ
+            CMP   #2
+            BEQ   @WRITE
+            LDA   ERR_BADCMD  ; unknown command
+            SEC
+            RTS
+
+@STATUS:    JMP   STATUS
+@READ:      JMP   READ
+@WRITE:     JMP   WRITE
 
 
 ;*******************************
@@ -42,10 +73,10 @@
 ;
 ;*******************************
 
-STATUS:     LDA   NO_ERR     ; no error
+STATUS:     LDA   NO_ERR      ; no error
             JSR   WRPROT
             BCC   @DONE
-            LDA   ERR_NO_WRITE; card write protected
+            LDA   ERR_NOWRITE ; card write protected
 
 @DONE:      LDX   #$FF        ; 32 MB partition
             LDY   #$FF
@@ -120,7 +151,7 @@ READ:       JSR   GETBLOCK    ; calc block address
             RTS
 
 @ERROR:     SEC               ; an error occured
-            LDA   ERR_IO_ERR
+            LDA   ERR_IOERR
             BRA   @DONE
 
 
@@ -196,9 +227,9 @@ WRITE:      JSR   WRPROT
             RTS
 
 @IOERROR:   SEC               ; an error occured
-            LDA   ERR_IO_ERR
+            LDA   ERR_IOERR
             BRA   @DONE
 
 @WPERROR:   SEC
-            LDA   ERR_NO_WRITE
+            LDA   ERR_NOWRITE
             BRA   @DONE

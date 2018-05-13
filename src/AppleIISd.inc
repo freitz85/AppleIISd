@@ -11,26 +11,31 @@
 ;
 ;*******************************
 
-; ZP equates
-SLOT16      :=    $2B         ; $s0 -> slot * 16
-SLOT        :=    $3D         ; $0s
+; ZP locations
+SLOT16      :=    $3E         ; $s0 -> slot * 16
+SLOT        :=    $3F         ; $0s
 CMDLO       :=    $40
 CMDHI       :=    $41
+PDZPAREA    =     SLOT16      
+PDZPSIZE    =     CMDHI-PDZPAREA+1
 
-; ProDOS equates
+; ProDOS
 DCMD        :=    $42         ; Command code
 DSNUMBER    :=    $43         ; drive / slot number
 BUFFER      :=    $44         ; buffer pointer
-BLOCK       :=    $46         ; block number
+BLOCKNUM    :=    $46         ; block number
 
-; Smartport equates
-SMPARAM     :=    $43         ; parameter count
-SMUNIT      :=    $44         ; unit number
-SMBUFF      :=    $45         ; buffer pointer
-SMSTAT      :=    $47         ; status / control code
-SMBLOCK     :=    $47         ; block number
-SMCOUNT     :=    $47         ; byte count
-SMADDR      :=    $49         ; address for read
+
+; Smartport
+SMPARAM     :=    $48         ; parameter count
+SMUNIT      :=    $49         ; unit number
+SMBUFF      :=    $4A         ; buffer pointer
+SMSTAT      :=    $4B         ; status / control code
+SMBLOCK     :=    $4C         ; block number
+SMCOUNT     :=    $4D         ; byte count
+SMADDR      :=    $4E         ; address for read
+
+
 
 ; Ram equates
 R30         :=    $0478
@@ -58,14 +63,14 @@ INITED      =     $80
 
 ; Error codes
 NO_ERR          =     $00
-ERR_BAD_CMD     =     $01
-ERR_BAD_PCNT    =     $04
-ERR_BUS_ERR     =     $06
-ERR_BAD_UNIT    =     $11
-ERR_BAD_CTL     =     $21
-ERR_BAD_CTL_PARM =    $22
-ERR_IO_ERR      =     $27
-ERR_NO_DRIVE    =     $28
-ERR_NO_WRITE    =     $2B
-ERR_BAD_BLOCK   =     $2D
-ERR_OFF_LINE    =     $2F
+ERR_BADCMD      =     $01
+ERR_BADPCNT     =     $04
+ERR_BUSERR      =     $06
+ERR_BADUNIT     =     $11
+ERR_BADCTL      =     $21
+ERR_BADCTLPARM  =     $22
+ERR_IOERR       =     $27
+ERR_NODRIVE     =     $28
+ERR_NOWRITE     =     $2B
+ERR_BADBLOCK    =     $2D
+ERR_OFFLINE     =     $2F

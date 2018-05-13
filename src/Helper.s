@@ -113,33 +113,26 @@ GETBLOCK:   PHX               ; save X
             PHY               ; save Y
             TXA
             TAY               ; SLOT16 is now in Y
-            LDX   SLOT
-            LDA   BLOCK       ; store block num
+            LDX   SLOT        ; SLOT is now in X
+            LDA   BLOCKNUM    ; store block num
             STA   R33,X       ; in R30-R33
-            LDA   BLOCK+1
+            LDA   BLOCKNUM+1
             STA   R32,X
             STZ   R31,X
             STZ   R30,X
 
-            LDA   #$80        ; drive number
-            AND   DSNUMBER
-            BEQ   @SLOT       ; D1
-            LDA   #1          ; D2
+            TXA               ; get SLOT
+            EOR   DSNUMBER
+            AND   #$70        ; check only slot bits
+            BEQ   @DRIVE      ; it is our slot
+            LDA   #2          ; it is a phantom slot
             STA   R31,X
 
-@SLOT:      LDA   SLOT
-            PHA               ; save SLOT
-            LDA   #$70        ; slot number * 16
-            AND   DSNUMBER
-            STA   SLOT
-            CPY   SLOT
-            BEQ   @RESTORE    ; slot number = real slot?
-            LDA   R31,X       ; is phantom slot
+@DRIVE:     BIT   DSNUMBER    ; drive number
+            BPL   @SDHC       ; D1
+            LDA   R31,X       ; D2
             INC   A
             STA   R31,X
-
-@RESTORE:   PLA               ; restore SLOT
-            STA   SLOT
 
 @SDHC:      LDA   #SDHC
             AND   SS,Y        ; if card is SDHC,

@@ -11,14 +11,12 @@
 ;
 ;*******************************
 
+.import PD_DISP
 .import SMARTPORT
 .import GETR1
 .import GETR3
 .import SDCMD
 .import CARDDET
-.import STATUS
-.import READ
-.import WRITE
 
 .include "AppleIISd.inc"
 
@@ -30,14 +28,15 @@
 ; 65535 blocks 
 ; Removable media 
 ; Non-interruptable 
-; 4 drives 
+; 2 drives 
 ; Read, write and status allowed 
 ; 
 ;******************************* 
 
             .segment "SLOTID"
-            .dbyt  $FFFF      ; 65535 blocks
-            .byt   $B7        ; Status bits
+            .byt   $0         ; not extended, no SCSI, no RAM
+            .dbyt  $0         ; use status call
+            .byt   $97        ; Status bits
             .byt   <DRIVER    ; LSB of driver
 
 
@@ -53,7 +52,7 @@
             LDX   #$20
             LDX   #$00
             LDX   #$03
-            LDX   #$3C
+            LDX   #$00        ; is Smartport controller
 
 PRODOS:     
             SEI               ; no interrupts if booting
@@ -87,8 +86,8 @@ PRODOS:
             LDA   #$08
             STA   BUFFER+1    ; buffer hi
             STZ   BUFFER      ; buffer lo
-            STZ   BLOCK+1     ; block hi
-            STZ   BLOCK       ; block lo
+            STZ   BLOCKNUM+1  ; block hi
+            STZ   BLOCKNUM    ; block lo
             LDA   #>DRIVER
             JSR   DRIVER      ; call driver
             CMP   #0 
@@ -100,9 +99,9 @@ PRODOS:
             LDA   #$0A
             STA   BUFFER+1    ; buffer hi
             STZ   BUFFER      ; buffer lo
-            STZ   BLOCK+1     ; block hi
+            STZ   BLOCKNUM+1  ; block hi
             LDA   #$01
-            STA   BLOCK       ; block lo
+            STA   BLOCKNUM    ; block lo
             JSR   DRIVER      ; call driver
             CMP   #0 
             BNE   @NEXTSLOT   ; init not successful 
@@ -139,6 +138,7 @@ DRIVER:     BRA   @SAVEZP     ; jump to ProDOS entry
             AND   #$0F
             PLP
             STA   SLOT        ; $0s
+            TAY               ; Y holds now SLOT
             ASL   A
             ASL   A
             ASL   A
@@ -149,33 +149,16 @@ DRIVER:     BRA   @SAVEZP     ; jump to ProDOS entry
             BIT   $CFFF
             JSR   CARDDET
             BCC   @INITED
-            LDA   ERR_OFF_LINE; no card inserted
+            LDA   ERR_OFFLINE ; no card inserted
             BRA   @RESTZP
 
 @INITED:    LDA   #INITED     ; check for init
             BIT   SS,X
-            BEQ   @INIT
+            BNE   @PD_DISP
+            JSR   INIT
+            BCS   @RESTZP     ; Init failed
 
-; TODO use jump table
-@CMD:       LDA   DCMD        ; get command
-            BEQ   @STATUS     ; branch if cmd is 0
-            CMP   #1
-            BEQ   @READ
-            CMP   #2
-            BEQ   @WRITE
-            LDA   ERR_BAD_CMD ; unknown command
-            SEC
-            BRA   @RESTZP
-
-@STATUS:    JSR   STATUS
-            BRA   @RESTZP
-@READ:      JSR   READ
-            BRA   @RESTZP
-@WRITE:     JSR   WRITE
-            BRA   @RESTZP
-
-@INIT:      JSR   INIT
-            BCC   @CMD        ; init ok
+@PD_DISP:   JSR   PD_DISP     ; ProDOS dispatcher
 
 @RESTZP:    TSX
             STA   $105,X      ; save retval on stack
@@ -336,7 +319,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             BCC   @END1
 
 @IOERROR:   SEC
-            LDY   ERR_IO_ERR  ; init error
+            LDY   ERR_IOERR   ; init error
 @END1:      LDA   SS,X        ; set CS high
             ORA   #SS0
             STA   SS,X
