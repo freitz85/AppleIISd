@@ -12,11 +12,12 @@
 ;*******************************
 
 ; ZP locations
+PSAVE       :=    $3D         ; P save location
 SLOT16      :=    $3E         ; $s0 -> slot * 16
 SLOT        :=    $3F         ; $0s
 CMDLO       :=    $40
 CMDHI       :=    $41
-PDZPAREA    =     SLOT16      
+PDZPAREA    =     PSAVE      
 PDZPSIZE    =     CMDHI-PDZPAREA+1
 
 ; ProDOS
@@ -42,9 +43,11 @@ R30         :=    $0478
 R31         :=    $04F8
 R32         :=    $0578
 R33         :=    $05F8
+DRVNUM      :=    $0678
 CURSLOT     :=    $07F8       ; $Cs
 
-; Slot equates
+; Rom equates
+KNOWNRTS    :=    $FF58
 OAPPLE      :=    $C061       ; open apple key
 DATA        :=    $C080
 CTRL        :=    DATA+1

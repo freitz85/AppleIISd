@@ -15,7 +15,7 @@
 
 
 .include "AppleIISd.inc"
-.segment "SLOTROM"
+.segment "EXTROM"
 
 
 ;*******************************

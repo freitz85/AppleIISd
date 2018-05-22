@@ -11,12 +11,13 @@
 ;
 ;*******************************
 
-.import PD_DISP
+.import PRODOS
 .import SMARTPORT
 .import GETR1
 .import GETR3
 .import SDCMD
 .import CARDDET
+.import READ
 
 .include "AppleIISd.inc"
 
@@ -55,9 +56,24 @@
 ;            LDX   #$00        ; is Smartport controller
             LDX   #$3C
 
-PRODOS:     
-            SEI               ; no interrupts if booting
+            SEI               ; find slot
+            JSR   KNOWNRTS
+            TSX
+            LDA   $0100,X
+            CLI
+            STA   CURSLOT     ; $Cs
+            AND   #$0F
+            STA   SLOT        ; $0s
+            TAY               ; Y holds now SLOT
+            ASL   A
+            ASL   A
+            ASL   A
+            ASL   A
+            STA   SLOT16      ; $s0
+            TAX               ; X holds now SLOT16
             BIT   $CFFF
+
+
 ;            LDY   #0          ; display copyright message
 ;@DRAW:      LDA   TEXT,Y
 ;            BEQ   @OAPPLE     ; check for NULL
@@ -67,7 +83,7 @@ PRODOS:
 ;            BPL   @DRAW
 
 @OAPPLE:    BIT   OAPPLE      ; check for OA key
-            BPL   @BOOT       ; and skip boot if pressed
+            BPL   @INIT       ; and skip boot if pressed
 
 @NEXTSLOT:  LDA   CURSLOT     ; skip boot when no card
             DEC   A
@@ -75,6 +91,9 @@ PRODOS:
             STZ   CMDLO
             JMP   (CMDLO)
 
+@INIT:      JSR   INIT
+            CMP   #NO_ERR
+            BNE   @NEXTSLOT   ; init not successful
 
 ;*******************************
 ;
@@ -82,31 +101,23 @@ PRODOS:
 ;
 ;*******************************
 
-@BOOT:      LDA   #$01        ; READ
-            STA   DCMD        ; load command
-            LDA   #$08
+; load disk blocks 0 and 1 to $800 and $A00
+@BOOT:      LDA   #$08        ; load to $800
             STA   BUFFER+1    ; buffer hi
             STZ   BUFFER      ; buffer lo
             STZ   BLOCKNUM+1  ; block hi
             STZ   BLOCKNUM    ; block lo
-            LDA   #>DRIVER
-            JSR   DRIVER      ; call driver
-            CMP   #0 
-            BNE   @NEXTSLOT   ; init not successful 
+            JSR   READ
+            BCS   @NEXTSLOT   ; load not successful 
 
-            LDA   #$01        ; READ
-            STA   DCMD        ; load command
-            STX   DSNUMBER    ; slot number
             LDA   #$0A
             STA   BUFFER+1    ; buffer hi
             STZ   BUFFER      ; buffer lo
             STZ   BLOCKNUM+1  ; block hi
             LDA   #$01
             STA   BLOCKNUM    ; block lo
-            JSR   DRIVER      ; call driver
-            CMP   #0 
-            BNE   @NEXTSLOT   ; init not successful 
-            LDX   SLOT16
+            JSR   READ
+            BCS   @NEXTSLOT   ; load not successful 
             JMP   $801        ; goto bootloader
 
 
@@ -120,37 +131,38 @@ DRIVER:     CLC               ; ProDOS entry
             BCC   @PRODOS
             SEC               ; Smartport entry
 
-@PRODOS:    PHA               ; make room for retval
-            LDY   PDZPSIZE-1  ; save zeropage area for ProDOS
+@PRODOS:    PHP               ; transfer P to X
+            PLX
+            LDY   #PDZPSIZE-1 ; save zeropage area for ProDOS
 @SAVEZP:    LDA   PDZPAREA,Y
             PHA
             DEY
             BPL   @SAVEZP
+            STX   PSAVE       ; save X (P)
 
-            PHP               ; push twice for PD/SP switch
-            PHP
+; Has this to be done every time this gets called or only on boot???
             SEI
-            LDA   #$60        ; opcode for RTS
-            STA   SLOT
-            JSR   SLOT
+            LDA   #$60        ; opcode for RTS 
+            STA   SLOT 
+            JSR   SLOT 
             TSX
             LDA   $0100,X
+            CLI
             STA   CURSLOT     ; $Cs
             AND   #$0F
-            PLP
             STA   SLOT        ; $0s
             TAY               ; Y holds now SLOT
             ASL   A
             ASL   A
             ASL   A
             ASL   A
-
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
             BIT   $CFFF
+
             JSR   CARDDET
             BCC   @INITED
-            LDA   ERR_OFFLINE ; no card inserted
+            LDA   #ERR_OFFLINE; no card inserted
             BRA   @END
 
 @INITED:    LDA   #INITED     ; check for init
@@ -159,7 +171,9 @@ DRIVER:     CLC               ; ProDOS entry
             JSR   INIT
             BCS   @END        ; Init failed
 
-@DISP:      PLP               ; get PSW from stack
+@DISP:      LDA   PSAVE       ; get saved P value
+            PHA               ; and transfer to P
+            PLP
             BCS   @SMARTPORT  ; Smartport dispatcher
             JSR   PRODOS      ; ProDOS dispatcher
 
@@ -178,7 +192,7 @@ DRIVER:     CLC               ; ProDOS entry
 @RESTZP:    PLA               ; restore zeropage area
             STA   PDZPAREA,Y
             INY
-            CPY   PDZPSIZE
+            CPY   #PDZPSIZE
             BCC   @RESTZP
             
             LDA   R33,X       ; get retval
@@ -337,11 +351,11 @@ INIT:       LDA   #$03        ; set SPI mode 3
             ORA   #ECE        ; enable 7MHz
             STA   CTRL,X
             CLC               ; all ok
-            LDY   NO_ERR
+            LDY   #NO_ERR
             BCC   @END1
 
 @IOERROR:   SEC
-            LDY   ERR_IOERR   ; init error
+            LDY   #ERR_IOERR  ; init error
 @END1:      LDA   SS,X        ; set CS high
             ORA   #SS0
             STA   SS,X

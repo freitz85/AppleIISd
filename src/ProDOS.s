@@ -48,7 +48,7 @@ PRODOS:     LDA   DCMD        ; get command
             BEQ   @READ
             CMP   #2
             BEQ   @WRITE
-            LDA   ERR_BADCMD  ; unknown command
+            LDA   #ERR_BADCMD ; unknown command
             SEC
             RTS
 
@@ -76,7 +76,7 @@ PRODOS:     LDA   DCMD        ; get command
 STATUS:     LDA   NO_ERR      ; no error
             JSR   WRPROT
             BCC   @DONE
-            LDA   ERR_NOWRITE ; card write protected
+            LDA   #ERR_NOWRITE; card write protected
 
 @DONE:      LDX   #$FF        ; 32 MB partition
             LDY   #$FF
@@ -139,7 +139,7 @@ READ:       JSR   GETBLOCK    ; calc block address
             AND   #<~FRX
             STA   CTRL,X
             CLC               ; no error
-            LDA   NO_ERR
+            LDA   #NO_ERR
 
 @DONE:      PHP
             PHA
@@ -151,7 +151,7 @@ READ:       JSR   GETBLOCK    ; calc block address
             RTS
 
 @ERROR:     SEC               ; an error occured
-            LDA   ERR_IOERR
+            LDA   #ERR_IOERR
             BRA   @DONE
 
 
@@ -227,9 +227,9 @@ WRITE:      JSR   WRPROT
             RTS
 
 @IOERROR:   SEC               ; an error occured
-            LDA   ERR_IOERR
+            LDA   #ERR_IOERR
             BRA   @DONE
 
 @WPERROR:   SEC
-            LDA   ERR_NOWRITE
+            LDA   #ERR_NOWRITE
             BRA   @DONE
