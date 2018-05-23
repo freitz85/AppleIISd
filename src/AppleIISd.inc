@@ -28,17 +28,16 @@ BLOCKNUM    :=    $46         ; block number
 
 
 ; Smartport
-SMPARAM     :=    $48         ; parameter count
-SMUNIT      :=    $49         ; unit number
-SMBUFF      :=    $4A         ; buffer pointer
-SMSTAT      :=    $4B         ; status / control code
-SMBLOCK     :=    $4C         ; block number
-SMCOUNT     :=    $4D         ; byte count
-SMADDR      :=    $4E         ; address for read
+SMPARAMLIST :=    $48         ; parameter list
+SMCMDLIST   :=    $4A         ; command list
+SMCSCODE    :=    $AC
+
+SMZPAREA    =     SMPARAMLIST
+SMZPSIZE    =     SMCSCODE-SMZPAREA+1
+SMCMD       =     DCMD
 
 
-
-; Ram equates
+; Ram equates, access with SLOT offset
 R30         :=    $0478
 R31         :=    $04F8
 R32         :=    $0578

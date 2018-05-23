@@ -36,7 +36,7 @@
 
             .segment "SLOTID"
             .byt   $0         ; not extended, no SCSI, no RAM
-            .dbyt  $0         ; use status call
+            .word  $0000      ; use status call
             .byt   $97        ; Status bits
             .byt   <DRIVER    ; LSB of driver
 
@@ -53,8 +53,8 @@
             LDX   #$20
             LDX   #$00
             LDX   #$03
-;            LDX   #$00        ; is Smartport controller
-            LDX   #$3C
+            LDX   #$00        ; is Smartport controller
+;            LDX   #$3C
 
             SEI               ; find slot
             JSR   KNOWNRTS
@@ -81,6 +81,9 @@
 ;            STA   $0750,Y     ; put second to last line
 ;            INY
 ;            BPL   @DRAW
+
+;            LDA   #197      
+;            JSR   $FCA8       ; wait for 100 ms
 
 @OAPPLE:    BIT   OAPPLE      ; check for OA key
             BPL   @INIT       ; and skip boot if pressed
