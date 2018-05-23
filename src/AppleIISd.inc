@@ -23,15 +23,13 @@ PDZPSIZE    =     CMDHI-PDZPAREA+1
 ; ProDOS
 DCMD        :=    $42         ; Command code
 DSNUMBER    :=    $43         ; drive / slot number
-BUFFER      :=    $44         ; buffer pointer
-BLOCKNUM    :=    $46         ; block number
-
+BUFFER      :=    $44         ; buffer pointer, two bytes
+BLOCKNUM    :=    $46         ; block number, two bytes
 
 ; Smartport
-SMPARAMLIST :=    $48         ; parameter list
-SMCMDLIST   :=    $4A         ; command list
+SMPARAMLIST :=    $48         ; parameter list, two bytes
+SMCMDLIST   :=    $4A         ; command list, two bytes
 SMCSCODE    :=    $AC
-
 SMZPAREA    =     SMPARAMLIST
 SMZPSIZE    =     SMCSCODE-SMZPAREA+1
 SMCMD       =     DCMD

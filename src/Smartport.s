@@ -13,6 +13,8 @@
             
 .export SMARTPORT
 
+.import READ
+.import WRITE
 
 .include "AppleIISd.inc"
 .segment "EXTROM"
@@ -78,7 +80,7 @@ SMARTPORT:  LDY   #SMZPSIZE-1   ; save zeropage area for Smarport
             TXA
             ASL   A             ; shift for use or word addresses
             TAX
-            JSR   @JMPSPCOMMAND
+            JSR   @JMPSPCOMMAND ; Y holds SLOT
             BCS   @END          ; jump on error
             LDA   #NO_ERR
 
@@ -134,12 +136,139 @@ SPDISPATCH:
 
 
 SMSTATUS:
-SMREADBLOCK:
-SMWRITEBLOCK:
-SMFORMAT:
 SMCONTROL:
-SMINIT:
+
+
+; Smartport Read Block command
+;
+; reads a 512-byte block using the ProDOS function
+;
+SMREADBLOCK:
+            JSR   TRANSLATE
+            BCC   @READ
+            RTS
+
+@READ:      LDX   SLOT16
+            LDY   SLOT
+            JMP   READ          ; call ProDOS read
+
+
+
+; Smartport Write Block command
+;
+; writes a 512-byte block using the ProDOS function
+;
+SMWRITEBLOCK:
+            JSR   TRANSLATE
+            BCC   @WRITE
+            RTS
+
+@WRITE:     LDX   SLOT16
+            LDY   SLOT
+            JMP   WRITE     ; call ProDOS write
+
+
+; Translates the Smartport unit number to a ProDOS device
+; and prepares the block number
+;
+; Unit 0: entire chain, not supported
+; Unit 1: this slot, drive 0
+; Unit 2: this slot, drive 1
+; unit 3: phantom slot, drive 0
+; unit 4: phantom slot, drive 1
+;
+TRANSLATE:  LDA   DRVNUM,Y
+            BEQ   @BADUNIT       ; not supportd for unit 0
+            CMP   #1
+            BEQ   @UNIT1
+            CMP   #2
+            BEQ   @UNIT2
+            CMP   #3
+            BEQ   @UNIT3
+            CMP   #4
+            BEQ   @UNIT4
+            BRA   @BADUNIT      ; only 4 partitions are supported
+
+@UNIT1:     LDA   SLOT16        ; this slot
+            BRA   @STORE
+@UNIT2:     LDA   SLOT16
+            ORA   #$80          ; drive 1
+            BRA   @STORE
+@UNIT3:     LDA   SLOT16
+            DEC   A             ; phantom slot
+            BRA   @STORE
+@UNIT4:     LDA   SLOT16
+            DEC   A             ; phantom slot
+            ORA   #$80          ; drive 1
+
+@STORE:     STA   DSNUMBER      ; store in ProDOS variable
+
+            LDY   #2            ; get buffer pointer
+            LDA   (SMPARAMLIST),Y
+            STA   BUFFER
+            INY
+            LDA   (SMPARAMLIST),Y
+            STA   BUFFER+1
+
+            INY                 ; get block number
+            LDA   (SMPARAMLIST),Y
+            STA   BLOCKNUM
+            INY
+            LDA   (SMPARAMLIST),Y
+            STA   BLOCKNUM+1
+            INY
+            LDA   (SMPARAMLIST),Y
+            BNE   @BADBLOCK     ; bit 23-16 need to be 0
+
+            CLC
+            RTS
+
+@BADUNIT:   LDA   #ERR_BADUNIT
+            SEC
+            RTS
+
+@BADBLOCK:  LDA   #ERR_BADBLOCK
+            SEC
+            RTS
+
+
+; Smartport Format command
+;
+; supported, but doesn't do anything
+;
+SMFORMAT:   LDA   #NO_ERR
+            CLC
+            RTS
+
+
+; Smartport Init comand
+;
+; throw error if DRVNUM is not 0, else do nothing
+;
+SMINIT:     LDA   DRVNUM,Y
+            CLC
+            BEQ   @END          ; error if not 0
+            LDA   #ERR_BADUNIT
+            SEC
+@END:       RTS
+
+
+; Smartport Open and Close commands
+;
+; supported for character devices, only
+;
 SMOPEN:
-SMCLOSE:
+SMCLOSE:    LDA   #ERR_BADCMD
+            SEC
+            RTS
+
+
+; Smartport Read Character and Write Character
+;
+; only 512-byte block operations are supported
+;
 SMREADCHAR:
 SMWRITECHAR:
+            LDA   #ERR_IOERR
+            SEC
+            RTS
