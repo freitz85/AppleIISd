@@ -15,6 +15,7 @@
 
 .import READ
 .import WRITE
+.import WRPROT
 
 .include "AppleIISd.inc"
 .segment "EXTROM"
@@ -107,37 +108,71 @@ SMARTPORT:  LDY   #SMZPSIZE-1   ; save zeropage area for Smarport
             
 
 
-; Required parameter counts for the commands
-REQPARAMCOUNT:
-            .byt 3              ; 0 = status
-            .byt 3              ; 1 = read block
-            .byt 3              ; 2 = write block
-            .byt 1              ; 3 = format
-            .byt 3              ; 4 = control
-            .byt 1              ; 5 = init
-            .byt 1              ; 6 = open
-            .byt 1              ; 7 = close
-            .byt 4              ; 8 = read char
-            .byt 4              ; 9 = write char
-
-; Command jump table
-SPDISPATCH:
-            .word SMSTATUS
-            .word SMREADBLOCK
-            .word SMWRITEBLOCK
-            .word SMFORMAT
-            .word SMCONTROL
-            .word SMINIT
-            .word SMOPEN
-            .word SMCLOSE
-            .word SMREADCHAR
-            .word SMWRITECHAR
-
-
 ; Smartport Status command
 ;
 SMSTATUS:   JSR   GETCSLIST
-            
+            LDY   SLOT
+            LDA   DRVNUM,Y
+            BNE   @PARTITION    ; status call for a partition
+
+            LDA   SMCSCODE
+            BEQ   @STATUS00     ; status call 0 for the bus
+            LDA   #ERR_BADCTL   ; calls other than 0 are not allowed
+            SEC
+            RTS
+
+@STATUS00:  LDA   #4            ; support 4 partitions
+            STA   (SMCMDLIST)
+            CLC
+            RTS
+
+@PARTITION: LDX   SMCSCODE
+            BEQ   @STATUS03     ; 0: device status
+            DEX
+            BEQ   @GETDCB       ; 1: get DCB
+            DEX   
+            DEX
+            BEQ   @STATUS03     ; 3: get DIB
+            LDA   #ERR_BADCTL
+            SEC
+            RTS
+
+@GETDCB:    LDA   #1            ; return 'empty' DCB, one byte
+            STA   (SMCMDLIST)
+            TAY
+            LDA   #NO_ERR
+            STA   (SMCMDLIST),Y
+            CLC
+            RTS
+
+@STATUS03:  LDA   #$F8          ; block device, read, write, format,
+                                ; online, no write-protect
+            JSR   WRPROT
+            BCC   @STATUSBYTE   
+            ORA   #$04          ; SD card write-protected
+@STATUSBYTE:STA  (SMCMDLIST)
+
+            LDY   #1            ; block count, always $00FFFF
+            LDA   #$FF
+            STA   (SMCMDLIST),Y
+            INY
+            STA   (SMCMDLIST),Y
+            INY
+            LDA   #0
+            STA   (SMCMDLIST),Y
+
+            LDA   SMCSCODE
+            BEQ   @DONE         ; done if code 0, else get DIB, 21 bytes
+
+            LDY   #4
+@LOOP:      LDA   STATUS3DATA-4,Y
+            STA   (SMCMDLIST),Y
+            INY
+            CPY   #21+4
+            BCC   @LOOP
+
+@DONE:      CLC
+            RTS
 
 
 ; Smartport Control command
@@ -322,3 +357,38 @@ SMWRITECHAR:
             LDA   #ERR_IOERR
             SEC
             RTS
+
+
+; Required parameter counts for the commands
+REQPARAMCOUNT:
+            .byt 3              ; 0 = status
+            .byt 3              ; 1 = read block
+            .byt 3              ; 2 = write block
+            .byt 1              ; 3 = format
+            .byt 3              ; 4 = control
+            .byt 1              ; 5 = init
+            .byt 1              ; 6 = open
+            .byt 1              ; 7 = close
+            .byt 4              ; 8 = read char
+            .byt 4              ; 9 = write char
+
+; Command jump table
+SPDISPATCH:
+            .word SMSTATUS
+            .word SMREADBLOCK
+            .word SMWRITEBLOCK
+            .word SMFORMAT
+            .word SMCONTROL
+            .word SMINIT
+            .word SMOPEN
+            .word SMCLOSE
+            .word SMREADCHAR
+            .word SMWRITECHAR
+
+; Status 3 command data
+STATUS3DATA:
+            .byt 16, "APPLE][SD       " ; ID length and string, padded
+            .byt $02                    ; hard disk
+            .byt $00                    ; removable hard disk
+            .word $0012                 ; driver version
+            .assert (*-STATUS3DATA)=21, error, "STATUS3DATA must be 21 bytes long"
