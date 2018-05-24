@@ -134,9 +134,51 @@ SPDISPATCH:
             .word SMWRITECHAR
 
 
+; Smartport Status command
+;
+SMSTATUS:   JSR   GETCSLIST
+            
 
-SMSTATUS:
-SMCONTROL:
+
+; Smartport Control command
+;
+; no controls supported, yet
+;
+SMCONTROL:  JSR   GETCSLIST
+            LDX   SMCSCODE
+            BEQ   @RESET        ; 0: Reset
+            DEX
+            BEQ   @SETDCB       ; 1: SetDCB
+            DEX
+            BEQ   @NEWLINE      ; 2: SetNewLine
+            DEX 
+            BEQ   @IRQ          ; 3: ServiceInterrupt
+            DEX
+            BEQ   @EJECT        ; 4: Eject
+
+@NEWLINE:   LDA   #ERR_BADCTL
+            SEC
+@RESET:
+@SETDCB:
+@EJECT:     RTS
+
+@IRQ:       LDA   #ERR_NOINT    ; interrupts not supported
+            SEC
+            RTS
+
+
+; Get control/status list pointer and code
+;
+GETCSLIST:  LDY   #2
+            LDA   (SMPARAMLIST),Y
+            STA   SMCMDLIST     ; get list pointer     
+            INY
+            LDA   (SMPARAMLIST),Y
+            STA   SMCMDLIST+1
+            INY
+            LDA   (SMPARAMLIST),Y
+            STA   SMCSCODE      ; get status/control code
+            RTS
 
 
 ; Smartport Read Block command
@@ -174,8 +216,8 @@ SMWRITEBLOCK:
 ; Unit 0: entire chain, not supported
 ; Unit 1: this slot, drive 0
 ; Unit 2: this slot, drive 1
-; unit 3: phantom slot, drive 0
-; unit 4: phantom slot, drive 1
+; Unit 3: phantom slot, drive 0
+; Unit 4: phantom slot, drive 1
 ;
 TRANSLATE:  LDA   DRVNUM,Y
             BEQ   @BADUNIT       ; not supportd for unit 0
@@ -235,15 +277,23 @@ TRANSLATE:  LDA   DRVNUM,Y
 ; Smartport Format command
 ;
 ; supported, but doesn't do anything
+; unit number must not be 0
 ;
-SMFORMAT:   LDA   #NO_ERR
+SMFORMAT:   LDA   DRVNUM,Y
+            BEQ   @ERROR
+            LDA   #NO_ERR
             CLC
+            RTS
+
+@ERROR:     LDA   #ERR_BADUNIT
+            SEC
             RTS
 
 
 ; Smartport Init comand
 ;
-; throw error if DRVNUM is not 0, else do nothing
+; supported, but doesn't do anything
+; unit number must be 0
 ;
 SMINIT:     LDA   DRVNUM,Y
             CLC

@@ -67,6 +67,7 @@ ERR_BADCMD      =     $01
 ERR_BADPCNT     =     $04
 ERR_BUSERR      =     $06
 ERR_BADUNIT     =     $11
+ERR_NOINT       =     $1F
 ERR_BADCTL      =     $21
 ERR_BADCTLPARM  =     $22
 ERR_IOERR       =     $27
