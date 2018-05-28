@@ -15,6 +15,7 @@
 
 .import READ
 .import WRITE
+.import CARDDET
 .import WRPROT
 
 .include "AppleIISd.inc"
@@ -42,16 +43,16 @@ SMARTPORT:  LDY   #SMZPSIZE-1   ; save zeropage area for Smarport
             DEY
             BPL   @SAVEZP
 
-            TSX                 ; get parameter list pointer
-            LDA   $101+SMZPSIZE,X
-            STA   SMPARAMLIST
+            TSX                 ; get call address
+            LDA   $103+PDZPSIZE+SMZPSIZE,X
+            STA   SMPARAMLIST   ; store temporarily
             CLC
             ADC   #3            ; adjust return address
-            STA   $101+SMZPSIZE,X
-            LDA   $102+SMZPSIZE,X
+            STA   $103+PDZPSIZE+SMZPSIZE,X
+            LDA   $104+PDZPSIZE+SMZPSIZE,X
             STA   SMPARAMLIST+1
             ADC   #0
-            STA   $102+SMZPSIZE,X
+            STA   $104+PDZPSIZE+SMZPSIZE,X
 
             LDY   #1            ; get command code
             LDA   (SMPARAMLIST),Y 
@@ -61,8 +62,8 @@ SMARTPORT:  LDY   #SMZPSIZE-1   ; save zeropage area for Smarport
             TAX
             INY
             LDA   (SMPARAMLIST),Y
-            STA   SMPARAMLIST+1 ; TODO: why overwrite, again?
-            STX   SMPARAMLIST
+            STA   SMPARAMLIST+1 ; is now parameter list
+            STX   SMPARAMLIST 
 
             LDA   #ERR_BADCMD   ; suspect bad command
             LDX   SMCMD
@@ -78,8 +79,8 @@ SMARTPORT:  LDY   #SMZPSIZE-1   ; save zeropage area for Smarport
             LDY   SLOT
             STA   DRVNUM,Y
 
-            TXA
-            ASL   A             ; shift for use or word addresses
+            TXA                 ; SMCMD
+            ASL   A             ; shift for use of word addresses
             TAX
             JSR   @JMPSPCOMMAND ; Y holds SLOT
             BCS   @END          ; jump on error
@@ -95,7 +96,7 @@ SMARTPORT:  LDY   #SMZPSIZE-1   ; save zeropage area for Smarport
 
             TXA
             LDY   #2            ; highbyte of # bytes transferred
-            LDY   #0            ; low byte of # bytes transferred
+            LDX   #0            ; low byte of # bytes transferred
             CMP   #1            ; C=1 if A != NO_ERR
             RTS
 
@@ -145,9 +146,13 @@ SMSTATUS:   JSR   GETCSLIST
             CLC
             RTS
 
-@STATUS03:  LDA   #$F8          ; block device, read, write, format,
-                                ; online, no write-protect
-            JSR   WRPROT
+@STATUS03:  LDA   #$E8          ; block device, read, write, format,
+                                ; not online, no write-protect
+            LDX   SLOT16
+            JSR   CARDDET
+            BCS   @WRPROT
+            ORA   #$10          ; card inserted
+@WRPROT:    JSR   WRPROT
             BCC   @STATUSBYTE   
             ORA   #$04          ; SD card write-protected
 @STATUSBYTE:STA  (SMCMDLIST)
@@ -206,7 +211,7 @@ SMCONTROL:  JSR   GETCSLIST
 ;
 GETCSLIST:  LDY   #2
             LDA   (SMPARAMLIST),Y
-            STA   SMCMDLIST     ; get list pointer     
+            STA   SMCMDLIST     ; get buffer pointer     
             INY
             LDA   (SMPARAMLIST),Y
             STA   SMCMDLIST+1

@@ -57,7 +57,9 @@
 ;            LDX   #$3C
 
             SEI               ; find slot
-            JSR   KNOWNRTS
+            LDA   #$60        ; opcode for RTS
+            STA   SLOT
+            JSR   SLOT
             TSX
             LDA   $0100,X
             CLI
@@ -73,17 +75,16 @@
             TAX               ; X holds now SLOT16
             BIT   $CFFF
 
+            LDY   #0          ; display copyright message
+@DRAW:      LDA   TEXT,Y
+            BEQ   @OAPPLE     ; check for NULL
+            ORA   #$80        ; set MSB
+            STA   $0750,Y     ; put second to last line
+            INY
+            BPL   @DRAW
 
-;            LDY   #0          ; display copyright message
-;@DRAW:      LDA   TEXT,Y
-;            BEQ   @OAPPLE     ; check for NULL
-;            ORA   #$80
-;            STA   $0750,Y     ; put second to last line
-;            INY
-;            BPL   @DRAW
-
-;            LDA   #197      
-;            JSR   $FCA8       ; wait for 100 ms
+            LDA   #197      
+            JSR   $FCA8       ; wait for 100 ms
 
 @OAPPLE:    BIT   OAPPLE      ; check for OA key
             BPL   @INIT       ; and skip boot if pressed
@@ -145,9 +146,9 @@ DRIVER:     CLC               ; ProDOS entry
 
 ; Has this to be done every time this gets called or only on boot???
             SEI
-            LDA   #$60        ; opcode for RTS 
-            STA   SLOT 
-            JSR   SLOT 
+            LDA   #$60        ; opcode for RTS
+            STA   SLOT
+            JSR   SLOT
             TSX
             LDA   $0100,X
             CLI

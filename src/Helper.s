@@ -178,6 +178,7 @@ COMMAND:    PHY               ; save Y
 ;*******************************
 ;
 ; Check for card detect
+; X must contain SLOT16
 ;
 ; C Clear - card in slot
 ;   Set   - no card in slot
@@ -197,6 +198,7 @@ CARDDET:    PHA
 ;*******************************
 ;
 ; Check for write protect
+; X must contain SLOT16
 ;
 ; C Clear - card not protected
 ;   Set   - card write protected

@@ -29,7 +29,7 @@ BLOCKNUM    :=    $46         ; block number, two bytes
 ; Smartport
 SMPARAMLIST :=    $48         ; parameter list, two bytes
 SMCMDLIST   :=    $4A         ; command list, two bytes
-SMCSCODE    :=    $AC
+SMCSCODE    :=    $4C
 SMZPAREA    =     SMPARAMLIST
 SMZPSIZE    =     SMCSCODE-SMZPAREA+1
 SMCMD       =     DCMD
