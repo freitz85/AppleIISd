@@ -61,6 +61,8 @@ WP          =     $20
 CD          =     $40
 INITED      =     $80
 
+SMDRIVERVER =     $120B       ; Version 1.2 Beta
+
 ; Error codes
 NO_ERR          =     $00
 ERR_BADCMD      =     $01

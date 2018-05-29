@@ -122,8 +122,15 @@ SMSTATUS:   JSR   GETCSLIST
             SEC
             RTS
 
+; TODO support partitions based on card size
 @STATUS00:  LDA   #4            ; support 4 partitions
             STA   (SMCMDLIST)
+
+            LDY   #7
+@LOOP00:    LDA   STATUS00DATA-1,Y
+            STA   (SMCMDLIST),Y
+            DEY
+            BNE   @LOOP00
             CLC
             RTS
 
@@ -200,7 +207,9 @@ SMCONTROL:  JSR   GETCSLIST
             SEC
 @RESET:
 @SETDCB:
-@EJECT:     RTS
+@EJECT:     LDA   #NO_ERR       ; only return OK
+            CLC
+            RTS
 
 @IRQ:       LDA   #ERR_NOINT    ; interrupts not supported
             SEC
@@ -390,10 +399,18 @@ SPDISPATCH:
             .word SMREADCHAR
             .word SMWRITECHAR
 
+; Status 00 command data
+STATUS00DATA:
+            .byt $40                    ; no interrupts
+            .word $0000                 ; unknown vendor
+            .word SMDRIVERVER           ; driver version
+            .byt $00, $00               ; reserved
+            .assert(*-STATUS00DATA)=7, error, "STATUS00DATA must be 7 bytes long"
+
 ; Status 3 command data
 STATUS3DATA:
             .byt 16, "APPLE][SD       " ; ID length and string, padded
             .byt $02                    ; hard disk
             .byt $00                    ; removable hard disk
-            .word $0012                 ; driver version
+            .word SMDRIVERVER           ; driver version
             .assert (*-STATUS3DATA)=21, error, "STATUS3DATA must be 21 bytes long"
