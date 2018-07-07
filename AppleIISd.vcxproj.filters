@@ -19,6 +19,9 @@
     <None Include="src\ProDOS.s">
       <Filter>src</Filter>
     </None>
+    <None Include="src\Smartport.s">
+      <Filter>src</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

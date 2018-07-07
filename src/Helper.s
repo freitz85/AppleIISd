@@ -1,10 +1,10 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.1
+; Version 1.2
 ; Helper functions
 ;
-; (c) Florian Reitz, 2017
+; (c) Florian Reitz, 2017 - 2018
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -55,8 +55,7 @@ GETR1:      LDA   #DUMMY
 @WAIT:      BIT   CTRL,X
             BPL   @WAIT
             LDA   DATA,X      ; get response
-            BIT   #$80
-            BNE   GETR1       ; wait for MSB=0
+            BMI   GETR1       ; wait for MSB=0
             PHA
             LDA   #DUMMY
             STA   DATA,X      ; send another dummy
@@ -111,21 +110,26 @@ GETR3:      JSR   GETR1       ; get R1 first
 
 GETBLOCK:   PHX               ; save X
             PHY               ; save Y
-            TXA
-            TAY               ; SLOT16 is now in Y
-            LDX   SLOT
-            LDA   BLOCK       ; store block num
+            LDX   SLOT        ; SLOT is now in X
+            LDY   SLOT16
+            LDA   BLOCKNUM    ; store block num
             STA   R33,X       ; in R30-R33
-            LDA   BLOCK+1
+            LDA   BLOCKNUM+1
             STA   R32,X
-            LDA   #0
-            STA   R31,X
-            STA   R30,X
+            STZ   R31,X
+            STZ   R30,X
 
-            LDA   #$80        ; drive number
-            AND   $43
-            BEQ   @SDHC       ; D1
-            LDA   #1          ; D2
+            TYA               ; get SLOT16
+            EOR   DSNUMBER
+            AND   #$70        ; check only slot bits
+            BEQ   @DRIVE      ; it is our slot
+            LDA   #2          ; it is a phantom slot
+            STA   R31,X
+
+@DRIVE:     BIT   DSNUMBER    ; drive number
+            BPL   @SDHC       ; D1
+            LDA   R31,X       ; D2
+            INC   A
             STA   R31,X
 
 @SDHC:      LDA   #SDHC
@@ -173,6 +177,7 @@ COMMAND:    PHY               ; save Y
 ;*******************************
 ;
 ; Check for card detect
+; X must contain SLOT16
 ;
 ; C Clear - card in slot
 ;   Set   - no card in slot
@@ -192,6 +197,7 @@ CARDDET:    PHA
 ;*******************************
 ;
 ; Check for write protect
+; X must contain SLOT16
 ;
 ; C Clear - card not protected
 ;   Set   - card write protected

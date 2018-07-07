@@ -19,6 +19,7 @@
     <None Include="src\AppleIISd.s" />
     <None Include="src\Helper.s" />
     <None Include="src\ProDOS.s" />
+    <None Include="src\Smartport.s" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9EA7EC3D-1771-420F-932F-231A35ED1200}</ProjectGuid>

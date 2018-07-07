@@ -9,8 +9,8 @@ The assembler sources are written for CC65. The [schematics](AppleIISd.pdf) are 
 
 ## Features
 * works with ProDOS and GS/OS
-* up to 64MB storage space (2x 65535 blocks)
-* ProDOS driver in ROM
+* up to 128MB storage space (4x 65535 blocks)
+* ProDOS and Smartport driver in ROM
 * Auto boot
 * Access LED
 * Card detect and write protect sensing
@@ -26,6 +26,21 @@ The AppleIISd requires an enhanced IIe or IIgs computer. The ROM code uses some 
 * Apple IIe enhanced, 64k, Prodos 1.9
 
 When a 2732 type ROM is used, the binary image has to be programmed at offset 0x800, because A11 is always high for compatibility with 2716 type ROMs.
+
+## Smartport drive remapping
+The AppleIISd features Smartport drivers in ROM to provide more than two drives in both GS/OS and ProDOS.
+
+As ProDOS supports only two drives per slot, additional drives on a Smartport device are mapped to 'phantom slots'. Version prior to version 2 supported only the remapping of drives when the card was in slot 5. Starting with version 2, the remapping seems to work on all slots. The following list shows the assignments as slot/drive, when no other devices are attached:
+
+* Slot 7: 7/1, 7/2, 4/1, 4/2
+* Slot 6: 6/1, 6/2, 4/1, 4/1
+* Slot 5: 5/1, 5/2, 2/1, 2/1
+* Slot 4: 4/1, 4/2, 1/1, 1/2
+* Slot 3: 80 col HW, not usable
+* Slot 2: 2/1, 2/2, 4/1, 4/2
+* Slot 1: 1/1, 1/2, 4/1, 4/2
+
+When more devices are connected, things get a little confusing ;-)
 
 ## Building the sources
 Be sure to have the newest version of CC65 (V2.16) and some kind of Make instaled, then type one of the following comands:
@@ -73,7 +88,7 @@ LDA $C0C0
 ## TODOs
 * Much more testing
 * SRAM option (may never work, though)
-* Enable 4 or 6 volumes under GS/OS
+* Enable more than 4 volumes under GS/OS
 * Use 28 pin socket to support other EPROMS than 2716 and 2732
 
 ## Known Bugs

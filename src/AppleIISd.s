@@ -1,23 +1,23 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.1
+; Version 1.2
 ; Main source
 ;
-; (c) Florian Reitz, 2017
+; (c) Florian Reitz, 2017 - 2018
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
 ;
 ;*******************************
 
+.import PRODOS
+.import SMARTPORT
 .import GETR1
 .import GETR3
 .import SDCMD
 .import CARDDET
-.import STATUS
 .import READ
-.import WRITE
 
 .include "AppleIISd.inc"
 
@@ -35,7 +35,8 @@
 ;******************************* 
 
             .segment "SLOTID"
-            .dbyt  $FFFF      ; 65535 blocks
+            .byt   $0         ; not extended, no SCSI, no RAM
+            .word  $0000      ; use status call
             .byt   $97        ; Status bits
             .byt   <DRIVER    ; LSB of driver
 
@@ -52,50 +53,50 @@
             LDX   #$20
             LDX   #$00
             LDX   #$03
-            LDX   #$3C
+            LDX   #$00        ; is Smartport controller
 
-; find slot nr
-            PHP
-            SEI
+            SEI               ; find slot
             LDA   #$60        ; opcode for RTS
             STA   SLOT
             JSR   SLOT
             TSX
             LDA   $0100,X
+            CLI
             STA   CURSLOT     ; $Cs
             AND   #$0F
-            PLP
             STA   SLOT        ; $0s
+            TAY               ; Y holds now SLOT
             ASL   A
             ASL   A
             ASL   A
             ASL   A
-
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
             BIT   $CFFF
+
             LDY   #0          ; display copyright message
 @DRAW:      LDA   TEXT,Y
             BEQ   @OAPPLE     ; check for NULL
-            ORA   #$80
+            ORA   #$80        ; set MSB
             STA   $0750,Y     ; put second to last line
             INY
             BPL   @DRAW
 
-@OAPPLE:    BIT   OAPPLE      ; check for OA key
-            BMI   @NEXTSLOT   ; and skip boot if pressed
+            LDA   #197      
+            JSR   $FCA8       ; wait for 100 ms
 
-            JSR   CARDDET
-            BCC   @INIT
+@OAPPLE:    BIT   OAPPLE      ; check for OA key
+            BPL   @INIT       ; and skip boot if pressed
 
 @NEXTSLOT:  LDA   CURSLOT     ; skip boot when no card
             DEC   A
-            STA   CMDHI
+            STA   CMDHI       ; use CMDHI/LO as pointer
             STZ   CMDLO
             JMP   (CMDLO)
 
 @INIT:      JSR   INIT
-
+            CMP   #NO_ERR
+            BNE   @NEXTSLOT   ; init not successful
 
 ;*******************************
 ;
@@ -103,33 +104,23 @@
 ;
 ;*******************************
 
-;@BOOT:     CMP   #0 
-;           BNE   @NEXTSLOT   ; init not successful 
-@BOOT:      LDA   #$01
-            STA   DCMD        ; load command
-            LDX   SLOT16
-            STX   $43         ; slot number
-            LDA   #$08
+; load disk blocks 0 and 1 to $800 and $A00
+@BOOT:      LDA   #$08        ; load to $800
             STA   BUFFER+1    ; buffer hi
             STZ   BUFFER      ; buffer lo
-            STZ   BLOCK+1     ; block hi
-            STZ   BLOCK       ; block lo
-            BIT   $CFFF
-            JSR   READ        ; call driver
+            STZ   BLOCKNUM+1  ; block hi
+            STZ   BLOCKNUM    ; block lo
+            JSR   READ
+            BCS   @NEXTSLOT   ; load not successful 
 
-            LDA   #$01
-            STA   DCMD        ; load command
-            LDX   SLOT16
-            STX   $43         ; slot number
             LDA   #$0A
             STA   BUFFER+1    ; buffer hi
             STZ   BUFFER      ; buffer lo
-            STZ   BLOCK+1     ; block hi
+            STZ   BLOCKNUM+1  ; block hi
             LDA   #$01
-            STA   BLOCK       ; block lo
-            BIT   $CFFF
-            JSR   READ        ; call driver
-            LDX   SLOT16
+            STA   BLOCKNUM    ; block lo
+            JSR   READ
+            BCS   @NEXTSLOT   ; load not successful 
             JMP   $801        ; goto bootloader
 
 
@@ -139,77 +130,89 @@
 ;
 ;*******************************
 
-DRIVER:     CLD
+DRIVER:     CLC               ; ProDOS entry
+            BCC   @PRODOS
+            SEC               ; Smartport entry
 
-@SAVEZP:    PHA               ; make room for retval
-            LDA   SLOT16      ; save all ZP locations
+@PRODOS:    PHP               ; transfer P to X
+            PLX
+            LDY   #PDZPSIZE-1 ; save zeropage area for ProDOS
+@SAVEZP:    LDA   PDZPAREA,Y
             PHA
-            LDA   SLOT
-            PHA
-            LDA   CMDLO
-            PHA
-            LDA   CMDHI
-            PHA
-            PHP
+            DEY
+            BPL   @SAVEZP
+            STX   PSAVE       ; save X (P)
+
+; Has this to be done every time this gets called or only on boot???
             SEI
             LDA   #$60        ; opcode for RTS
             STA   SLOT
             JSR   SLOT
             TSX
             LDA   $0100,X
+            CLI
             STA   CURSLOT     ; $Cs
             AND   #$0F
-            PLP
             STA   SLOT        ; $0s
+            TAY               ; Y holds now SLOT
             ASL   A
             ASL   A
             ASL   A
             ASL   A
-
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
             BIT   $CFFF
+
             JSR   CARDDET
             BCC   @INITED
-            LDA   #$2F        ; no card inserted
-            BRA   @RESTZP
+            LDA   #ERR_OFFLINE; no card inserted
+            BRA   @END
 
 @INITED:    LDA   #INITED     ; check for init
             BIT   SS,X
-            BEQ   @INIT
+            BNE   @DISP
+            JSR   INIT
+            BCS   @END        ; Init failed
 
-@CMD:       LDA   DCMD        ; get command
-            BEQ   @STATUS     ; branch if cmd is 0
-            CMP   #1
-            BEQ   @READ
-            CMP   #2
-            BEQ   @WRITE
-            LDA   #1          ; unknown command
-            SEC
-            BRA   @RESTZP
+@DISP:      LDA   PSAVE       ; get saved P value
+            PHA               ; and transfer to P
+            PLP
+            BCS   @SMARTPORT  ; Smartport dispatcher
+            JSR   PRODOS      ; ProDOS dispatcher
 
-@STATUS:    JSR   STATUS
-            BRA   @RESTZP
-@READ:      JSR   READ
-            BRA   @RESTZP
-@WRITE:     JSR   WRITE
-            BRA   @RESTZP
-
-@INIT:      JSR   INIT
-            BCC   @CMD        ; init ok
-
-@RESTZP:    TSX
-            STA   $105,X      ; save retval on stack
-            PLA               ; restore all ZP locations
-            STA   CMDHI
+@END:       PHX
+            LDX   SLOT        ; X holds $0s
+            STA   R30,X       ; save A
             PLA
-            STA   CMDLO
+            STA   R31,X       ; save X
+            TYA
+            STA   R32,X       ; save Y
+            PHP
             PLA
-            STA   SLOT
-            PLA
-            STA   SLOT16
-            PLA               ; get retval
+            STA   R33,X       ; save P
+            
+            LDY   #0
+@RESTZP:    PLA               ; restore zeropage area
+            STA   PDZPAREA,Y
+            INY
+            CPY   #PDZPSIZE
+            BCC   @RESTZP
+            
+            LDA   R33,X       ; get retval
+            PHA
+            LDA   R32,X
+            PHA
+            LDA   R31,X
+            PHA
+            LDA   R30,X        ; restore A
+            PLX                ; restore X
+            PLY                ; restore Y
+            PLP                ; restore P
             RTS
+
+@SMARTPORT: CLC
+            JSR   SMARTPORT
+            BRA   @END
 
 
 ;*******************************
@@ -230,7 +233,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             LDA   SS,X
             ORA   #SS0        ; set CS high
             STA   SS,X
-            LDA   #7
+            LDA   #7          ; set 400 kHz
             STA   DIV,X
             LDY   #10
             LDA   #DUMMY
@@ -351,11 +354,11 @@ INIT:       LDA   #$03        ; set SPI mode 3
             ORA   #ECE        ; enable 7MHz
             STA   CTRL,X
             CLC               ; all ok
-            LDY   #0
+            LDY   #NO_ERR
             BCC   @END1
 
 @IOERROR:   SEC
-            LDY   #$27        ; init error
+            LDY   #ERR_IOERR  ; init error
 @END1:      LDA   SS,X        ; set CS high
             ORA   #SS0
             STA   SS,X
@@ -365,7 +368,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             RTS
 
 
-TEXT:       .asciiz "  Apple][Sd v1.1 (c)2017 Florian Reitz"
+TEXT:       .asciiz "  Apple][Sd v1.2 (c)2018 Florian Reitz"
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95
