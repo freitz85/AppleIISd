@@ -73,7 +73,7 @@ PRODOS:     LDA   DCMD        ; get command
 ;
 ;*******************************
 
-STATUS:     LDA   NO_ERR      ; no error
+STATUS:     LDA   #NO_ERR     ; Thanks for this one, Antoine!
             JSR   WRPROT
             BCC   @DONE
             LDA   #ERR_NOWRITE; card write protected

@@ -55,8 +55,7 @@ GETR1:      LDA   #DUMMY
 @WAIT:      BIT   CTRL,X
             BPL   @WAIT
             LDA   DATA,X      ; get response
-            BIT   #$80
-            BNE   GETR1       ; wait for MSB=0
+            BMI   GETR1       ; wait for MSB=0
             PHA
             LDA   #DUMMY
             STA   DATA,X      ; send another dummy

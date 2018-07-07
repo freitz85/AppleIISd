@@ -54,7 +54,6 @@
             LDX   #$00
             LDX   #$03
             LDX   #$00        ; is Smartport controller
-;            LDX   #$3C
 
             SEI               ; find slot
             LDA   #$60        ; opcode for RTS
