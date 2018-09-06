@@ -1,7 +1,7 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2
+; Version 1.2.1
 ; Main source
 ;
 ; (c) Florian Reitz, 2017 - 2018
@@ -368,7 +368,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             RTS
 
 
-TEXT:       .asciiz "  Apple][Sd v1.2 (c)2018 Florian Reitz"
+TEXT:       .asciiz " Apple][Sd v1.2.1 (c)2018 Florian Reitz "
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95
