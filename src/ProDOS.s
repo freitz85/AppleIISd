@@ -210,7 +210,7 @@ WRITE:      JSR   WRPROT
             CMP   #$05
             BNE   @IOERROR    ; check for write error
             CLC               ; no error
-            LDA   NO_ERR
+            LDA   #NO_ERR
 
 @DONE:      PHP
             PHA
