@@ -11,8 +11,10 @@
 ;
 ;*******************************
             
+.export WRDATA
 .export COMMAND
 .export SDCMD
+.export SDCMD0
 .export GETBLOCK
 .export CARDDET
 .export WRPROT
@@ -22,24 +24,56 @@
 .include "AppleIISd.inc"
 .segment "EXTROM"
 
-
+WRDATA:	STA	DATA,X
+@WAIT:	BIT	CTRL,X
+	BPL	@WAIT
+	RTS
+;********************************
+; Wait for card ready
+; C set on timeout
+;********************************
+WREADY:
+	PHA
+	LDA   #$FE
+@LOOP:	PHA   ; counter
+	LDA   #DUMMY
+        JSR   WRDATA
+        LDA   DATA,X
+        CMP   #$FF
+        BNE   @AGAIN
+        PLA
+        PLA
+        CLC
+        RTS
+@AGAIN: PLA
+        CMP   #$FF
+        BEQ   @TOUT
+        SBC   #0 ; dec a
+	JMP   @LOOP
+@TOUT:  PLA
+	SEC
+	RTS
+	
 ;*******************************
 ;
 ; Send SD command
 ; Call with command in CMDHI and CMDLO
+; Returns iwth carry set on timeout
 ;
 ;*******************************
 
-SDCMD:      PHY
+SDCMD:      JSR   WREADY
+            BCC   SDCMD0
+            RTS
+SDCMD0:     PHY
             LDY   #0
 @LOOP:      LDA   (CMDLO),Y
-            STA   DATA,X
-@WAIT:      BIT   CTRL,X      ; TC is in N
-            BPL   @WAIT
+            JSR   WRDATA
             INY
             CPY   #6
             BCC   @LOOP
             PLY
+            CLC
             RTS
 
 
@@ -50,16 +84,22 @@ SDCMD:      PHY
 ;
 ;*******************************
 
-GETR1:      LDA   #DUMMY
-            STA   DATA,X
-@WAIT:      BIT   CTRL,X
-            BPL   @WAIT
+GETR1:      PHY
+            LDY   #10
+@AGAIN:     LDA   #DUMMY
+            JSR   WRDATA
             LDA   DATA,X      ; get response
-            BMI   GETR1       ; wait for MSB=0
-            PHA
+            BIT   #$80
+            BEQ   @CONT       ; wait for MSB=0
+            DEY
+            BNE   @AGAIN
+            PLY
+            RTS
+@CONT:      PHA
             LDA   #DUMMY
-            STA   DATA,X      ; send another dummy
+            JSR   WRDATA      ; send another dummy
             PLA               ; restore R1
+            PLY
             RTS
 
 ;*******************************
@@ -74,12 +114,10 @@ GETR3:      JSR   GETR1       ; get R1 first
             PHA               ; save R1
             PHY               ; save Y
             LDY   #04         ; load counter
-            JMP   @WAIT       ; first byte is already there 
+            JMP   @LOAD       ; first byte is already there 
 @LOOP:      LDA   #DUMMY      ; send dummy
-            STA   DATA,X
-@WAIT:      BIT   CTRL,X
-            BPL   @WAIT
-            LDA   DATA,X
+            JSR   WRDATA
+@LOAD:      LDA   DATA,X
             PHA
             DEY
             BNE   @LOOP       ; do 4 times
@@ -94,7 +132,7 @@ GETR3:      JSR   GETR1       ; get R1 first
             STA   R30,Y       ; R30 is MSB
             PLY               ; restore Y
             LDA   #DUMMY
-            STA   DATA,X      ; send another dummy
+            JSR   WRDATA      ; send another dummy
             PLA               ; restore R1
             RTS
 
@@ -156,19 +194,23 @@ GETBLOCK:   PHX               ; save X
 ;
 ;*******************************
 
-COMMAND:    PHY               ; save Y
+COMMAND:    
+            JSR   WREADY
+            BCC   @CONT
+            RTS
+@CONT:      PHY               ; save Y
             LDY   SLOT
-            STA   DATA,X      ; send command
+            JSR   WRDATA      ; send command
             LDA   R30,Y       ; get arg from R30 on
-            STA   DATA,X
+            JSR   WRDATA
             LDA   R31,Y
-            STA   DATA,X
+            JSR   WRDATA
             LDA   R32,Y
-            STA   DATA,X
+            JSR   WRDATA
             LDA   R33,Y
-            STA   DATA,X
+            JSR   WRDATA
             LDA   #DUMMY
-            STA   DATA,X      ; dummy crc
+            JSR   WRDATA      ; dummy crc
             JSR   GETR1
             PLY               ; restore Y
             RTS

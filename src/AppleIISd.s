@@ -13,9 +13,11 @@
 
 .import PRODOS
 .import SMARTPORT
+.import WRDATA
 .import GETR1
 .import GETR3
 .import SDCMD
+.import SDCMD0
 .import CARDDET
 .import READ
 
@@ -238,9 +240,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             LDY   #10
             LDA   #DUMMY
 
-@LOOP:      STA   DATA,X
-@WAIT:      BIT   CTRL,X
-            BPL   @WAIT
+@LOOP:      JSR   WRDATA
             DEY
             BNE   @LOOP       ; do 10 times
             LDA   SS,X
@@ -251,7 +251,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             STA   CMDLO
             LDA   #>CMD0
             STA   CMDHI
-            JSR   SDCMD
+            JSR   SDCMD0
             JSR   GETR1       ; get response
             CMP   #$01
             BNE   @ERROR1     ; error!
@@ -261,6 +261,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             LDA   #>CMD8
             STA   CMDHI
             JSR   SDCMD
+            BCS   @ERROR1
             JSR   GETR3       ; R7 is also 1+4 bytes 
             CMP   #$01
             BNE   @SDV1       ; may be SD Ver. 1
@@ -275,12 +276,14 @@ INIT:       LDA   #$03        ; set SPI mode 3
             LDA   #>CMD55
             STA   CMDHI
             JSR   SDCMD
+            BCS   @ERROR1
             JSR   GETR1
             LDA   #<ACMD4140  ; enable SDHC support 
             STA   CMDLO
             LDA   #>ACMD4140
             STA   CMDHI
             JSR   SDCMD
+            BCS   @ERROR1
             JSR   GETR1
             CMP   #$01
             BEQ   @SDV2       ; wait for ready
@@ -292,7 +295,8 @@ INIT:       LDA   #$03        ; set SPI mode 3
             STA   CMDLO 
             LDA   #>CMD58 
             STA   CMDHI 
-            JSR   SDCMD 
+            JSR   SDCMD
+            BCS   @ERROR1
             JSR   GETR3 
             CMP   #0 
             BNE   @ERROR1     ; error! 
@@ -313,11 +317,13 @@ INIT:       LDA   #$03        ; set SPI mode 3
             LDA   #>CMD55
             STA   CMDHI
             JSR   SDCMD       ; ignore response
+            BCS   @ERROR1
             LDA   #<ACMD410
             STA   CMDLO
             LDA   #>ACMD410
             STA   CMDHI
             JSR   SDCMD
+            BCS   @ERROR1
             JSR   GETR1
             CMP   #$01
             BEQ   @SDV1       ; wait for ready
@@ -331,6 +337,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             LDA   #>CMD1
             STA   CMDHI
 @LOOP1:     JSR   SDCMD
+            BCS   @IOERROR
             JSR   GETR1
             CMP   #$01
             BEQ   @LOOP1      ; wait for ready
@@ -343,6 +350,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             LDA   #>CMD16
             STA   CMDHI
             JSR   SDCMD
+            BCS   @IOERROR
             JSR   GETR1
             CMP   #0
             BNE   @IOERROR    ; error!
@@ -350,9 +358,9 @@ INIT:       LDA   #$03        ; set SPI mode 3
 @END:       LDA   SS,X
             ORA   #INITED     ; initialized
             STA   SS,X
-            LDA   CTRL,X
-            ORA   #ECE        ; enable 7MHz
-            STA   CTRL,X
+            ;LDA   CTRL,X
+            ;ORA   #ECE        ; enable 7MHz
+            ;STA   CTRL,X
             CLC               ; all ok
             LDY   #NO_ERR
             BCC   @END1
@@ -368,7 +376,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             RTS
 
 
-TEXT:       .asciiz " Apple][Sd v1.2.1 (c)2018 Florian Reitz "
+TEXT:       .asciiz " Apple][Sd v1.2.2 (c)2018 Florian Reitz "
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95

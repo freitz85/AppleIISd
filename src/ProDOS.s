@@ -16,6 +16,7 @@
 .export READ
 .export WRITE
 
+.import WRDATA
 .import COMMAND
 .import SDCMD
 .import GETBLOCK
@@ -108,16 +109,16 @@ READ:       JSR   GETBLOCK    ; calc block address
             BNE   @ERROR      ; check for error
 
 @GETTOK:    LDA   #DUMMY      ; get data token
-            STA   DATA,X
+            JSR   WRDATA
             LDA   DATA,X      ; get response
             CMP   #$FE
             BNE   @GETTOK     ; wait for $FE
 
             LDA   CTRL,X      ; enable FRX
-            ORA   #FRX
+            ORA   #FRX+ECE
             STA   CTRL,X
             LDA   #DUMMY
-            STA   DATA,X
+            JSR   WRDATA
 
             LDY   #0
 @LOOP1:     LDA   DATA,X      ; read data from card
@@ -136,7 +137,7 @@ READ:       JSR   GETBLOCK    ; calc block address
             LDA   DATA,X      ; read a dummy byte
 
             LDA   CTRL,X      ; disable FRX
-            AND   #<~FRX
+            AND   #<~(FRX+ECE)
             STA   CTRL,X
             CLC               ; no error
             LDA   #NO_ERR
@@ -184,27 +185,27 @@ WRITE:      JSR   WRPROT
             BNE   @IOERROR    ; check for error
 
             LDA   #DUMMY
-            STA   DATA,X      ; send dummy
+            JSR   WRDATA      ; send dummy
             LDA   #$FE
-            STA   DATA,X      ; send data token
+            JSR   WRDATA      ; send data token
 
             LDY   #0
 @LOOP1:     LDA   (BUFFER),Y
-            STA   DATA,X
+            JSR   WRDATA
             INY
             BNE   @LOOP1
             INC   BUFFER+1
 @LOOP2:     LDA   (BUFFER),Y
-            STA   DATA,X
+            JSR   WRDATA
             INY
             BNE   @LOOP2
             DEC   BUFFER+1
 
 @CRC:       LDA   #DUMMY
-            STA   DATA,X      ; send 2 dummy crc bytes
-            STA   DATA,X
+            JSR   WRDATA      ; send 2 dummy crc bytes
+            JSR   WRDATA
 
-            STA   DATA,X      ; get data response
+            JSR   WRDATA      ; get data response
             LDA   DATA,X
             AND   #$1F
             CMP   #$05
@@ -215,7 +216,7 @@ WRITE:      JSR   WRPROT
 @DONE:      PHP
             PHA
 @WAIT:      LDA   #DUMMY
-            STA   DATA,X      ; wait for write cycle
+            JSR   WRDATA      ; wait for write cycle
             LDA   DATA,X      ; to complete
             BEQ   @WAIT
 
