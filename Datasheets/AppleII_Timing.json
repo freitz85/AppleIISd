@@ -1,0 +1,18 @@
+{signal: [
+ ['Apple',
+  {name: '7M',    wave: 'n........', period: 2 },
+  {name: 'Phi0',  wave: 'hl......h......l..', node: '.a......b......c'},
+  {name: 'Q3',    wave: 'lh...l..h...l..h..'},
+  {name: 'ADD',   wave: '=.x=............x.', node: '...d............e', phase: 0.5},
+  {name: '/DEV_SEL',wave: 'h.......0......1..'},
+ {},
+  {name: 'R/W',   wave: 'x..=.........x....', phase: 0.5},
+  {name: 'DATA',  wave: 'x........=.......z', node: '.........f.......g', data: 'FromCPU', phase: 0.5},
+  {name: 'DATA',  wave: 'x..........=....z.', node: '...........h....i', data: 'ToCPU', phase: 0.5},
+ ],
+
+],
+  edge: [
+  'a<->b 490 ns', 'a-|>d max 100ns', 'b-|>f max 30ns', 'c-|>e min 15ns', 'h|->c min 140ns', 'c-|>g min 30ns', 'c|->i min 10ns'
+  ]
+}

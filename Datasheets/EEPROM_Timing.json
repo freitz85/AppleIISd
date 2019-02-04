@@ -1,0 +1,21 @@
+{signal: [
+ ['E2 Read',
+  {name: 'ADD',   wave: 'x.=......x..', node: '..a......b'},
+  {name: '/CE',   wave: '1..0.....1..', node: '...c'},
+  {name: '/OE',   wave: '1...0....1..', node: '....d'},
+  {name: 'DATA',  wave: 'z......=...z', node: '.......e...f'},
+ ],
+ {},
+ ['E2 Write',
+  {name: 'ADD',   wave: 'x.=..x........=', node: '..g..h'},
+  {name: '/CE',   wave: '1.0......1....0', node: '.........i'},
+  {name: '/OE',   wave: '0.1......0.....'},
+  {name: '/WE',   wave: '1..0....1.....0', node: '...j....k.....l'},
+  {name: 'DATA',  wave: 'z....=.....z...', node: '.....m.....n'},
+ ],
+],
+  edge: [
+  'a-|>e max 150ns', 'b-|>f max 50ns', 'c-|>e max 150ns', 'd|->e 10-70ns', 
+    'g-|>j min 10ns', 'k|->i min 0ns', 'j-|>h min 50ns', 'j->k min 100ns', 'k|->m min 50ns', 'k-|>n min 10ns'
+  ]
+}
