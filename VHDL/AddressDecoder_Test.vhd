@@ -53,6 +53,7 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
          DATA_EN : OUT  std_logic;
          NG : OUT  std_logic;
          NOE : OUT  std_logic;
+         NWE : OUT  std_logic;
          LED : OUT  std_logic
         );
     END COMPONENT;
@@ -73,6 +74,7 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
    signal DATA_EN : std_logic;
    signal NG : std_logic;
    signal NOE : std_logic;
+   signal NWE : std_logic;
    signal LED : std_logic;
    
    -- Clock period definitions
@@ -94,6 +96,7 @@ BEGIN
           DATA_EN => DATA_EN,
           NG => NG,
           NOE => NOE,
+          NWE => NWE,
           LED => LED
         );
  
@@ -152,9 +155,26 @@ BEGIN
       wait until falling_edge(PHI0);
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
+
+      -- C8xx write access, selected
+      RNW <= '0'
+      wait until rising_edge(PHI0);
+      NIO_STB <= '0';
+      wait until falling_edge(PHI0);
+      NIO_STB <= '1';
+      wait until rising_edge(PHI0);
       
       -- C9xx access, selected
+      RNW <= '1';
       A <= "1001";  -- must become "010"      
+      wait until rising_edge(PHI0);
+      NIO_STB <= '0';
+      wait until falling_edge(PHI0);
+      NIO_STB <= '1';
+      wait until rising_edge(PHI0);
+
+      -- C9xx access write, selected
+      RNW <= '0';     
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
@@ -162,6 +182,7 @@ BEGIN
       wait until rising_edge(PHI0);
       
       -- CPLD access
+      RNW <= '1';
       A <= "0101";  -- must become "000"      
       wait until rising_edge(PHI0);
       NDEV_SEL <= '0';

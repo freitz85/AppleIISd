@@ -28,6 +28,7 @@ NET "NG"  LOC = "P12"  ;
 NET "NIO_SEL"  LOC = "P14"  ;
 NET "NIO_STB"  LOC = "P42"  ;
 NET "NOE"  LOC = "P25"  ;
+NET "NWE"  LOC = "P5"  ;
 NET "PHI0"  LOC = "P8"  ;
 NET "NRESET"  LOC = "P20"  ;
 NET "RNW"  LOC = "P1"  ;

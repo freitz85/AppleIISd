@@ -43,6 +43,7 @@ Port (
     NIO_SEL : in std_logic;
     NIO_STB : in std_logic;
     NOE : out std_logic;
+    NWE : out std_logic;
     PHI0 : in std_logic;
     NRESET : in std_logic;
     RNW : in std_logic;
@@ -104,9 +105,11 @@ Port (
         DATA_EN : out  std_logic;
         NG : out  std_logic;
         NOE : out  std_logic;
+        NWE : out std_logic;
         LED : out std_logic
       );
-end component;
+end component;
+
 
 begin
     spi: SpiController port map(
@@ -139,6 +142,7 @@ begin
         NRESET => NRESET,
         DATA_EN => data_en,
         NOE => NOE,
+        NWE => NWE,
         NG => NG
         --LED => LED
     );

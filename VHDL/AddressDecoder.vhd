@@ -31,18 +31,19 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity AddressDecoder is
     Port ( A : in  std_logic_vector (11 downto 8);
-           B : out  std_logic_vector (10 downto 8); -- to EPROM
+           B : out  std_logic_vector (10 downto 8); -- to EEPROM
            CLK : in std_logic;
            PHI0 : in std_logic;
            RNW : in  std_logic;
-           NDEV_SEL : in  std_logic;    -- $C0n0 - $C0nF
-           NIO_SEL : in  std_logic;     -- $Cs00 - $CsFF
-           NIO_STB : in  std_logic;     -- $C800 - $CFFF
+           NDEV_SEL : in  std_logic;    -- $C0n0 - $C0nF, CPLD registers
+           NIO_SEL : in  std_logic;     -- $Cs00 - $CsFF, EEPROM bank 0
+           NIO_STB : in  std_logic;     -- $C800 - $CFFF, EEPROM banks 1 to 7
            NRESET : in std_logic;
            DATA_EN : out  std_logic;    -- to CPLD
            NG : out  std_logic;         -- to bus transceiver
-           NOE : out  std_logic;
-           LED : out  std_logic);       -- to EPROM
+           NOE : out  std_logic;        -- to EEPROM
+           NWE : out std_logic;         -- to EEPROM
+           LED : out  std_logic);       
 end AddressDecoder;
 
 architecture Behavioral of AddressDecoder is
@@ -79,6 +80,9 @@ begin
          or (ndev_sel_int and nio_sel_int and ncs)
          or not PHI0;
     NOE  <= not RNW 
+         or not NDEV_SEL
+         or (not NIO_STB and ncs);
+    NWE  <= RNW
          or not NDEV_SEL
          or (not NIO_STB and ncs);
     
