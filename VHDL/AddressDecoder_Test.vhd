@@ -68,7 +68,7 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
    signal CLK : std_logic := '0';
    signal PHI0 : std_logic := '1';
 
- 	--Outputs
+    --Outputs
    signal B : std_logic_vector(10 downto 8);
    signal DATA_EN : std_logic;
    signal NG : std_logic;
@@ -80,7 +80,7 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
  
 BEGIN
  
-	-- Instantiate the Unit Under Test (UUT)
+   -- Instantiate the Unit Under Test (UUT)
    uut: AddressDecoder PORT MAP (
           A => A,
           B => B,
@@ -100,10 +100,10 @@ BEGIN
    -- Clock process definitions
    CLK_process :process
    begin
-		CLK <= '0';
-		wait for CLK_period/2;
-		CLK <= '1';
-		wait for CLK_period/2;
+      CLK <= '0';
+      wait for CLK_period/2;
+      CLK <= '1';
+      wait for CLK_period/2;
    end process;
  
    PHI0_process :process(CLK)
@@ -120,7 +120,7 @@ BEGIN
 
    -- Stimulus process
    stim_proc: process
-   begin		
+   begin      
       -- hold reset state.
       wait for CLK_period * 10;
       NRESET <= '0';
@@ -128,8 +128,10 @@ BEGIN
       NRESET <= '1';
       wait for CLK_period * 10;
 
-      -- insert stimulus here 
       -- C0nX access
+      -- NG must be '0"
+      -- NOE must be '1'
+      -- NWE must be '1'
       A <= "0000";  -- must become "000"
       wait until rising_edge(PHI0);
       NDEV_SEL <= '0';
@@ -137,7 +139,10 @@ BEGIN
       NDEV_SEL <= '1';
       wait until rising_edge(PHI0);
       
-      -- CnXX access
+      -- CnXX access, select
+      -- NG must be '0'
+      -- NOE must be '0'
+      -- NWE must be '1'
       A <= "0100";  -- must become "000"     
       wait until rising_edge(PHI0);
       NIO_SEL <= '0';
@@ -146,14 +151,20 @@ BEGIN
       wait until rising_edge(PHI0);
       
       -- C8xx access, selected
+      -- NG must be '0'
+      -- NOE must be '0'
+      -- NWE must be '1'
       A <= "1000";  -- must become "001"      
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
-
+      
       -- C8xx write access, selected
+      -- NG must be '0'
+      -- NOE must be '1'
+      -- NWE must be '0'
       RNW <= '0';
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
@@ -162,6 +173,9 @@ BEGIN
       wait until rising_edge(PHI0);
       
       -- C9xx access, selected
+      -- NG must be '0'
+      -- NOE must be '0'
+      -- NWE must be '1'
       RNW <= '1';
       A <= "1001";  -- must become "010"      
       wait until rising_edge(PHI0);
@@ -169,8 +183,11 @@ BEGIN
       wait until falling_edge(PHI0);
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
-
+      
       -- C9xx access write, selected
+      -- NG must be '0'
+      -- NOE must be '1'
+      -- NWE must be '0'
       RNW <= '0';     
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
@@ -179,6 +196,9 @@ BEGIN
       wait until rising_edge(PHI0);
       
       -- CPLD access
+      -- NG must be '0'
+      -- NOE must be '1'
+      -- NWE must be '1'
       RNW <= '1';
       A <= "0101";  -- must become "000"      
       wait until rising_edge(PHI0);
@@ -188,6 +208,9 @@ BEGIN
       wait until rising_edge(PHI0);
       
       -- CFFF access
+      -- NG must be '1'
+      -- NOE must be '1'
+      -- NWE must be '1'
       A <= "1111";  -- must become "111"      
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
@@ -196,6 +219,9 @@ BEGIN
       wait until rising_edge(PHI0);
       
       -- C8xx access, unselected
+      -- NG must be '1'
+      -- NOE must be '1'
+      -- NWE must be '1'
       A <= "1000"; -- must become "001"      
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
