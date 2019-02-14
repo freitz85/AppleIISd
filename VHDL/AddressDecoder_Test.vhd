@@ -138,11 +138,36 @@ BEGIN
       wait until falling_edge(PHI0);
       NDEV_SEL <= '1';
       wait until rising_edge(PHI0);
+
+      -- C0nX access, write
+      -- NG must be '0"
+      -- NOE must be '1'
+      -- NWE must be '1'
+      RNW <= '0';
+      A <= "0000";  -- must become "000"
+      wait until rising_edge(PHI0);
+      NDEV_SEL <= '0';
+      wait until falling_edge(PHI0);
+      NDEV_SEL <= '1';
+      wait until rising_edge(PHI0);
       
       -- CnXX access, select
       -- NG must be '0'
       -- NOE must be '0'
       -- NWE must be '1'
+      RNW <= '1';
+      A <= "0100";  -- must become "000"     
+      wait until rising_edge(PHI0);
+      NIO_SEL <= '0';
+      wait until falling_edge(PHI0);
+      NIO_SEL <= '1';
+      wait until rising_edge(PHI0);
+
+      -- CnXX access, write, select
+      -- NG must be '0'
+      -- NOE must be '1'
+      -- NWE must be '0'
+      RNW <= '0';
       A <= "0100";  -- must become "000"     
       wait until rising_edge(PHI0);
       NIO_SEL <= '0';
@@ -154,6 +179,7 @@ BEGIN
       -- NG must be '0'
       -- NOE must be '0'
       -- NWE must be '1'
+      RNW <= '1';
       A <= "1000";  -- must become "001"      
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
@@ -222,6 +248,18 @@ BEGIN
       -- NG must be '1'
       -- NOE must be '1'
       -- NWE must be '1'
+      A <= "1000"; -- must become "001"      
+      wait until rising_edge(PHI0);
+      NIO_STB <= '0';
+      wait until falling_edge(PHI0);
+      NIO_STB <= '1';
+      wait until rising_edge(PHI0);
+
+      -- C8xx access write, unselected
+      -- NG must be '1'
+      -- NOE must be '1'
+      -- NWE must be '1'
+      RNW <= '0';
       A <= "1000"; -- must become "001"      
       wait until rising_edge(PHI0);
       NIO_STB <= '0';

@@ -51,7 +51,7 @@ architecture Behavioral of AddressDecoder is
     signal ndev_sel_int : std_logic;
     signal nio_sel_int : std_logic;
     signal nio_stb_int : std_logic;
-    signal ncs : std_logic;             -- $C800 - $CFFF enabled
+    signal ncs : std_logic;             -- $C800 - $CFFE enabled
     signal a_int : std_logic_vector (11 downto 8);
 
 begin
@@ -78,11 +78,13 @@ begin
          or (ndev_sel_int and nio_sel_int and ncs)
          or not PHI0;
     NOE  <= not RNW 
-         or not NDEV_SEL
-         or (not NIO_STB and ncs);
+         or (not NIO_SEL and not NIO_STB)
+         or (NIO_SEL and NIO_STB)
+         or (NIO_SEL and ncs);
     NWE  <= RNW
-         or not NDEV_SEL
-         or (not NIO_STB and ncs);
+         or (not NIO_SEL and not NIO_STB)
+         or (NIO_SEL and NIO_STB)
+         or (NIO_SEL and ncs);
     
     cfxx <= a_int(8) and a_int(9) and a_int(10) and not nio_stb_int;
     
