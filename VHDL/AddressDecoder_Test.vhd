@@ -51,6 +51,7 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
          NIO_STB : IN  std_logic;
          NRESET : IN  std_logic;
          DATA_EN : OUT  std_logic;
+         PGM_EN : IN  std_logic;
          NG : OUT  std_logic;
          NOE : OUT  std_logic;
          NWE : OUT  std_logic
@@ -67,6 +68,7 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
    signal NRESET : std_logic := '1';
    signal CLK : std_logic := '0';
    signal PHI0 : std_logic := '1';
+   signal PGM_EN : std_logic := '1';
 
     --Outputs
    signal B : std_logic_vector(10 downto 8);
@@ -92,6 +94,7 @@ BEGIN
           NIO_STB => NIO_STB,
           NRESET => NRESET,
           DATA_EN => DATA_EN,
+          PGM_EN => PGM_EN,
           NG => NG,
           NOE => NOE,
           NWE => NWE
@@ -174,12 +177,26 @@ BEGIN
       wait until falling_edge(PHI0);
       NIO_SEL <= '1';
       wait until rising_edge(PHI0);
+
+      -- CnXX access, write, select, no PGM_EN
+      -- NG must be '0'
+      -- NOE must be '1'
+      -- NWE must be '1'
+      RNW <= '0';
+      PGM_EN <= '0';
+      A <= "0100";  -- must become "000"     
+      wait until rising_edge(PHI0);
+      NIO_SEL <= '0';
+      wait until falling_edge(PHI0);
+      NIO_SEL <= '1';
+      wait until rising_edge(PHI0);
       
       -- C8xx access, selected
       -- NG must be '0'
       -- NOE must be '0'
       -- NWE must be '1'
       RNW <= '1';
+      PGM_EN <= '1';
       A <= "1000";  -- must become "001"      
       wait until rising_edge(PHI0);
       NIO_STB <= '0';

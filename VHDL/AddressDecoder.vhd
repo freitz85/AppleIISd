@@ -40,6 +40,7 @@ entity AddressDecoder is
            NIO_STB : in  std_logic;     -- $C800 - $CFFF, EEPROM banks 1 to 7
            NRESET : in std_logic;
            DATA_EN : out  std_logic;    -- to CPLD
+           PGM_EN : in std_logic;       -- from CPLD;
            NG : out  std_logic;         -- to bus transceiver
            NOE : out  std_logic;        -- to EEPROM
            NWE : out std_logic);        -- to EEPROM    
@@ -84,7 +85,8 @@ begin
     NWE  <= RNW
          or (not NIO_SEL and not NIO_STB)
          or (NIO_SEL and NIO_STB)
-         or (NIO_SEL and ncs);
+         or (NIO_SEL and ncs)
+         or not PGM_EN;
     
     cfxx <= a_int(8) and a_int(9) and a_int(10) and not nio_stb_int;
     

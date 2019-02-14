@@ -70,6 +70,7 @@ architecture Behavioral of AppleIISd is
     signal addr_low_int : std_logic_vector (1 downto 0);
     
     signal data_en : std_logic;
+    signal pgm_en : std_logic;
         
 component SpiController is
 Port (
@@ -87,7 +88,8 @@ Port (
         nsel : out  std_logic;
         wp : in  std_logic;
         card : in  std_logic;
-        led : out  std_logic
+        led : out  std_logic;
+        pgm_en : out std_logic
     );
 end component;
 
@@ -103,6 +105,7 @@ Port (
         NIO_STB : in  std_logic;
         NRESET : in std_logic;
         DATA_EN : out  std_logic;
+        PGM_EN : in std_logic;
         NG : out  std_logic;
         NOE : out  std_logic;
         NWE : out std_logic
@@ -126,7 +129,8 @@ begin
         nsel => NSEL,
         wp => WP,
         card => CARD,
-        led => LED
+        led => LED,
+        pgm_en => pgm_en
     );
     
     addDec: AddressDecoder port map(
@@ -140,6 +144,7 @@ begin
         NIO_STB => NIO_STB,
         NRESET => NRESET,
         DATA_EN => data_en,
+        PGM_EN => pgm_en,
         NOE => NOE,
         NWE => NWE,
         NG => NG

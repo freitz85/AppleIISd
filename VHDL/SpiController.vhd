@@ -25,6 +25,7 @@ Port (
         nsel : out  STD_LOGIC;
         wp : in  STD_LOGIC;
         card : in  STD_LOGIC;
+        pgm_en : out STD_LOGIC;
         led : out  STD_LOGIC
     );
 
@@ -40,6 +41,7 @@ architecture Behavioral of SpiController is
     signal spidataout: std_logic_vector (7 downto 0);
     signal sdhc: std_logic;     -- is SDHC card
     signal inited: std_logic;   -- card initialized
+    signal pgmen: std_logic;    -- enable EEPROM programming
     
     -- spi register flags
     signal tc: std_logic;       -- transmission complete; cleared on spi data read
@@ -66,7 +68,6 @@ architecture Behavioral of SpiController is
     signal shiftclk : std_logic;
     
 begin    
-    --led <= not (inited);
     led <= not (bsy or not slavesel);
     bsy <= start_shifting or shifting2;
     
@@ -194,6 +195,7 @@ begin
         
     -- outputs
     nsel <= slavesel;
+    pgm_en <= pgmen;
 
     tc_proc: process (ndev_sel, shiftdone) 
     begin
@@ -207,14 +209,14 @@ begin
     --------------------------
     -- cpu register section
     -- cpu read
-    cpu_read: process(addr, spidatain, tc, bsy, frx, 
+    cpu_read: process(addr, spidatain, tc, bsy, frx, pgmen,
             ece, divisor, slavesel, wp, card, sdhc, inited)
     begin
         case addr is
             when "00" =>        -- read SPI data in
                 data_out <= spidatain;
             when "01" =>        -- read status register
-                data_out(0) <= '0';
+                data_out(0) <= pgmen;
                 data_out(1) <= '0';
                 data_out(2) <= ece;
                 data_out(3) <= '0';
@@ -248,6 +250,7 @@ begin
             spidataout <= (others => '1');
             sdhc <= '0';
             inited <= '0';
+            pgmen <= '0';
         elsif (card = '1') then
             sdhc <= '0';
             inited <= '0';
@@ -256,6 +259,7 @@ begin
                 when "00" =>        -- write SPI data out (see other process above)
                     spidataout <= data_in;
                 when "01" =>        -- write status register
+                    pgmen <= data_in(0);
                     ece <= data_in(2);
                     frx <= data_in(4);
                     -- no bit 5 - 7
@@ -273,4 +277,3 @@ begin
     end process;
     
 end Behavioral;
-
