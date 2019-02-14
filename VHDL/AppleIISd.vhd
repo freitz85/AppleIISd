@@ -105,8 +105,7 @@ Port (
         DATA_EN : out  std_logic;
         NG : out  std_logic;
         NOE : out  std_logic;
-        NWE : out std_logic;
-        LED : out std_logic
+        NWE : out std_logic
       );
 end component;
 
@@ -144,7 +143,6 @@ begin
         NOE => NOE,
         NWE => NWE,
         NG => NG
-        --LED => LED
     );
     
     DATA <= data_out when (data_en = '1') else (others => 'Z');      -- data bus tristate

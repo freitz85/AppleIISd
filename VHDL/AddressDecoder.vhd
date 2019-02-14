@@ -42,8 +42,7 @@ entity AddressDecoder is
            DATA_EN : out  std_logic;    -- to CPLD
            NG : out  std_logic;         -- to bus transceiver
            NOE : out  std_logic;        -- to EEPROM
-           NWE : out std_logic;         -- to EEPROM
-           LED : out  std_logic);       
+           NWE : out std_logic);        -- to EEPROM    
 end AddressDecoder;
 
 architecture Behavioral of AddressDecoder is
@@ -66,7 +65,6 @@ begin
     -- $C0xx to $C7xx is mapped to EEPROM bank 0
     -- $C8xx to $CExx is mapped to banks 1 to 7
     
-    LED <= ncs;
     B(8) <= (a_int(11) and not a_int(8))
          or (a_int(11) and a_int(10) and a_int(9));
     B(9) <= (a_int(11) and not a_int(9) and a_int(8))
@@ -111,6 +109,4 @@ begin
             a_int <= A;
         end if;
     end process;
-    
 end Behavioral;
-

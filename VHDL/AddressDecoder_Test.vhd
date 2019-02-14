@@ -53,8 +53,7 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
          DATA_EN : OUT  std_logic;
          NG : OUT  std_logic;
          NOE : OUT  std_logic;
-         NWE : OUT  std_logic;
-         LED : OUT  std_logic
+         NWE : OUT  std_logic
         );
     END COMPONENT;
     
@@ -75,7 +74,6 @@ ARCHITECTURE behavior OF AddressDecoder_Test IS
    signal NG : std_logic;
    signal NOE : std_logic;
    signal NWE : std_logic;
-   signal LED : std_logic;
    
    -- Clock period definitions
    constant CLK_period : time := 142 ns;
@@ -96,8 +94,7 @@ BEGIN
           DATA_EN => DATA_EN,
           NG => NG,
           NOE => NOE,
-          NWE => NWE,
-          LED => LED
+          NWE => NWE
         );
  
    -- Clock process definitions
@@ -157,7 +154,7 @@ BEGIN
       wait until rising_edge(PHI0);
 
       -- C8xx write access, selected
-      RNW <= '0'
+      RNW <= '0';
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
