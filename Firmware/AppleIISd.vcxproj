@@ -11,9 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\README.md" />
     <None Include="makefile" />
+    <None Include="Makefile.options" />
     <None Include="obj\AppleIISd.lst" />
-    <None Include="README.md" />
     <None Include="src\AppleIISd.cfg" />
     <None Include="src\AppleIISd.inc" />
     <None Include="src\AppleIISd.s" />

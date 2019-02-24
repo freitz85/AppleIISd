@@ -8,7 +8,6 @@
     <None Include="src\AppleIISd.s">
       <Filter>src</Filter>
     </None>
-    <None Include="README.md" />
     <None Include="obj\AppleIISd.lst" />
     <None Include="src\Helper.s">
       <Filter>src</Filter>
@@ -22,6 +21,8 @@
     <None Include="src\Smartport.s">
       <Filter>src</Filter>
     </None>
+    <None Include="Makefile.options" />
+    <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
