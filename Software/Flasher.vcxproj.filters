@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="makefile" />
+    <None Include="Makefile.options" />
+    <None Include="Flasher.bin.map" />
+    <None Include="obj\Flasher.lst" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Flasher.c" />
+  </ItemGroup>
+</Project>
