@@ -1,18 +1,38 @@
+#include "AppleIISd.h"
+
 #include <stdio.h>
 #include <errno.h>
 #include <conio.h>
 #include <apple2enh.h>
 
+typedef enum
+{
+    STATE_0 = 0x7C,     // pipe
+    STATE_1 = 0x2F,     // slash
+    STATE_2 = 0x2D,     // hyphen
+    STATE_3 = 0x5C,     // backslash
+
+    STATE_LAST          // don't use
+} STATE_CURSOR_T;
+
+
+void writeChip(const byte* pSource, byte* pDest, unsigned length);
+void printStatus(byte percentage);
+
+// Binary can't be larger than 2k
+byte buffer[2048] = { 0 };
+
 int main()
 {
-    // Binary can't be larger than 2k
-    char buffer[2048];
-    char* pBuf = buffer;
     FILE* pFile;
-    size_t fileSize;
     char slotNum;
 
+    APPLE_II_SD_T* pAIISD = (APPLE_II_SD_T*)SLOT_IO_START;
+    byte* pSlotRom = SLOT_ROM_START;
+    byte* pExtRom = EXT_ROM_START;
+
     videomode(VIDEOMODE_80COL);
+    clrscr();
     cprintf("AppleIISd firmware flasher\r");
     cprintf("(c) 2019 Florian Reitz\r\r");
     
@@ -29,23 +49,40 @@ int main()
         return 1;   // failure
     }
 
+    ((byte*)pAIISD) += slotNum << 4;
+    pSlotRom += slotNum << 8;
+
     // open file
     pFile = fopen("AppleIISd.bin", "rb");
     if(pFile)
     {
         // read buffer
-        fileSize = fread(buffer, sizeof(buffer), 1, pFile);
+        unsigned fileSize = fread(buffer, sizeof(buffer), 1, pFile);
 
         // enable write
+        pAIISD->status.pgmen = 1;
 
         // clear 0xCFFF
-        *((char*)0xCFFF) = 0;
+        *CFFF = 0;
 
         // write to SLOTROM
+        cprintf("\r\rFlashing SLOTROM: ");
+        writeChip(buffer, pSlotRom, 256);
 
         // write to EXTROM
+        cprintf("\r\rFlashing EXTROM: ");
+        writeChip(buffer + 256, pExtRom, fileSize - 256);
+
+        // zero rest of chip
+        if(fileSize < 2048)
+        {
+            cprintf("\r\rErase rest of chip: ");
+            writeChip(NULL, pExtRom + fileSize, 2048 - fileSize);
+        }
 
         // disable write
+        pAIISD->status.pgmen = 0;
+        cprintf("\r\r Flashing finished!\r");
     }
     else
     {
@@ -56,4 +93,37 @@ int main()
     return 0;   // success
 }
 
+void writeChip(const byte* pSource, byte* pDest, unsigned length)
+{
+    unsigned i;
+    for(i=0; i<length; i++)
+    {
+        if(pSource)
+        {
+            *pDest = pSource[i];
+        }
+        else
+        {
+            // erase if no source
+            *pDest = 0;
+        }
 
+        printStatus(i * 100 / length);
+        pDest++;
+    }
+}
+
+void printStatus(byte percentage)
+{
+    static STATE_CURSOR_T state = STATE_0;
+
+    byte x = wherex();
+    cprintf("% 2hhu %c", percentage, (char)state);
+    gotox(x);
+
+    state++;
+    if(state == STATE_LAST)
+    {
+        state = STATE_0;
+    }
+}

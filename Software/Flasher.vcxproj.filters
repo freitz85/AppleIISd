@@ -9,4 +9,7 @@
   <ItemGroup>
     <ClCompile Include="src\Flasher.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\AppleIISd.h" />
+  </ItemGroup>
 </Project>

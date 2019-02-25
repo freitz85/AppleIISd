@@ -19,6 +19,9 @@
   <ItemGroup>
     <ClCompile Include="src\Flasher.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\AppleIISd.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B2CF2E9D-62A7-4A68-9477-9B15A8707E78}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
