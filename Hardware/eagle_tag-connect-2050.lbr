@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.3.2">
+<eagle version="8.2.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
-<setting keepoldvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="50" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
+<grid distance="25" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
@@ -142,6 +141,7 @@ VIDA Products INC</description>
 <hole x="0" y="0" drill="1"/>
 <hole x="7.62" y="-1.016" drill="1"/>
 <hole x="7.62" y="1.016" drill="1"/>
+<rectangle x1="1.27" y1="-0.635" x2="6.35" y2="0.635" layer="39"/>
 </package>
 <package name="TC2050-MCP">
 <description>&lt;B&gt;TAG-CONNECT ISP Connector&lt;/B&gt;&lt;BR&gt;&lt;BR&gt;&lt;I&gt;Manufacturer:&lt;/I&gt; &lt;a href="www.tag-connect.com"&gt;Tag-Connect&lt;/a&gt;&lt;BR&gt;
@@ -186,6 +186,7 @@ VIDA Products INC</description>
 <hole x="0" y="-2.54" drill="2.3749"/>
 <hole x="5.715" y="2.54" drill="2.3749"/>
 <hole x="5.715" y="-2.54" drill="2.3749"/>
+<rectangle x1="1.27" y1="-0.635" x2="6.35" y2="0.635" layer="39"/>
 </package>
 </packages>
 <symbols>

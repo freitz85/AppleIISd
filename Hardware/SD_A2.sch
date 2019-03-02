@@ -16443,46 +16443,6 @@ Based on the following sources:
 </library>
 <library name="eagle_tag-connect-2050">
 <packages>
-<package name="TC2050-MCP-NL">
-<description>&lt;B&gt;TAG-CONNECT ISP Connector&lt;/B&gt;&lt;BR&gt;&lt;BR&gt;&lt;I&gt;Manufacturer:&lt;/I&gt; &lt;a href="www.tag-connect.com"&gt;Tag-Connect&lt;/a&gt;&lt;BR&gt;
-&lt;BR&gt;Cable for easy In-Circuit PCB Programming. Designed for Standard JTAG 10 Pin, suitable for many others.&lt;BR&gt;
-&lt;BR&gt;Footprint for TC2050 NL &lt;BR&gt;
-
-&lt;TABLE cellspacing=0 cellpadding=0 border=0&gt;
-&lt;TR&gt;&lt;TD width=20&gt;&lt;/TD&gt;&lt;TD&gt;
-&lt;TABLE cellspacing=0 cellpadding=1 border=1&gt;
-&lt;TR bgcolor=silver&gt;&lt;TD align=center&gt;PAD&lt;/TD&gt;&lt;TD align=center&gt;Description&lt;/TD&gt;&lt;/TR&gt;
-&lt;TR&gt;&lt;TD align=center&gt;1&lt;/TD&gt;&lt;TD&gt;VTREF&lt;/TD&gt;&lt;/TR&gt;
-&lt;TR&gt;&lt;TD align=center&gt;2&lt;/TD&gt;&lt;TD&gt;nTRST&lt;/TD&gt;&lt;/TR&gt;
-&lt;TR&gt;&lt;TD align=center&gt;3&lt;/TD&gt;&lt;TD&gt;TDI&lt;/TD&gt;&lt;/TR&gt;
-&lt;TR&gt;&lt;TD align=center&gt;4&lt;/TD&gt;&lt;TD&gt;TMS&lt;/TD&gt;&lt;/TR&gt;
-&lt;TR&gt;&lt;TD align=center&gt;5&lt;/TD&gt;&lt;TD&gt;TCK&lt;/TD&gt;&lt;/TR&gt;
-&lt;TR&gt;&lt;TD align=center&gt;6&lt;/TD&gt;&lt;TD&gt;RTCK&lt;/TD&gt;&lt;/TR&gt;
-&lt;TR&gt;&lt;TD align=center&gt;7&lt;/TD&gt;&lt;TD&gt;TDO&lt;/TD&gt;&lt;/TR&gt;
-&lt;TR&gt;&lt;TD align=center&gt;8&lt;/TD&gt;&lt;TD&gt;RESET&lt;/TD&gt;&lt;/TR&gt;
-&lt;TR&gt;&lt;TD align=center&gt;9&lt;/TD&gt;&lt;TD&gt;GND&lt;/TD&gt;&lt;/TR&gt;
-&lt;TR&gt;&lt;TD align=center&gt;10&lt;/TD&gt;&lt;TD&gt;NC&lt;/TD&gt;&lt;/TR&gt;
-&lt;/TABLE&gt;
-&lt;/TD&gt;&lt;/TR&gt;&lt;/TABLE&gt;&lt;BR&gt;&lt;BR&gt;
-©2009 ROFA.cz
-Modified 7/2011 by Tim McCarthy-Smith 
-VIDA Products INC</description>
-<wire x1="0" y1="-2.54" x2="7.62" y2="-2.54" width="0.127" layer="21"/>
-<smd name="10" x="1.27" y="0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
-<smd name="9" x="2.54" y="0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
-<smd name="8" x="3.81" y="0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
-<smd name="3" x="3.81" y="-0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
-<smd name="2" x="2.54" y="-0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
-<smd name="1" x="1.27" y="-0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
-<smd name="7" x="5.08" y="0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
-<smd name="6" x="6.35" y="0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
-<smd name="4" x="5.08" y="-0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
-<smd name="5" x="6.35" y="-0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
-<text x="-0.635" y="1.27" size="1.27" layer="25">&gt;name</text>
-<hole x="0" y="0" drill="1"/>
-<hole x="7.62" y="-1.016" drill="1"/>
-<hole x="7.62" y="1.016" drill="1"/>
-</package>
 <package name="TC2050-MCP">
 <description>&lt;B&gt;TAG-CONNECT ISP Connector&lt;/B&gt;&lt;BR&gt;&lt;BR&gt;&lt;I&gt;Manufacturer:&lt;/I&gt; &lt;a href="www.tag-connect.com"&gt;Tag-Connect&lt;/a&gt;&lt;BR&gt;
 &lt;BR&gt;Cable for easy In-Circuit PCB Programming. Designed for Standard JTAG 10 Pin, suitable for many others.&lt;BR&gt;
@@ -16526,6 +16486,48 @@ VIDA Products INC</description>
 <hole x="0" y="-2.54" drill="2.3749"/>
 <hole x="5.715" y="2.54" drill="2.3749"/>
 <hole x="5.715" y="-2.54" drill="2.3749"/>
+<rectangle x1="1.27" y1="-0.635" x2="6.35" y2="0.635" layer="39"/>
+</package>
+<package name="TC2050-MCP-NL">
+<description>&lt;B&gt;TAG-CONNECT ISP Connector&lt;/B&gt;&lt;BR&gt;&lt;BR&gt;&lt;I&gt;Manufacturer:&lt;/I&gt; &lt;a href="www.tag-connect.com"&gt;Tag-Connect&lt;/a&gt;&lt;BR&gt;
+&lt;BR&gt;Cable for easy In-Circuit PCB Programming. Designed for Standard JTAG 10 Pin, suitable for many others.&lt;BR&gt;
+&lt;BR&gt;Footprint for TC2050 NL &lt;BR&gt;
+
+&lt;TABLE cellspacing=0 cellpadding=0 border=0&gt;
+&lt;TR&gt;&lt;TD width=20&gt;&lt;/TD&gt;&lt;TD&gt;
+&lt;TABLE cellspacing=0 cellpadding=1 border=1&gt;
+&lt;TR bgcolor=silver&gt;&lt;TD align=center&gt;PAD&lt;/TD&gt;&lt;TD align=center&gt;Description&lt;/TD&gt;&lt;/TR&gt;
+&lt;TR&gt;&lt;TD align=center&gt;1&lt;/TD&gt;&lt;TD&gt;VTREF&lt;/TD&gt;&lt;/TR&gt;
+&lt;TR&gt;&lt;TD align=center&gt;2&lt;/TD&gt;&lt;TD&gt;nTRST&lt;/TD&gt;&lt;/TR&gt;
+&lt;TR&gt;&lt;TD align=center&gt;3&lt;/TD&gt;&lt;TD&gt;TDI&lt;/TD&gt;&lt;/TR&gt;
+&lt;TR&gt;&lt;TD align=center&gt;4&lt;/TD&gt;&lt;TD&gt;TMS&lt;/TD&gt;&lt;/TR&gt;
+&lt;TR&gt;&lt;TD align=center&gt;5&lt;/TD&gt;&lt;TD&gt;TCK&lt;/TD&gt;&lt;/TR&gt;
+&lt;TR&gt;&lt;TD align=center&gt;6&lt;/TD&gt;&lt;TD&gt;RTCK&lt;/TD&gt;&lt;/TR&gt;
+&lt;TR&gt;&lt;TD align=center&gt;7&lt;/TD&gt;&lt;TD&gt;TDO&lt;/TD&gt;&lt;/TR&gt;
+&lt;TR&gt;&lt;TD align=center&gt;8&lt;/TD&gt;&lt;TD&gt;RESET&lt;/TD&gt;&lt;/TR&gt;
+&lt;TR&gt;&lt;TD align=center&gt;9&lt;/TD&gt;&lt;TD&gt;GND&lt;/TD&gt;&lt;/TR&gt;
+&lt;TR&gt;&lt;TD align=center&gt;10&lt;/TD&gt;&lt;TD&gt;NC&lt;/TD&gt;&lt;/TR&gt;
+&lt;/TABLE&gt;
+&lt;/TD&gt;&lt;/TR&gt;&lt;/TABLE&gt;&lt;BR&gt;&lt;BR&gt;
+©2009 ROFA.cz
+Modified 7/2011 by Tim McCarthy-Smith 
+VIDA Products INC</description>
+<wire x1="0" y1="-2.54" x2="7.62" y2="-2.54" width="0.127" layer="21"/>
+<smd name="10" x="1.27" y="0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
+<smd name="9" x="2.54" y="0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
+<smd name="8" x="3.81" y="0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
+<smd name="3" x="3.81" y="-0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
+<smd name="2" x="2.54" y="-0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
+<smd name="1" x="1.27" y="-0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
+<smd name="7" x="5.08" y="0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
+<smd name="6" x="6.35" y="0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
+<smd name="4" x="5.08" y="-0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
+<smd name="5" x="6.35" y="-0.635" dx="0.7874" dy="0.7874" layer="1" roundness="100" cream="no"/>
+<text x="-0.635" y="1.27" size="1.27" layer="25">&gt;name</text>
+<hole x="0" y="0" drill="1"/>
+<hole x="7.62" y="-1.016" drill="1"/>
+<hole x="7.62" y="1.016" drill="1"/>
+<rectangle x1="1.27" y1="-0.635" x2="6.35" y2="0.635" layer="39"/>
 </package>
 </packages>
 <symbols>
@@ -17492,10 +17494,13 @@ type I, package type TS</description>
 <instance part="C11" gate="G$1" x="259.08" y="22.86"/>
 <instance part="C12" gate="G$1" x="266.7" y="22.86"/>
 <instance part="C13" gate="G$1" x="274.32" y="22.86"/>
-<instance part="U$1" gate="G$1" x="330.2" y="30.48"/>
+<instance part="U$1" gate="G$1" x="330.2" y="30.48" smashed="yes"/>
 <instance part="+3V6" gate="G$1" x="304.8" y="22.86"/>
 <instance part="GND11" gate="1" x="304.8" y="0"/>
-<instance part="IC5" gate="G$1" x="264.16" y="73.66"/>
+<instance part="IC5" gate="G$1" x="264.16" y="73.66" smashed="yes">
+<attribute name="NAME" x="254" y="100.33" size="1.778" layer="95"/>
+<attribute name="VALUE" x="254" y="40.64" size="1.778" layer="96"/>
+</instance>
 <instance part="GND8" gate="1" x="248.92" y="40.64"/>
 <instance part="P+5" gate="1" x="251.46" y="104.14"/>
 <instance part="RN1" gate="A" x="320.04" y="175.26" smashed="yes">
