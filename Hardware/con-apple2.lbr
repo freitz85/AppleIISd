@@ -478,7 +478,7 @@ Dimensions taken from Tech Note #28</description>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="A2-50PIN" prefix="ST" uservalue="yes">
+<deviceset name="A2-50PIN">
 <description>&lt;B&gt;Apple ][ Peripheral Card Connector&lt;/B&gt;
 &lt;br /&gt;
 This is the, default, 50-pin connector for slot #1 to #7
@@ -494,23 +494,23 @@ Pins are laid out as seen from the top of the slot</description>
 <gate name="_D5" symbol="ATPIN" x="-5.08" y="-22.86" addlevel="always"/>
 <gate name="_D6" symbol="ATPIN" x="-5.08" y="-20.32" addlevel="always"/>
 <gate name="_D7" symbol="ATPIN" x="-5.08" y="-17.78" addlevel="always"/>
-<gate name="_DEVSELECT\" symbol="ATPIN" x="-5.08" y="-15.24" addlevel="always"/>
-<gate name="_00" symbol="ATPIN" x="-5.08" y="-12.7" addlevel="always"/>
+<gate name="_!DEVSELECT" symbol="ATPIN" x="-5.08" y="-15.24" addlevel="always"/>
+<gate name="_PHI0" symbol="ATPIN" x="-5.08" y="-12.7" addlevel="always"/>
 <gate name="_USER1" symbol="ATPIN" x="-5.08" y="-10.16" addlevel="always"/>
-<gate name="_01" symbol="ATPIN" x="-5.08" y="-7.62" addlevel="always"/>
+<gate name="_PHI1" symbol="ATPIN" x="-5.08" y="-7.62" addlevel="always"/>
 <gate name="_Q3" symbol="ATPIN" x="-5.08" y="-5.08" addlevel="always"/>
 <gate name="_7M" symbol="ATPIN" x="-5.08" y="-2.54" addlevel="always"/>
 <gate name="_NC@2" symbol="ATPIN" x="-5.08" y="0" addlevel="always"/>
 <gate name="_-5V" symbol="ATPIN" x="-5.08" y="2.54" addlevel="always"/>
 <gate name="_-12V" symbol="ATPIN" x="-5.08" y="5.08" addlevel="always"/>
-<gate name="_INH\" symbol="ATPIN" x="-5.08" y="7.62" addlevel="always"/>
-<gate name="_RES\" symbol="ATPIN" x="-5.08" y="10.16" addlevel="always"/>
-<gate name="_IRQ\" symbol="ATPIN" x="-5.08" y="12.7" addlevel="always"/>
-<gate name="_NMI\" symbol="ATPIN" x="-5.08" y="15.24" addlevel="always"/>
+<gate name="_!INH" symbol="ATPIN" x="-5.08" y="7.62" addlevel="always"/>
+<gate name="_!RES" symbol="ATPIN" x="-5.08" y="10.16" addlevel="always"/>
+<gate name="_!IRQ" symbol="ATPIN" x="-5.08" y="12.7" addlevel="always"/>
+<gate name="_!NMI" symbol="ATPIN" x="-5.08" y="15.24" addlevel="always"/>
 <gate name="_INT_IN" symbol="ATPIN" x="-5.08" y="17.78" addlevel="always"/>
 <gate name="_DMA_IN" symbol="ATPIN" x="-5.08" y="20.32" addlevel="always"/>
 <gate name="_GND" symbol="ATPIN" x="-5.08" y="22.86" addlevel="always"/>
-<gate name="_IOSELECT\" symbol="ATPIN" x="27.94" y="-38.1" addlevel="always"/>
+<gate name="_!IOSELECT" symbol="ATPIN" x="27.94" y="-38.1" addlevel="always"/>
 <gate name="_A00" symbol="ATPIN" x="27.94" y="-35.56" addlevel="always"/>
 <gate name="_A01" symbol="ATPIN" x="27.94" y="-33.02" addlevel="always"/>
 <gate name="_A02" symbol="ATPIN" x="27.94" y="-30.48" addlevel="always"/>
@@ -527,11 +527,11 @@ Pins are laid out as seen from the top of the slot</description>
 <gate name="_A13" symbol="ATPIN" x="27.94" y="-2.54" addlevel="always"/>
 <gate name="_A14" symbol="ATPIN" x="27.94" y="0" addlevel="always"/>
 <gate name="_A15" symbol="ATPIN" x="27.94" y="2.54" addlevel="always"/>
-<gate name="_RW" symbol="ATPIN" x="27.94" y="5.08" addlevel="always"/>
+<gate name="_R!W" symbol="ATPIN" x="27.94" y="5.08" addlevel="always"/>
 <gate name="_NC@1" symbol="ATPIN" x="27.94" y="7.62" addlevel="always"/>
-<gate name="_IOSTR\" symbol="ATPIN" x="27.94" y="10.16" addlevel="always"/>
+<gate name="_!IOSTR" symbol="ATPIN" x="27.94" y="10.16" addlevel="always"/>
 <gate name="_RDY" symbol="ATPIN" x="27.94" y="12.7" addlevel="always"/>
-<gate name="_DMA\" symbol="ATPIN" x="27.94" y="15.24" addlevel="always"/>
+<gate name="_!DMA" symbol="ATPIN" x="27.94" y="15.24" addlevel="always"/>
 <gate name="_INT_OUT" symbol="ATPIN" x="27.94" y="17.78" addlevel="always"/>
 <gate name="_DMA_OUT" symbol="ATPIN" x="27.94" y="20.32" addlevel="always"/>
 <gate name="_+5V" symbol="ATPIN" x="27.94" y="22.86" addlevel="always"/>
@@ -539,12 +539,18 @@ Pins are laid out as seen from the top of the slot</description>
 <devices>
 <device name="SLOT1-3" package="A2-50PIN-SL1-3">
 <connects>
+<connect gate="_!DEVSELECT" pin="P" pad="41"/>
+<connect gate="_!DMA" pin="P" pad="22"/>
+<connect gate="_!INH" pin="P" pad="32"/>
+<connect gate="_!IOSELECT" pin="P" pad="01"/>
+<connect gate="_!IOSTR" pin="P" pad="20"/>
+<connect gate="_!IRQ" pin="P" pad="30"/>
+<connect gate="_!NMI" pin="P" pad="29"/>
+<connect gate="_!RES" pin="P" pad="31"/>
 <connect gate="_+12V" pin="P" pad="50"/>
 <connect gate="_+5V" pin="P" pad="25"/>
 <connect gate="_-12V" pin="P" pad="33"/>
 <connect gate="_-5V" pin="P" pad="34"/>
-<connect gate="_00" pin="P" pad="40"/>
-<connect gate="_01" pin="P" pad="38"/>
 <connect gate="_7M" pin="P" pad="36"/>
 <connect gate="_A00" pin="P" pad="02"/>
 <connect gate="_A01" pin="P" pad="03"/>
@@ -570,24 +576,18 @@ Pins are laid out as seen from the top of the slot</description>
 <connect gate="_D5" pin="P" pad="44"/>
 <connect gate="_D6" pin="P" pad="43"/>
 <connect gate="_D7" pin="P" pad="42"/>
-<connect gate="_DEVSELECT\" pin="P" pad="41"/>
-<connect gate="_DMA\" pin="P" pad="22"/>
 <connect gate="_DMA_IN" pin="P" pad="27"/>
 <connect gate="_DMA_OUT" pin="P" pad="24"/>
 <connect gate="_GND" pin="P" pad="26"/>
-<connect gate="_INH\" pin="P" pad="32"/>
 <connect gate="_INT_IN" pin="P" pad="28"/>
 <connect gate="_INT_OUT" pin="P" pad="23"/>
-<connect gate="_IOSELECT\" pin="P" pad="01"/>
-<connect gate="_IOSTR\" pin="P" pad="20"/>
-<connect gate="_IRQ\" pin="P" pad="30"/>
 <connect gate="_NC@1" pin="P" pad="19"/>
 <connect gate="_NC@2" pin="P" pad="35"/>
-<connect gate="_NMI\" pin="P" pad="29"/>
+<connect gate="_PHI0" pin="P" pad="40"/>
+<connect gate="_PHI1" pin="P" pad="38"/>
 <connect gate="_Q3" pin="P" pad="37"/>
+<connect gate="_R!W" pin="P" pad="18"/>
 <connect gate="_RDY" pin="P" pad="21"/>
-<connect gate="_RES\" pin="P" pad="31"/>
-<connect gate="_RW" pin="P" pad="18"/>
 <connect gate="_USER1" pin="P" pad="39"/>
 </connects>
 <technologies>
@@ -596,12 +596,18 @@ Pins are laid out as seen from the top of the slot</description>
 </device>
 <device name="SLOT4-7" package="A2-50PIN-SL4-7">
 <connects>
+<connect gate="_!DEVSELECT" pin="P" pad="41"/>
+<connect gate="_!DMA" pin="P" pad="22"/>
+<connect gate="_!INH" pin="P" pad="32"/>
+<connect gate="_!IOSELECT" pin="P" pad="01"/>
+<connect gate="_!IOSTR" pin="P" pad="20"/>
+<connect gate="_!IRQ" pin="P" pad="30"/>
+<connect gate="_!NMI" pin="P" pad="29"/>
+<connect gate="_!RES" pin="P" pad="31"/>
 <connect gate="_+12V" pin="P" pad="50"/>
 <connect gate="_+5V" pin="P" pad="25"/>
 <connect gate="_-12V" pin="P" pad="33"/>
 <connect gate="_-5V" pin="P" pad="34"/>
-<connect gate="_00" pin="P" pad="40"/>
-<connect gate="_01" pin="P" pad="38"/>
 <connect gate="_7M" pin="P" pad="36"/>
 <connect gate="_A00" pin="P" pad="02"/>
 <connect gate="_A01" pin="P" pad="03"/>
@@ -627,24 +633,18 @@ Pins are laid out as seen from the top of the slot</description>
 <connect gate="_D5" pin="P" pad="44"/>
 <connect gate="_D6" pin="P" pad="43"/>
 <connect gate="_D7" pin="P" pad="42"/>
-<connect gate="_DEVSELECT\" pin="P" pad="41"/>
-<connect gate="_DMA\" pin="P" pad="22"/>
 <connect gate="_DMA_IN" pin="P" pad="27"/>
 <connect gate="_DMA_OUT" pin="P" pad="24"/>
 <connect gate="_GND" pin="P" pad="26"/>
-<connect gate="_INH\" pin="P" pad="32"/>
 <connect gate="_INT_IN" pin="P" pad="28"/>
 <connect gate="_INT_OUT" pin="P" pad="23"/>
-<connect gate="_IOSELECT\" pin="P" pad="01"/>
-<connect gate="_IOSTR\" pin="P" pad="20"/>
-<connect gate="_IRQ\" pin="P" pad="30"/>
 <connect gate="_NC@1" pin="P" pad="19"/>
 <connect gate="_NC@2" pin="P" pad="35"/>
-<connect gate="_NMI\" pin="P" pad="29"/>
+<connect gate="_PHI0" pin="P" pad="40"/>
+<connect gate="_PHI1" pin="P" pad="38"/>
 <connect gate="_Q3" pin="P" pad="37"/>
+<connect gate="_R!W" pin="P" pad="18"/>
 <connect gate="_RDY" pin="P" pad="21"/>
-<connect gate="_RES\" pin="P" pad="31"/>
-<connect gate="_RW" pin="P" pad="18"/>
 <connect gate="_USER1" pin="P" pad="39"/>
 </connects>
 <technologies>

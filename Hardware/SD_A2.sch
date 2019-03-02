@@ -421,14 +421,14 @@ Dimensions taken from Tech Note #28</description>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="A2-50PIN" prefix="ST" uservalue="yes">
+<deviceset name="A2-50PIN">
 <description>&lt;B&gt;Apple ][ Peripheral Card Connector&lt;/B&gt;
 &lt;br /&gt;
 This is the, default, 50-pin connector for slot #1 to #7
 &lt;br /&gt;
 Pins are laid out as seen from the top of the slot</description>
 <gates>
-<gate name="_-12V@2" symbol="ATPIN" x="-5.08" y="-38.1" addlevel="always"/>
+<gate name="_+12V" symbol="ATPIN" x="-5.08" y="-38.1" addlevel="always"/>
 <gate name="_D0" symbol="ATPIN" x="-5.08" y="-35.56" addlevel="always"/>
 <gate name="_D1" symbol="ATPIN" x="-5.08" y="-33.02" addlevel="always"/>
 <gate name="_D2" symbol="ATPIN" x="-5.08" y="-30.48" addlevel="always"/>
@@ -437,23 +437,23 @@ Pins are laid out as seen from the top of the slot</description>
 <gate name="_D5" symbol="ATPIN" x="-5.08" y="-22.86" addlevel="always"/>
 <gate name="_D6" symbol="ATPIN" x="-5.08" y="-20.32" addlevel="always"/>
 <gate name="_D7" symbol="ATPIN" x="-5.08" y="-17.78" addlevel="always"/>
-<gate name="_DEVSELECT\" symbol="ATPIN" x="-5.08" y="-15.24" addlevel="always"/>
-<gate name="_00" symbol="ATPIN" x="-5.08" y="-12.7" addlevel="always"/>
+<gate name="_!DEVSELECT" symbol="ATPIN" x="-5.08" y="-15.24" addlevel="always"/>
+<gate name="_PHI0" symbol="ATPIN" x="-5.08" y="-12.7" addlevel="always"/>
 <gate name="_USER1" symbol="ATPIN" x="-5.08" y="-10.16" addlevel="always"/>
-<gate name="_01" symbol="ATPIN" x="-5.08" y="-7.62" addlevel="always"/>
+<gate name="_PHI1" symbol="ATPIN" x="-5.08" y="-7.62" addlevel="always"/>
 <gate name="_Q3" symbol="ATPIN" x="-5.08" y="-5.08" addlevel="always"/>
 <gate name="_7M" symbol="ATPIN" x="-5.08" y="-2.54" addlevel="always"/>
 <gate name="_NC@2" symbol="ATPIN" x="-5.08" y="0" addlevel="always"/>
 <gate name="_-5V" symbol="ATPIN" x="-5.08" y="2.54" addlevel="always"/>
-<gate name="_-12V@1" symbol="ATPIN" x="-5.08" y="5.08" addlevel="always"/>
-<gate name="_INH\" symbol="ATPIN" x="-5.08" y="7.62" addlevel="always"/>
-<gate name="_RES\" symbol="ATPIN" x="-5.08" y="10.16" addlevel="always"/>
-<gate name="_IRQ\" symbol="ATPIN" x="-5.08" y="12.7" addlevel="always"/>
-<gate name="_NMI\" symbol="ATPIN" x="-5.08" y="15.24" addlevel="always"/>
+<gate name="_-12V" symbol="ATPIN" x="-5.08" y="5.08" addlevel="always"/>
+<gate name="_!INH" symbol="ATPIN" x="-5.08" y="7.62" addlevel="always"/>
+<gate name="_!RES" symbol="ATPIN" x="-5.08" y="10.16" addlevel="always"/>
+<gate name="_!IRQ" symbol="ATPIN" x="-5.08" y="12.7" addlevel="always"/>
+<gate name="_!NMI" symbol="ATPIN" x="-5.08" y="15.24" addlevel="always"/>
 <gate name="_INT_IN" symbol="ATPIN" x="-5.08" y="17.78" addlevel="always"/>
 <gate name="_DMA_IN" symbol="ATPIN" x="-5.08" y="20.32" addlevel="always"/>
 <gate name="_GND" symbol="ATPIN" x="-5.08" y="22.86" addlevel="always"/>
-<gate name="_IOSELECT\" symbol="ATPIN" x="27.94" y="-38.1" addlevel="always"/>
+<gate name="_!IOSELECT" symbol="ATPIN" x="27.94" y="-38.1" addlevel="always"/>
 <gate name="_A00" symbol="ATPIN" x="27.94" y="-35.56" addlevel="always"/>
 <gate name="_A01" symbol="ATPIN" x="27.94" y="-33.02" addlevel="always"/>
 <gate name="_A02" symbol="ATPIN" x="27.94" y="-30.48" addlevel="always"/>
@@ -470,11 +470,11 @@ Pins are laid out as seen from the top of the slot</description>
 <gate name="_A13" symbol="ATPIN" x="27.94" y="-2.54" addlevel="always"/>
 <gate name="_A14" symbol="ATPIN" x="27.94" y="0" addlevel="always"/>
 <gate name="_A15" symbol="ATPIN" x="27.94" y="2.54" addlevel="always"/>
-<gate name="_RW" symbol="ATPIN" x="27.94" y="5.08" addlevel="always"/>
+<gate name="_R!W" symbol="ATPIN" x="27.94" y="5.08" addlevel="always"/>
 <gate name="_NC@1" symbol="ATPIN" x="27.94" y="7.62" addlevel="always"/>
-<gate name="_IOSTR\" symbol="ATPIN" x="27.94" y="10.16" addlevel="always"/>
+<gate name="_!IOSTR" symbol="ATPIN" x="27.94" y="10.16" addlevel="always"/>
 <gate name="_RDY" symbol="ATPIN" x="27.94" y="12.7" addlevel="always"/>
-<gate name="_DMA\" symbol="ATPIN" x="27.94" y="15.24" addlevel="always"/>
+<gate name="_!DMA" symbol="ATPIN" x="27.94" y="15.24" addlevel="always"/>
 <gate name="_INT_OUT" symbol="ATPIN" x="27.94" y="17.78" addlevel="always"/>
 <gate name="_DMA_OUT" symbol="ATPIN" x="27.94" y="20.32" addlevel="always"/>
 <gate name="_+5V" symbol="ATPIN" x="27.94" y="22.86" addlevel="always"/>
@@ -482,12 +482,18 @@ Pins are laid out as seen from the top of the slot</description>
 <devices>
 <device name="SLOT1-3" package="A2-50PIN-SL1-3">
 <connects>
+<connect gate="_!DEVSELECT" pin="P" pad="41"/>
+<connect gate="_!DMA" pin="P" pad="22"/>
+<connect gate="_!INH" pin="P" pad="32"/>
+<connect gate="_!IOSELECT" pin="P" pad="01"/>
+<connect gate="_!IOSTR" pin="P" pad="20"/>
+<connect gate="_!IRQ" pin="P" pad="30"/>
+<connect gate="_!NMI" pin="P" pad="29"/>
+<connect gate="_!RES" pin="P" pad="31"/>
+<connect gate="_+12V" pin="P" pad="50"/>
 <connect gate="_+5V" pin="P" pad="25"/>
-<connect gate="_-12V@1" pin="P" pad="33"/>
-<connect gate="_-12V@2" pin="P" pad="50"/>
+<connect gate="_-12V" pin="P" pad="33"/>
 <connect gate="_-5V" pin="P" pad="34"/>
-<connect gate="_00" pin="P" pad="40"/>
-<connect gate="_01" pin="P" pad="38"/>
 <connect gate="_7M" pin="P" pad="36"/>
 <connect gate="_A00" pin="P" pad="02"/>
 <connect gate="_A01" pin="P" pad="03"/>
@@ -513,24 +519,18 @@ Pins are laid out as seen from the top of the slot</description>
 <connect gate="_D5" pin="P" pad="44"/>
 <connect gate="_D6" pin="P" pad="43"/>
 <connect gate="_D7" pin="P" pad="42"/>
-<connect gate="_DEVSELECT\" pin="P" pad="41"/>
-<connect gate="_DMA\" pin="P" pad="22"/>
 <connect gate="_DMA_IN" pin="P" pad="27"/>
 <connect gate="_DMA_OUT" pin="P" pad="24"/>
 <connect gate="_GND" pin="P" pad="26"/>
-<connect gate="_INH\" pin="P" pad="32"/>
 <connect gate="_INT_IN" pin="P" pad="28"/>
 <connect gate="_INT_OUT" pin="P" pad="23"/>
-<connect gate="_IOSELECT\" pin="P" pad="01"/>
-<connect gate="_IOSTR\" pin="P" pad="20"/>
-<connect gate="_IRQ\" pin="P" pad="30"/>
 <connect gate="_NC@1" pin="P" pad="19"/>
 <connect gate="_NC@2" pin="P" pad="35"/>
-<connect gate="_NMI\" pin="P" pad="29"/>
+<connect gate="_PHI0" pin="P" pad="40"/>
+<connect gate="_PHI1" pin="P" pad="38"/>
 <connect gate="_Q3" pin="P" pad="37"/>
+<connect gate="_R!W" pin="P" pad="18"/>
 <connect gate="_RDY" pin="P" pad="21"/>
-<connect gate="_RES\" pin="P" pad="31"/>
-<connect gate="_RW" pin="P" pad="18"/>
 <connect gate="_USER1" pin="P" pad="39"/>
 </connects>
 <technologies>
@@ -539,12 +539,18 @@ Pins are laid out as seen from the top of the slot</description>
 </device>
 <device name="SLOT4-7" package="A2-50PIN-SL4-7">
 <connects>
+<connect gate="_!DEVSELECT" pin="P" pad="41"/>
+<connect gate="_!DMA" pin="P" pad="22"/>
+<connect gate="_!INH" pin="P" pad="32"/>
+<connect gate="_!IOSELECT" pin="P" pad="01"/>
+<connect gate="_!IOSTR" pin="P" pad="20"/>
+<connect gate="_!IRQ" pin="P" pad="30"/>
+<connect gate="_!NMI" pin="P" pad="29"/>
+<connect gate="_!RES" pin="P" pad="31"/>
+<connect gate="_+12V" pin="P" pad="50"/>
 <connect gate="_+5V" pin="P" pad="25"/>
-<connect gate="_-12V@1" pin="P" pad="33"/>
-<connect gate="_-12V@2" pin="P" pad="50"/>
+<connect gate="_-12V" pin="P" pad="33"/>
 <connect gate="_-5V" pin="P" pad="34"/>
-<connect gate="_00" pin="P" pad="40"/>
-<connect gate="_01" pin="P" pad="38"/>
 <connect gate="_7M" pin="P" pad="36"/>
 <connect gate="_A00" pin="P" pad="02"/>
 <connect gate="_A01" pin="P" pad="03"/>
@@ -570,24 +576,18 @@ Pins are laid out as seen from the top of the slot</description>
 <connect gate="_D5" pin="P" pad="44"/>
 <connect gate="_D6" pin="P" pad="43"/>
 <connect gate="_D7" pin="P" pad="42"/>
-<connect gate="_DEVSELECT\" pin="P" pad="41"/>
-<connect gate="_DMA\" pin="P" pad="22"/>
 <connect gate="_DMA_IN" pin="P" pad="27"/>
 <connect gate="_DMA_OUT" pin="P" pad="24"/>
 <connect gate="_GND" pin="P" pad="26"/>
-<connect gate="_INH\" pin="P" pad="32"/>
 <connect gate="_INT_IN" pin="P" pad="28"/>
 <connect gate="_INT_OUT" pin="P" pad="23"/>
-<connect gate="_IOSELECT\" pin="P" pad="01"/>
-<connect gate="_IOSTR\" pin="P" pad="20"/>
-<connect gate="_IRQ\" pin="P" pad="30"/>
 <connect gate="_NC@1" pin="P" pad="19"/>
 <connect gate="_NC@2" pin="P" pad="35"/>
-<connect gate="_NMI\" pin="P" pad="29"/>
+<connect gate="_PHI0" pin="P" pad="40"/>
+<connect gate="_PHI1" pin="P" pad="38"/>
 <connect gate="_Q3" pin="P" pad="37"/>
+<connect gate="_R!W" pin="P" pad="18"/>
 <connect gate="_RDY" pin="P" pad="21"/>
-<connect gate="_RES\" pin="P" pad="31"/>
-<connect gate="_RW" pin="P" pad="18"/>
 <connect gate="_USER1" pin="P" pad="39"/>
 </connects>
 <technologies>
@@ -17401,7 +17401,7 @@ type I, package type TS</description>
 <plain>
 </plain>
 <instances>
-<instance part="ST1" gate="_-12V@2" x="73.66" y="35.56" rot="R180"/>
+<instance part="ST1" gate="_+12V" x="73.66" y="35.56" rot="R180"/>
 <instance part="ST1" gate="_D0" x="73.66" y="132.08" rot="R180"/>
 <instance part="ST1" gate="_D1" x="73.66" y="129.54" rot="R180"/>
 <instance part="ST1" gate="_D2" x="73.66" y="127" rot="R180"/>
@@ -17410,16 +17410,16 @@ type I, package type TS</description>
 <instance part="ST1" gate="_D5" x="73.66" y="119.38" rot="R180"/>
 <instance part="ST1" gate="_D6" x="73.66" y="116.84" rot="R180"/>
 <instance part="ST1" gate="_D7" x="73.66" y="114.3" rot="R180"/>
-<instance part="ST1" gate="_DEVSELECT\" x="73.66" y="76.2" rot="R180"/>
-<instance part="ST1" gate="_00" x="73.66" y="106.68" rot="R180"/>
+<instance part="ST1" gate="_!DEVSELECT" x="73.66" y="76.2" rot="R180"/>
+<instance part="ST1" gate="_PHI0" x="73.66" y="106.68" rot="R180"/>
 <instance part="ST1" gate="_7M" x="73.66" y="165.1" rot="R180"/>
 <instance part="ST1" gate="_-5V" x="73.66" y="20.32" rot="R180"/>
-<instance part="ST1" gate="_-12V@1" x="73.66" y="27.94" rot="R180"/>
-<instance part="ST1" gate="_RES\" x="73.66" y="78.74" rot="R180"/>
+<instance part="ST1" gate="_-12V" x="73.66" y="27.94" rot="R180"/>
+<instance part="ST1" gate="_!RES" x="73.66" y="78.74" rot="R180"/>
 <instance part="ST1" gate="_INT_IN" x="73.66" y="144.78" rot="R180"/>
 <instance part="ST1" gate="_DMA_IN" x="73.66" y="149.86" rot="R180"/>
 <instance part="ST1" gate="_GND" x="73.66" y="10.16" rot="R180"/>
-<instance part="ST1" gate="_IOSELECT\" x="73.66" y="81.28" rot="R180"/>
+<instance part="ST1" gate="_!IOSELECT" x="73.66" y="81.28" rot="R180"/>
 <instance part="ST1" gate="_A00" x="73.66" y="50.8" rot="R180"/>
 <instance part="ST1" gate="_A01" x="73.66" y="53.34" rot="R180"/>
 <instance part="ST1" gate="_A02" x="73.66" y="55.88" rot="R180"/>
@@ -17432,8 +17432,8 @@ type I, package type TS</description>
 <instance part="ST1" gate="_A09" x="73.66" y="177.8" rot="R180"/>
 <instance part="ST1" gate="_A10" x="73.66" y="175.26" rot="R180"/>
 <instance part="ST1" gate="_A11" x="73.66" y="172.72" rot="R180"/>
-<instance part="ST1" gate="_RW" x="73.66" y="162.56" rot="R180"/>
-<instance part="ST1" gate="_IOSTR\" x="73.66" y="167.64" rot="R180"/>
+<instance part="ST1" gate="_R!W" x="73.66" y="162.56" rot="R180"/>
+<instance part="ST1" gate="_!IOSTR" x="73.66" y="167.64" rot="R180"/>
 <instance part="ST1" gate="_INT_OUT" x="73.66" y="142.24" rot="R180"/>
 <instance part="ST1" gate="_DMA_OUT" x="73.66" y="152.4" rot="R180"/>
 <instance part="ST1" gate="_+5V" x="73.66" y="12.7" rot="R180"/>
@@ -17789,7 +17789,7 @@ type I, package type TS</description>
 <segment>
 <pinref part="IC1" gate="A" pin="DIR"/>
 <label x="124.46" y="137.16" size="1.778" layer="95"/>
-<pinref part="ST1" gate="_RW" pin="P"/>
+<pinref part="ST1" gate="_R!W" pin="P"/>
 <wire x1="76.2" y1="162.56" x2="132.08" y2="162.56" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="162.56" x2="167.64" y2="162.56" width="0.1524" layer="91"/>
 <wire x1="167.64" y1="137.16" x2="167.64" y2="162.56" width="0.1524" layer="91"/>
@@ -17803,7 +17803,7 @@ type I, package type TS</description>
 </net>
 <net name="PHI_0" class="0">
 <segment>
-<pinref part="ST1" gate="_00" pin="P"/>
+<pinref part="ST1" gate="_PHI0" pin="P"/>
 <wire x1="76.2" y1="106.68" x2="162.56" y2="106.68" width="0.1524" layer="91"/>
 <label x="78.74" y="106.68" size="1.778" layer="95"/>
 <pinref part="IC4" gate="G$1" pin="FB01/15"/>
@@ -18327,7 +18327,7 @@ type I, package type TS</description>
 </net>
 <net name="!IO_STR" class="0">
 <segment>
-<pinref part="ST1" gate="_IOSTR\" pin="P"/>
+<pinref part="ST1" gate="_!IOSTR" pin="P"/>
 <wire x1="195.58" y1="167.64" x2="76.2" y2="167.64" width="0.1524" layer="91"/>
 <label x="78.74" y="167.64" size="1.778" layer="95"/>
 <pinref part="IC4" gate="G$1" pin="FB02/14"/>
@@ -18341,7 +18341,7 @@ type I, package type TS</description>
 <label x="78.74" y="76.2" size="1.778" layer="95"/>
 <wire x1="208.28" y1="76.2" x2="208.28" y2="93.98" width="0.1524" layer="91"/>
 <wire x1="208.28" y1="76.2" x2="76.2" y2="76.2" width="0.1524" layer="91"/>
-<pinref part="ST1" gate="_DEVSELECT\" pin="P"/>
+<pinref part="ST1" gate="_!DEVSELECT" pin="P"/>
 </segment>
 </net>
 <net name="!RESET" class="0">
@@ -18350,7 +18350,7 @@ type I, package type TS</description>
 <pinref part="IC4" gate="G$1" pin="FB03/15"/>
 <wire x1="205.74" y1="78.74" x2="205.74" y2="93.98" width="0.1524" layer="91"/>
 <label x="78.74" y="78.74" size="1.778" layer="95"/>
-<pinref part="ST1" gate="_RES\" pin="P"/>
+<pinref part="ST1" gate="_!RES" pin="P"/>
 </segment>
 </net>
 <net name="CLK" class="0">
@@ -18377,7 +18377,7 @@ type I, package type TS</description>
 <segment>
 <pinref part="IC4" gate="G$1" pin="FB03/09"/>
 <wire x1="198.12" y1="93.98" x2="198.12" y2="81.28" width="0.1524" layer="91"/>
-<pinref part="ST1" gate="_IOSELECT\" pin="P"/>
+<pinref part="ST1" gate="_!IOSELECT" pin="P"/>
 <wire x1="198.12" y1="81.28" x2="76.2" y2="81.28" width="0.1524" layer="91"/>
 <label x="78.74" y="81.28" size="1.778" layer="95"/>
 </segment>
@@ -18394,7 +18394,7 @@ type I, package type TS</description>
 </net>
 <net name="+12V" class="0">
 <segment>
-<pinref part="ST1" gate="_-12V@2" pin="P"/>
+<pinref part="ST1" gate="_+12V" pin="P"/>
 <pinref part="P+6" gate="1" pin="+12V"/>
 <wire x1="76.2" y1="35.56" x2="81.28" y2="35.56" width="0.1524" layer="91"/>
 <wire x1="81.28" y1="35.56" x2="81.28" y2="38.1" width="0.1524" layer="91"/>
@@ -18407,7 +18407,7 @@ type I, package type TS</description>
 </net>
 <net name="-12V" class="0">
 <segment>
-<pinref part="ST1" gate="_-12V@1" pin="P"/>
+<pinref part="ST1" gate="_-12V" pin="P"/>
 <pinref part="P-2" gate="1" pin="-12V"/>
 <wire x1="76.2" y1="27.94" x2="81.28" y2="27.94" width="0.1524" layer="91"/>
 <wire x1="81.28" y1="27.94" x2="81.28" y2="30.48" width="0.1524" layer="91"/>

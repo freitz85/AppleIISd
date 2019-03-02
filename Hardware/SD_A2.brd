@@ -3319,7 +3319,7 @@ Covered vias can be set in Masks (Limit).
 </pass>
 </autorouter>
 <elements>
-<element name="ST1" library="con-apple2" package="A2-50PIN-SL1-3" value="" x="100.33" y="0" smashed="yes">
+<element name="ST1" library="con-apple2" package="A2-50PIN-SL1-3" value="A2-50PINSLOT1-3" x="100.33" y="0" smashed="yes">
 <attribute name="VALUE" x="94.615" y="-0.635" size="1.778" layer="27"/>
 </element>
 <element name="IC4" library="xilinx-xc9" package="S44" value="XC9572XL" x="36.81" y="64.21" smashed="yes">
