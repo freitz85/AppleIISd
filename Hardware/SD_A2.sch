@@ -17913,7 +17913,7 @@ type I, package type TS</description>
 <wire x1="243.84" y1="71.12" x2="251.46" y2="71.12" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$5" class="0">
+<net name="DMA" class="0">
 <segment>
 <pinref part="ST1" gate="_DMA_OUT" pin="P"/>
 <wire x1="76.2" y1="152.4" x2="78.74" y2="152.4" width="0.1524" layer="91"/>
@@ -17922,7 +17922,7 @@ type I, package type TS</description>
 <wire x1="78.74" y1="149.86" x2="76.2" y2="149.86" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$6" class="0">
+<net name="INT" class="0">
 <segment>
 <pinref part="ST1" gate="_INT_IN" pin="P"/>
 <wire x1="76.2" y1="144.78" x2="78.74" y2="144.78" width="0.1524" layer="91"/>
