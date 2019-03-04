@@ -16,11 +16,12 @@ typedef enum
 } STATE_CURSOR_T;
 
 
-void writeChip(const byte* pSource, byte* pDest, unsigned length);
-void printStatus(byte percentage);
+
+void writeChip(const uint8* pSource, uint8* pDest, uint16 length);
+void printStatus(uint8 percentage);
 
 // Binary can't be larger than 2k
-byte buffer[2048] = { 0 };
+uint8 buffer[2048] = { 0 };
 
 int main()
 {
@@ -28,8 +29,8 @@ int main()
     char slotNum;
 
     APPLE_II_SD_T* pAIISD = (APPLE_II_SD_T*)SLOT_IO_START;
-    byte* pSlotRom = SLOT_ROM_START;
-    byte* pExtRom = EXT_ROM_START;
+    uint8* pSlotRom = SLOT_ROM_START;
+    uint8* pExtRom = EXT_ROM_START;
 
     videomode(VIDEOMODE_80COL);
     clrscr();
@@ -49,7 +50,7 @@ int main()
         return 1;   // failure
     }
 
-    ((byte*)pAIISD) += slotNum << 4;
+    ((uint8*)pAIISD) += slotNum << 4;
     pSlotRom += slotNum << 8;
 
     // open file
@@ -57,8 +58,12 @@ int main()
     if(pFile)
     {
         // read buffer
-        unsigned fileSize = fread(buffer, sizeof(buffer), 1, pFile);
+        uint16 fileSize = fread(buffer, 1, sizeof(buffer), pFile);
+        fclose(pFile);
+        pFile = NULL;
 
+        if(fileSize == 2048)
+        {
         // enable write
         pAIISD->status.pgmen = 1;
 
@@ -75,14 +80,12 @@ int main()
 
         // zero rest of chip
         if(fileSize < 2048)
-        {
-            cprintf("\r\rErase rest of chip: ");
-            writeChip(NULL, pExtRom + fileSize, 2048 - fileSize);
         }
-
-        // disable write
-        pAIISD->status.pgmen = 0;
-        cprintf("\r\r Flashing finished!\r");
+        else
+        {
+            cprintf("\r\nWrong file size: %d\r\n", fileSize);
+            return 1;
+        }
     }
     else
     {
@@ -93,9 +96,9 @@ int main()
     return 0;   // success
 }
 
-void writeChip(const byte* pSource, byte* pDest, unsigned length)
+void writeChip(const uint8* pSource, uint8* pDest, uint16 length)
 {
-    unsigned i;
+    uint32 i;
     for(i=0; i<length; i++)
     {
         if(pSource)
@@ -113,11 +116,12 @@ void writeChip(const byte* pSource, byte* pDest, unsigned length)
     }
 }
 
-void printStatus(byte percentage)
+void printStatus(uint8 percentage)
 {
     static STATE_CURSOR_T state = STATE_0;
+    uint8 wait = 0;
 
-    byte x = wherex();
+    uint8 x = wherex();
     cprintf("% 2hhu %c", percentage, (char)state);
     gotox(x);
 

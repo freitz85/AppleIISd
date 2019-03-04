@@ -23,6 +23,7 @@
     </None>
     <None Include="Makefile.options" />
     <None Include="..\README.md" />
+    <None Include="..\AppleIISd.bin.map" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

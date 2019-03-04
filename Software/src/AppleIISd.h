@@ -1,19 +1,21 @@
 #ifndef APPLE_II_SD_H
 #define APPLE_II_SD_H
 
-typedef unsigned char byte;
+typedef unsigned char   uint8;
+typedef unsigned short  uint16;
+typedef unsigned int    uint32;
 
-#define SLOT_IO_START   (byte*)0xC080
-#define SLOT_ROM_START  (byte*)0xC000
-#define EXT_ROM_START   (byte*)0xC800
+#define SLOT_IO_START   (uint8*)0xC080
+#define SLOT_ROM_START  (uint8*)0xC000
+#define EXT_ROM_START   (uint8*)0xC800
 
-#define CFFF            (byte*)0xCFFF
+#define CFFF            (uint8*)0xCFFF
 
 typedef struct
 {
     // data register 
     // +0
-    byte data;
+    uint8 data;
 
     // status register
     // +1
@@ -31,7 +33,7 @@ typedef struct
             const unsigned tc : 1;
         };
 
-        byte status;
+        uint8 status;
     } status;
 
     // clock divisor register
@@ -55,7 +57,7 @@ typedef struct
             unsigned inited : 1;
         };
 
-        byte ss_card;
+        uint8 ss_card;
     } ss_card;
 } APPLE_II_SD_T;
 

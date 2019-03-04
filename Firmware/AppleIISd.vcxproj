@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\AppleIISd.bin.map" />
     <None Include="..\README.md" />
     <None Include="makefile" />
     <None Include="Makefile.options" />
