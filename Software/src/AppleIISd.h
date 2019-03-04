@@ -3,7 +3,7 @@
 
 typedef unsigned char   uint8;
 typedef unsigned short  uint16;
-typedef unsigned int    uint32;
+typedef unsigned long   uint32;
 
 #define SLOT_IO_START   (uint8*)0xC080
 #define SLOT_ROM_START  (uint8*)0xC000

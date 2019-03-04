@@ -5,16 +5,19 @@
 #include <conio.h>
 #include <apple2enh.h>
 
+#define BIN_FILE_NAME   "AppleIISd.bin"
+
 typedef enum
 {
-    STATE_0 = 0x7C,     // pipe
-    STATE_1 = 0x2F,     // slash
-    STATE_2 = 0x2D,     // hyphen
-    STATE_3 = 0x5C,     // backslash
+    STATE_0,     // pipe
+    STATE_1,     // slash
+    STATE_2,     // hyphen
+    STATE_3,     // backslash
 
     STATE_LAST          // don't use
 } STATE_CURSOR_T;
 
+const char state_char[STATE_LAST] = { '|', '/', '-', '\\' };
 
 
 void writeChip(const uint8* pSource, uint8* pDest, uint16 length);
@@ -34,19 +37,20 @@ int main()
 
     videomode(VIDEOMODE_80COL);
     clrscr();
-    cprintf("AppleIISd firmware flasher\r");
-    cprintf("(c) 2019 Florian Reitz\r\r");
+    cprintf("AppleIISd firmware flasher\r\n");
+    cprintf("(c) 2019 Florian Reitz\r\n\r\n");
     
     // ask for slot
     cursor(1);      // enable blinking cursor
     cprintf("Slot number (1-7): ");
-    slotNum = cgetc();
-    cursor(0);      // disable blinking cursor    
+    cscanf("%c", &slotNum);
+    slotNum -= 0x30;
+    cursor(0);      // disable blinking cursor
 
     // check if slot is valid
     if((slotNum < 1) || (slotNum > 7))
     {
-        cprintf("Invalid slot number!");
+        cprintf("\r\nInvalid slot number!");
         return 1;   // failure
     }
 
@@ -54,7 +58,7 @@ int main()
     pSlotRom += slotNum << 8;
 
     // open file
-    pFile = fopen("AppleIISd.bin", "rb");
+    pFile = fopen(BIN_FILE_NAME, "rb");
     if(pFile)
     {
         // read buffer
@@ -64,22 +68,23 @@ int main()
 
         if(fileSize == 2048)
         {
-        // enable write
-        pAIISD->status.pgmen = 1;
+            // enable write
+            pAIISD->status.pgmen = 1;
 
-        // clear 0xCFFF
-        *CFFF = 0;
+            // clear 0xCFFF
+            *CFFF = 0;
 
-        // write to SLOTROM
-        cprintf("\r\rFlashing SLOTROM: ");
-        writeChip(buffer, pSlotRom, 256);
+            // write to SLOTROM
+            cprintf("\r\n\r\nFlashing SLOTROM: ");
+            writeChip(buffer, pSlotRom, 256);
 
-        // write to EXTROM
-        cprintf("\r\rFlashing EXTROM: ");
-        writeChip(buffer + 256, pExtRom, fileSize - 256);
+            // write to EXTROM
+            cprintf("\r\nFlashing EXTROM:  ");
+            writeChip(buffer + 256, pExtRom, fileSize - 256);
 
-        // zero rest of chip
-        if(fileSize < 2048)
+            // disable write
+            pAIISD->status.pgmen = 0;
+            cprintf("\r\n\r\nFlashing finished!\n");
         }
         else
         {
@@ -89,7 +94,7 @@ int main()
     }
     else
     {
-        cprintf("Can't open binary file: %d\r", errno);
+        cprintf("\r\nCan't open %s file\r\n", BIN_FILE_NAME);
         return 1;
     }
 
@@ -111,7 +116,7 @@ void writeChip(const uint8* pSource, uint8* pDest, uint16 length)
             *pDest = 0;
         }
 
-        printStatus(i * 100 / length);
+        printStatus((i * 100u / length) + 1);
         pDest++;
     }
 }
@@ -120,10 +125,16 @@ void printStatus(uint8 percentage)
 {
     static STATE_CURSOR_T state = STATE_0;
     uint8 wait = 0;
-
     uint8 x = wherex();
-    cprintf("% 2hhu %c", percentage, (char)state);
+    char cState = (percentage < 100) ? state_char[state] : ' ';
+
+    cprintf("% 2hhu%% %c", percentage, cState);
     gotox(x);
+
+    while(wait < 0xff)
+    {
+        wait++;
+    }
 
     state++;
     if(state == STATE_LAST)
