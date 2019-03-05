@@ -20,7 +20,7 @@ typedef enum
 const char state_char[STATE_LAST] = { '|', '/', '-', '\\' };
 
 
-void writeChip(const uint8* pSource, uint8* pDest, uint16 length);
+boolean writeChip(const uint8* pSource, uint8* pDest, uint16 length);
 void printStatus(uint8 percentage);
 
 // Binary can't be larger than 2k
@@ -28,6 +28,7 @@ uint8 buffer[2048] = { 0 };
 
 int main()
 {
+    int retval = 0;
     FILE* pFile;
     char slotNum;
 
@@ -76,49 +77,68 @@ int main()
 
             // write to SLOTROM
             cprintf("\r\n\r\nFlashing SLOTROM: ");
-            writeChip(buffer, pSlotRom, 256);
-
-            // write to EXTROM
-            cprintf("\r\nFlashing EXTROM:  ");
-            writeChip(buffer + 256, pExtRom, fileSize - 256);
+            if(writeChip(buffer, pSlotRom, 256))
+            {
+                // write to EXTROM
+                cprintf("\r\nFlashing EXTROM:  ");
+                if(writeChip(buffer + 256, pExtRom, fileSize - 256))
+                {
+                    cprintf("\r\n\r\nFlashing finished!\n");
+                }
+                else
+                {
+                    retval = 1;
+                }
+            }
+            else
+            {
+                retval = 1;
+            }
 
             // disable write
             pAIISD->status.pgmen = 0;
-            cprintf("\r\n\r\nFlashing finished!\n");
         }
         else
         {
             cprintf("\r\nWrong file size: %d\r\n", fileSize);
-            return 1;
+            retval = 1;
         }
     }
     else
     {
         cprintf("\r\nCan't open %s file\r\n", BIN_FILE_NAME);
-        return 1;
+        retval = 1;
     }
 
-    return 0;   // success
+    return retval;
 }
 
-void writeChip(const uint8* pSource, uint8* pDest, uint16 length)
+boolean writeChip(const uint8* pSource, uint8* pDest, uint16 length)
 {
     uint32 i;
+    uint8 data = 0;
+
     for(i=0; i<length; i++)
     {
+        // set 0 if no source
         if(pSource)
         {
-            *pDest = pSource[i];
+            data = pSource[i];
         }
-        else
+
+        *pDest = data;
+        if(*pDest != data)
         {
-            // erase if no source
-            *pDest = 0;
+            // verification not successful
+            cprintf("\r\n\r\n!!! Flashing failed at %p !!!\r\n", pDest);
+            return FALSE;
         }
 
         printStatus((i * 100u / length) + 1);
         pDest++;
     }
+
+    return TRUE;
 }
 
 void printStatus(uint8 percentage)
