@@ -1,3 +1,3 @@
 make
-java -jar AppleCommander-1.3.5.jar -d cc65.dsk %~n1
-java -jar AppleCommander-1.3.5.jar -cc65 cc65.dsk %~n1 bin < %1
+java -jar AppleCommander-ac-1.5.0.jar -d flasher.dsk %~n1
+java -jar AppleCommander-ac-1.5.0.jar -as flasher.dsk %~n1 < %1

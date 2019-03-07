@@ -36,7 +36,7 @@ int main()
     uint8* pSlotRom = SLOT_ROM_START;
     uint8* pExtRom = EXT_ROM_START;
 
-    videomode(VIDEOMODE_80COL);
+    videomode(VIDEOMODE_40COL);
     clrscr();
     cprintf("AppleIISd firmware flasher\r\n");
     cprintf("(c) 2019 Florian Reitz\r\n\r\n");
@@ -52,6 +52,7 @@ int main()
     if((slotNum < 1) || (slotNum > 7))
     {
         cprintf("\r\nInvalid slot number!");
+        cgetc();
         return 1;   // failure
     }
 
@@ -110,6 +111,7 @@ int main()
         retval = 1;
     }
 
+    cgetc();
     return retval;
 }
 
@@ -127,6 +129,10 @@ boolean writeChip(const uint8* pSource, uint8* pDest, uint16 length)
         }
 
         *pDest = data;
+
+        // use print as writecycle
+        printStatus((i * 100u / length) + 1);
+
         if(*pDest != data)
         {
             // verification not successful
@@ -134,7 +140,6 @@ boolean writeChip(const uint8* pSource, uint8* pDest, uint16 length)
             return FALSE;
         }
 
-        printStatus((i * 100u / length) + 1);
         pDest++;
     }
 
@@ -148,7 +153,7 @@ void printStatus(uint8 percentage)
     uint8 x = wherex();
     char cState = (percentage < 100) ? state_char[state] : ' ';
 
-    cprintf("% 2hhu%% %c", percentage, cState);
+    cprintf("% 3hhu%% %c", percentage, cState);
     gotox(x);
 
     while(wait < 0xff)
