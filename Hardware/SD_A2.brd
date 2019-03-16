@@ -339,6 +339,10 @@ http://www.xilinx.com&lt;br&gt;
 <packages>
 <package name="S44">
 <description>&lt;b&gt;PLCC SOCKET&lt;/b&gt;</description>
+<circle x="-2.54" y="2.54" radius="1.27" width="0.1524" layer="21"/>
+<circle x="2.54" y="2.54" radius="1.27" width="0.1524" layer="21"/>
+<circle x="-2.54" y="-2.54" radius="1.27" width="0.1524" layer="21"/>
+<circle x="2.54" y="-2.54" radius="1.27" width="0.1524" layer="21"/>
 <wire x1="-10.16" y1="11.684" x2="-11.684" y2="10.16" width="0.1524" layer="21"/>
 <wire x1="-11.684" y1="10.16" x2="-11.684" y2="-11.049" width="0.1524" layer="21"/>
 <wire x1="-8.255" y1="6.985" x2="-6.985" y2="8.255" width="0.1524" layer="21"/>
@@ -582,10 +586,21 @@ http://www.xilinx.com&lt;br&gt;
 <wire x1="-1.27" y1="3.81" x2="1.27" y2="3.81" width="0.1524" layer="21"/>
 <wire x1="1.27" y1="3.81" x2="0" y2="5.08" width="0.1524" layer="21"/>
 <wire x1="0" y1="5.08" x2="-1.27" y2="3.81" width="0.1524" layer="21"/>
-<circle x="-2.54" y="2.54" radius="1.27" width="0.1524" layer="21"/>
-<circle x="2.54" y="2.54" radius="1.27" width="0.1524" layer="21"/>
-<circle x="-2.54" y="-2.54" radius="1.27" width="0.1524" layer="21"/>
-<circle x="2.54" y="-2.54" radius="1.27" width="0.1524" layer="21"/>
+<rectangle x1="-0.508" y1="2.159" x2="0.508" y2="4.064" layer="21"/>
+<rectangle x1="-0.889" y1="3.81" x2="0.889" y2="4.191" layer="21"/>
+<rectangle x1="-0.635" y1="4.191" x2="0.635" y2="4.445" layer="21"/>
+<rectangle x1="-0.381" y1="4.445" x2="0.381" y2="4.699" layer="21"/>
+<rectangle x1="-0.127" y1="4.699" x2="0.127" y2="4.953" layer="21"/>
+<rectangle x1="-1.143" y1="3.81" x2="-0.889" y2="3.937" layer="21"/>
+<rectangle x1="-1.016" y1="3.937" x2="-0.889" y2="4.064" layer="21"/>
+<rectangle x1="-0.762" y1="4.191" x2="-0.635" y2="4.318" layer="21"/>
+<rectangle x1="-0.508" y1="4.445" x2="-0.381" y2="4.572" layer="21"/>
+<rectangle x1="-0.254" y1="4.699" x2="-0.127" y2="4.826" layer="21"/>
+<rectangle x1="0.127" y1="4.699" x2="0.254" y2="4.826" layer="21"/>
+<rectangle x1="0.381" y1="4.445" x2="0.508" y2="4.572" layer="21"/>
+<rectangle x1="0.635" y1="4.191" x2="0.762" y2="4.318" layer="21"/>
+<rectangle x1="0.889" y1="3.81" x2="1.143" y2="3.937" layer="21"/>
+<rectangle x1="0.889" y1="3.937" x2="1.016" y2="4.064" layer="21"/>
 <pad name="1" x="1.27" y="6.35" drill="0.8128"/>
 <pad name="2" x="-1.27" y="8.89" drill="0.8128" shape="octagon"/>
 <pad name="3" x="-1.27" y="6.35" drill="0.8128" shape="octagon"/>
@@ -633,21 +648,6 @@ http://www.xilinx.com&lt;br&gt;
 <text x="-2.54" y="11.938" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
 <text x="-10.16" y="11.938" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <text x="8.255" y="-10.795" size="1.27" layer="21" ratio="10">44</text>
-<rectangle x1="-0.508" y1="2.159" x2="0.508" y2="4.064" layer="21"/>
-<rectangle x1="-0.889" y1="3.81" x2="0.889" y2="4.191" layer="21"/>
-<rectangle x1="-0.635" y1="4.191" x2="0.635" y2="4.445" layer="21"/>
-<rectangle x1="-0.381" y1="4.445" x2="0.381" y2="4.699" layer="21"/>
-<rectangle x1="-0.127" y1="4.699" x2="0.127" y2="4.953" layer="21"/>
-<rectangle x1="-1.143" y1="3.81" x2="-0.889" y2="3.937" layer="21"/>
-<rectangle x1="-1.016" y1="3.937" x2="-0.889" y2="4.064" layer="21"/>
-<rectangle x1="-0.762" y1="4.191" x2="-0.635" y2="4.318" layer="21"/>
-<rectangle x1="-0.508" y1="4.445" x2="-0.381" y2="4.572" layer="21"/>
-<rectangle x1="-0.254" y1="4.699" x2="-0.127" y2="4.826" layer="21"/>
-<rectangle x1="0.127" y1="4.699" x2="0.254" y2="4.826" layer="21"/>
-<rectangle x1="0.381" y1="4.445" x2="0.508" y2="4.572" layer="21"/>
-<rectangle x1="0.635" y1="4.191" x2="0.762" y2="4.318" layer="21"/>
-<rectangle x1="0.889" y1="3.81" x2="1.143" y2="3.937" layer="21"/>
-<rectangle x1="0.889" y1="3.937" x2="1.016" y2="4.064" layer="21"/>
 </package>
 </packages>
 </library>

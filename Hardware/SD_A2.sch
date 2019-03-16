@@ -605,6 +605,10 @@ http://www.xilinx.com&lt;br&gt;
 <packages>
 <package name="S44">
 <description>&lt;b&gt;PLCC SOCKET&lt;/b&gt;</description>
+<circle x="-2.54" y="2.54" radius="1.27" width="0.1524" layer="21"/>
+<circle x="2.54" y="2.54" radius="1.27" width="0.1524" layer="21"/>
+<circle x="-2.54" y="-2.54" radius="1.27" width="0.1524" layer="21"/>
+<circle x="2.54" y="-2.54" radius="1.27" width="0.1524" layer="21"/>
 <wire x1="-10.16" y1="11.684" x2="-11.684" y2="10.16" width="0.1524" layer="21"/>
 <wire x1="-11.684" y1="10.16" x2="-11.684" y2="-11.049" width="0.1524" layer="21"/>
 <wire x1="-8.255" y1="6.985" x2="-6.985" y2="8.255" width="0.1524" layer="21"/>
@@ -848,10 +852,21 @@ http://www.xilinx.com&lt;br&gt;
 <wire x1="-1.27" y1="3.81" x2="1.27" y2="3.81" width="0.1524" layer="21"/>
 <wire x1="1.27" y1="3.81" x2="0" y2="5.08" width="0.1524" layer="21"/>
 <wire x1="0" y1="5.08" x2="-1.27" y2="3.81" width="0.1524" layer="21"/>
-<circle x="-2.54" y="2.54" radius="1.27" width="0.1524" layer="21"/>
-<circle x="2.54" y="2.54" radius="1.27" width="0.1524" layer="21"/>
-<circle x="-2.54" y="-2.54" radius="1.27" width="0.1524" layer="21"/>
-<circle x="2.54" y="-2.54" radius="1.27" width="0.1524" layer="21"/>
+<rectangle x1="-0.508" y1="2.159" x2="0.508" y2="4.064" layer="21"/>
+<rectangle x1="-0.889" y1="3.81" x2="0.889" y2="4.191" layer="21"/>
+<rectangle x1="-0.635" y1="4.191" x2="0.635" y2="4.445" layer="21"/>
+<rectangle x1="-0.381" y1="4.445" x2="0.381" y2="4.699" layer="21"/>
+<rectangle x1="-0.127" y1="4.699" x2="0.127" y2="4.953" layer="21"/>
+<rectangle x1="-1.143" y1="3.81" x2="-0.889" y2="3.937" layer="21"/>
+<rectangle x1="-1.016" y1="3.937" x2="-0.889" y2="4.064" layer="21"/>
+<rectangle x1="-0.762" y1="4.191" x2="-0.635" y2="4.318" layer="21"/>
+<rectangle x1="-0.508" y1="4.445" x2="-0.381" y2="4.572" layer="21"/>
+<rectangle x1="-0.254" y1="4.699" x2="-0.127" y2="4.826" layer="21"/>
+<rectangle x1="0.127" y1="4.699" x2="0.254" y2="4.826" layer="21"/>
+<rectangle x1="0.381" y1="4.445" x2="0.508" y2="4.572" layer="21"/>
+<rectangle x1="0.635" y1="4.191" x2="0.762" y2="4.318" layer="21"/>
+<rectangle x1="0.889" y1="3.81" x2="1.143" y2="3.937" layer="21"/>
+<rectangle x1="0.889" y1="3.937" x2="1.016" y2="4.064" layer="21"/>
 <pad name="1" x="1.27" y="6.35" drill="0.8128"/>
 <pad name="2" x="-1.27" y="8.89" drill="0.8128" shape="octagon"/>
 <pad name="3" x="-1.27" y="6.35" drill="0.8128" shape="octagon"/>
@@ -899,21 +914,113 @@ http://www.xilinx.com&lt;br&gt;
 <text x="-2.54" y="11.938" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
 <text x="-10.16" y="11.938" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <text x="8.255" y="-10.795" size="1.27" layer="21" ratio="10">44</text>
-<rectangle x1="-0.508" y1="2.159" x2="0.508" y2="4.064" layer="21"/>
-<rectangle x1="-0.889" y1="3.81" x2="0.889" y2="4.191" layer="21"/>
-<rectangle x1="-0.635" y1="4.191" x2="0.635" y2="4.445" layer="21"/>
-<rectangle x1="-0.381" y1="4.445" x2="0.381" y2="4.699" layer="21"/>
-<rectangle x1="-0.127" y1="4.699" x2="0.127" y2="4.953" layer="21"/>
-<rectangle x1="-1.143" y1="3.81" x2="-0.889" y2="3.937" layer="21"/>
-<rectangle x1="-1.016" y1="3.937" x2="-0.889" y2="4.064" layer="21"/>
-<rectangle x1="-0.762" y1="4.191" x2="-0.635" y2="4.318" layer="21"/>
-<rectangle x1="-0.508" y1="4.445" x2="-0.381" y2="4.572" layer="21"/>
-<rectangle x1="-0.254" y1="4.699" x2="-0.127" y2="4.826" layer="21"/>
-<rectangle x1="0.127" y1="4.699" x2="0.254" y2="4.826" layer="21"/>
-<rectangle x1="0.381" y1="4.445" x2="0.508" y2="4.572" layer="21"/>
-<rectangle x1="0.635" y1="4.191" x2="0.762" y2="4.318" layer="21"/>
-<rectangle x1="0.889" y1="3.81" x2="1.143" y2="3.937" layer="21"/>
-<rectangle x1="0.889" y1="3.937" x2="1.016" y2="4.064" layer="21"/>
+</package>
+<package name="SQFP-S-10X10-44">
+<description>&lt;b&gt;QFP44&lt;/b&gt;&lt;p&gt;
+shrink quad flat pack, square</description>
+<wire x1="-7.4" y1="7.4" x2="7.4" y2="7.4" width="0.1998" layer="39"/>
+<wire x1="7.4" y1="7.4" x2="7.4" y2="-7.4" width="0.1998" layer="39"/>
+<wire x1="-7.4" y1="-7.4" x2="-7.4" y2="7.4" width="0.1998" layer="39"/>
+<wire x1="7.4" y1="-7.4" x2="-7.4" y2="-7.4" width="0.1998" layer="39"/>
+<wire x1="-4.91" y1="-4.91" x2="4.91" y2="-4.91" width="0.2032" layer="51"/>
+<wire x1="4.91" y1="-4.91" x2="4.91" y2="4.91" width="0.2032" layer="51"/>
+<wire x1="4.91" y1="4.91" x2="-4.91" y2="4.91" width="0.2032" layer="51"/>
+<wire x1="-4.91" y1="4.91" x2="-4.91" y2="-4.91" width="0.2032" layer="51"/>
+<wire x1="-4.72" y1="4.71" x2="4.71" y2="4.71" width="0.2032" layer="21"/>
+<wire x1="4.71" y1="4.71" x2="4.71" y2="-4.71" width="0.2032" layer="21"/>
+<wire x1="4.71" y1="-4.71" x2="-4.72" y2="-4.71" width="0.2032" layer="21"/>
+<wire x1="-4.72" y1="-4.71" x2="-4.72" y2="4.71" width="0.2032" layer="21"/>
+<circle x="-3.7501" y="-3.7501" radius="0.5002" width="0.254" layer="21"/>
+<smd name="1" x="-4" y="-6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="2" x="-3.2" y="-6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="3" x="-2.4" y="-6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="4" x="-1.6" y="-6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="5" x="-0.8" y="-6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="6" x="0" y="-6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="7" x="0.8" y="-6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="8" x="1.6" y="-6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="9" x="2.4" y="-6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="10" x="3.2" y="-6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="11" x="4" y="-6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="12" x="6" y="-4" dx="1.8" dy="0.5" layer="1"/>
+<smd name="13" x="6" y="-3.2" dx="1.8" dy="0.5" layer="1"/>
+<smd name="14" x="6" y="-2.4" dx="1.8" dy="0.5" layer="1"/>
+<smd name="15" x="6" y="-1.6" dx="1.8" dy="0.5" layer="1"/>
+<smd name="16" x="6" y="-0.8" dx="1.8" dy="0.5" layer="1"/>
+<smd name="17" x="6" y="0" dx="1.8" dy="0.5" layer="1"/>
+<smd name="18" x="6" y="0.8" dx="1.8" dy="0.5" layer="1"/>
+<smd name="19" x="6" y="1.6" dx="1.8" dy="0.5" layer="1"/>
+<smd name="20" x="6" y="2.4" dx="1.8" dy="0.5" layer="1"/>
+<smd name="21" x="6" y="3.2" dx="1.8" dy="0.5" layer="1"/>
+<smd name="22" x="6" y="4" dx="1.8" dy="0.5" layer="1"/>
+<smd name="23" x="4" y="6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="24" x="3.2" y="6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="25" x="2.4" y="6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="26" x="1.6" y="6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="27" x="0.8" y="6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="28" x="0" y="6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="29" x="-0.8" y="6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="30" x="-1.6" y="6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="31" x="-2.4" y="6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="32" x="-3.2" y="6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="33" x="-4" y="6" dx="0.5" dy="1.8" layer="1"/>
+<smd name="34" x="-6" y="4" dx="1.8" dy="0.5" layer="1"/>
+<smd name="35" x="-6" y="3.2" dx="1.8" dy="0.5" layer="1"/>
+<smd name="36" x="-6" y="2.4" dx="1.8" dy="0.5" layer="1"/>
+<smd name="37" x="-6" y="1.6" dx="1.8" dy="0.5" layer="1"/>
+<smd name="38" x="-6" y="0.8" dx="1.8" dy="0.5" layer="1"/>
+<smd name="39" x="-6" y="0" dx="1.8" dy="0.5" layer="1"/>
+<smd name="40" x="-6" y="-0.8" dx="1.8" dy="0.5" layer="1"/>
+<smd name="41" x="-6" y="-1.6" dx="1.8" dy="0.5" layer="1"/>
+<smd name="42" x="-6" y="-2.4" dx="1.8" dy="0.5" layer="1"/>
+<smd name="43" x="-6" y="-3.2" dx="1.8" dy="0.5" layer="1"/>
+<smd name="44" x="-6" y="-4" dx="1.8" dy="0.5" layer="1"/>
+<text x="-3.81" y="-2.175" size="1.27" layer="25">&gt;NAME</text>
+<text x="-3.81" y="1.905" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="-4.22" y1="-6.7201" x2="-3.78" y2="-4.95" layer="51"/>
+<rectangle x1="-3.4201" y1="-6.7201" x2="-2.9799" y2="-4.95" layer="51"/>
+<rectangle x1="-2.62" y1="-6.7201" x2="-2.1801" y2="-4.95" layer="51"/>
+<rectangle x1="-1.8199" y1="-6.7201" x2="-1.38" y2="-4.95" layer="51"/>
+<rectangle x1="-1.0201" y1="-6.7201" x2="-0.5799" y2="-4.95" layer="51"/>
+<rectangle x1="-0.22" y1="-6.7201" x2="0.22" y2="-4.95" layer="51"/>
+<rectangle x1="0.5799" y1="-6.7201" x2="1.0201" y2="-4.95" layer="51"/>
+<rectangle x1="1.38" y1="-6.7201" x2="1.8199" y2="-4.95" layer="51"/>
+<rectangle x1="2.1801" y1="-6.7201" x2="2.62" y2="-4.95" layer="51"/>
+<rectangle x1="2.9799" y1="-6.7201" x2="3.4201" y2="-4.95" layer="51"/>
+<rectangle x1="3.78" y1="-6.7201" x2="4.22" y2="-4.95" layer="51"/>
+<rectangle x1="4.95" y1="-4.22" x2="6.7201" y2="-3.78" layer="51"/>
+<rectangle x1="4.95" y1="-3.4201" x2="6.7201" y2="-2.9799" layer="51"/>
+<rectangle x1="4.95" y1="-2.62" x2="6.7201" y2="-2.1801" layer="51"/>
+<rectangle x1="4.95" y1="-1.8199" x2="6.7201" y2="-1.38" layer="51"/>
+<rectangle x1="4.95" y1="-1.0201" x2="6.7201" y2="-0.5799" layer="51"/>
+<rectangle x1="4.95" y1="-0.22" x2="6.7201" y2="0.22" layer="51"/>
+<rectangle x1="4.95" y1="0.5799" x2="6.7201" y2="1.0201" layer="51"/>
+<rectangle x1="4.95" y1="1.38" x2="6.7201" y2="1.8199" layer="51"/>
+<rectangle x1="4.95" y1="2.1801" x2="6.7201" y2="2.62" layer="51"/>
+<rectangle x1="4.95" y1="2.9799" x2="6.7201" y2="3.4201" layer="51"/>
+<rectangle x1="4.95" y1="3.78" x2="6.7201" y2="4.22" layer="51"/>
+<rectangle x1="3.78" y1="4.95" x2="4.22" y2="6.7201" layer="51"/>
+<rectangle x1="2.9799" y1="4.95" x2="3.4201" y2="6.7201" layer="51"/>
+<rectangle x1="2.1801" y1="4.95" x2="2.62" y2="6.7201" layer="51"/>
+<rectangle x1="1.38" y1="4.95" x2="1.8199" y2="6.7201" layer="51"/>
+<rectangle x1="0.5799" y1="4.95" x2="1.0201" y2="6.7201" layer="51"/>
+<rectangle x1="-0.22" y1="4.95" x2="0.22" y2="6.7201" layer="51"/>
+<rectangle x1="-1.0201" y1="4.95" x2="-0.5799" y2="6.7201" layer="51"/>
+<rectangle x1="-1.8199" y1="4.95" x2="-1.38" y2="6.7201" layer="51"/>
+<rectangle x1="-2.62" y1="4.95" x2="-2.1801" y2="6.7201" layer="51"/>
+<rectangle x1="-3.4201" y1="4.95" x2="-2.9799" y2="6.7201" layer="51"/>
+<rectangle x1="-4.22" y1="4.95" x2="-3.78" y2="6.7201" layer="51"/>
+<rectangle x1="-6.7201" y1="3.78" x2="-4.95" y2="4.22" layer="51"/>
+<rectangle x1="-6.7201" y1="2.9799" x2="-4.95" y2="3.4201" layer="51"/>
+<rectangle x1="-6.7201" y1="2.1801" x2="-4.95" y2="2.62" layer="51"/>
+<rectangle x1="-6.7201" y1="1.38" x2="-4.95" y2="1.8199" layer="51"/>
+<rectangle x1="-6.7201" y1="0.5799" x2="-4.95" y2="1.0201" layer="51"/>
+<rectangle x1="-6.7201" y1="-0.22" x2="-4.95" y2="0.22" layer="51"/>
+<rectangle x1="-6.7201" y1="-1.0201" x2="-4.95" y2="-0.5799" layer="51"/>
+<rectangle x1="-6.7201" y1="-1.8199" x2="-4.95" y2="-1.38" layer="51"/>
+<rectangle x1="-6.7201" y1="-2.62" x2="-4.95" y2="-2.1801" layer="51"/>
+<rectangle x1="-6.7201" y1="-3.4201" x2="-4.95" y2="-2.9799" layer="51"/>
+<rectangle x1="-6.7201" y1="-4.22" x2="-4.95" y2="-3.78" layer="51"/>
 </package>
 </packages>
 <symbols>
@@ -922,8 +1029,6 @@ http://www.xilinx.com&lt;br&gt;
 <wire x1="25.4" y1="-25.4" x2="25.4" y2="25.4" width="0.254" layer="94"/>
 <wire x1="25.4" y1="25.4" x2="-25.4" y2="25.4" width="0.254" layer="94"/>
 <wire x1="-25.4" y1="25.4" x2="-25.4" y2="-25.4" width="0.254" layer="94"/>
-<text x="-5.08" y="1.27" size="1.778" layer="95">&gt;NAME</text>
-<text x="-5.08" y="-2.54" size="1.778" layer="96">&gt;VALUE</text>
 <pin name="FB01/02" x="-30.48" y="12.7" length="middle"/>
 <pin name="FB01/05" x="-30.48" y="10.16" length="middle"/>
 <pin name="FB01/06" x="-30.48" y="7.62" length="middle"/>
@@ -933,26 +1038,6 @@ http://www.xilinx.com&lt;br&gt;
 <pin name="FB01/14" x="-30.48" y="-2.54" length="middle"/>
 <pin name="FB01/15" x="-30.48" y="-5.08" length="middle"/>
 <pin name="FB01/17" x="-30.48" y="-7.62" length="middle"/>
-<pin name="FB03/02" x="-10.16" y="-30.48" length="middle" rot="R90"/>
-<pin name="FB03/05" x="-7.62" y="-30.48" length="middle" rot="R90"/>
-<pin name="FB03/08" x="-5.08" y="-30.48" length="middle" rot="R90"/>
-<pin name="FB03/09" x="-2.54" y="-30.48" length="middle" rot="R90"/>
-<pin name="TDI" x="30.48" y="-15.24" length="middle" direction="in" rot="R180"/>
-<pin name="TMS" x="30.48" y="-17.78" length="middle" direction="in" rot="R180"/>
-<pin name="TCK" x="30.48" y="-10.16" length="middle" direction="in" rot="R180"/>
-<pin name="FB03/11" x="0" y="-30.48" length="middle" rot="R90"/>
-<pin name="FB03/14" x="2.54" y="-30.48" length="middle" rot="R90"/>
-<pin name="FB03/15" x="5.08" y="-30.48" length="middle" rot="R90"/>
-<pin name="FB03/17" x="10.16" y="-30.48" length="middle" rot="R90"/>
-<pin name="FB03/16" x="7.62" y="-30.48" length="middle" rot="R90"/>
-<pin name="FB04/02" x="30.48" y="-2.54" length="middle" rot="R180"/>
-<pin name="FB04/05" x="30.48" y="0" length="middle" rot="R180"/>
-<pin name="FB04/08" x="30.48" y="2.54" length="middle" rot="R180"/>
-<pin name="FB04/11" x="30.48" y="5.08" length="middle" rot="R180"/>
-<pin name="FB04/14" x="30.48" y="7.62" length="middle" rot="R180"/>
-<pin name="TDO" x="30.48" y="-12.7" length="middle" direction="out" rot="R180"/>
-<pin name="FB04/15" x="30.48" y="10.16" length="middle" rot="R180"/>
-<pin name="FB04/17" x="30.48" y="12.7" length="middle" rot="R180"/>
 <pin name="FB02/02" x="10.16" y="30.48" length="middle" rot="R270"/>
 <pin name="FB02/05" x="7.62" y="30.48" length="middle" rot="R270"/>
 <pin name="FB02/06" x="5.08" y="30.48" length="middle" rot="R270"/>
@@ -962,17 +1047,39 @@ http://www.xilinx.com&lt;br&gt;
 <pin name="FB02/14" x="-5.08" y="30.48" length="middle" rot="R270"/>
 <pin name="FB02/15" x="-7.62" y="30.48" length="middle" rot="R270"/>
 <pin name="FB02/17" x="-10.16" y="30.48" length="middle" rot="R270"/>
+<pin name="FB03/02" x="-10.16" y="-30.48" length="middle" rot="R90"/>
+<pin name="FB03/05" x="-7.62" y="-30.48" length="middle" rot="R90"/>
+<pin name="FB03/08" x="-5.08" y="-30.48" length="middle" rot="R90"/>
+<pin name="FB03/09" x="-2.54" y="-30.48" length="middle" rot="R90"/>
+<pin name="FB03/11" x="0" y="-30.48" length="middle" rot="R90"/>
+<pin name="FB03/14" x="2.54" y="-30.48" length="middle" rot="R90"/>
+<pin name="FB03/15" x="5.08" y="-30.48" length="middle" rot="R90"/>
+<pin name="FB03/16" x="7.62" y="-30.48" length="middle" rot="R90"/>
+<pin name="FB03/17" x="10.16" y="-30.48" length="middle" rot="R90"/>
+<pin name="FB04/02" x="30.48" y="-2.54" length="middle" rot="R180"/>
+<pin name="FB04/05" x="30.48" y="0" length="middle" rot="R180"/>
+<pin name="FB04/08" x="30.48" y="2.54" length="middle" rot="R180"/>
+<pin name="FB04/11" x="30.48" y="5.08" length="middle" rot="R180"/>
+<pin name="FB04/14" x="30.48" y="7.62" length="middle" rot="R180"/>
+<pin name="FB04/15" x="30.48" y="10.16" length="middle" rot="R180"/>
+<pin name="FB04/17" x="30.48" y="12.7" length="middle" rot="R180"/>
+<pin name="TCK" x="30.48" y="-10.16" length="middle" direction="in" rot="R180"/>
+<pin name="TDI" x="30.48" y="-15.24" length="middle" direction="in" rot="R180"/>
+<pin name="TDO" x="30.48" y="-12.7" length="middle" direction="out" rot="R180"/>
+<pin name="TMS" x="30.48" y="-17.78" length="middle" direction="in" rot="R180"/>
+<text x="-5.08" y="1.27" size="1.778" layer="95">&gt;NAME</text>
+<text x="-5.08" y="-2.54" size="1.778" layer="96">&gt;VALUE</text>
 </symbol>
 <symbol name="SUPPLY">
-<text x="-0.635" y="-0.635" size="1.778" layer="95">&gt;NAME</text>
-<text x="1.905" y="-5.842" size="1.27" layer="95" rot="R90">GND</text>
-<text x="1.905" y="2.54" size="1.27" layer="95" rot="R90">VCCINT</text>
+<pin name="GND@0" x="-5.08" y="-7.62" visible="pad" length="middle" direction="pwr" rot="R90"/>
 <pin name="GND@1" x="0" y="-7.62" visible="pad" length="middle" direction="pwr" rot="R90"/>
+<pin name="GND@2" x="5.08" y="-7.62" visible="pad" length="middle" direction="pwr" rot="R90"/>
 <pin name="VCCINT@0" x="-5.08" y="7.62" visible="pad" length="middle" direction="pwr" rot="R270"/>
 <pin name="VCCINT@1" x="0" y="7.62" visible="pad" length="middle" direction="pwr" rot="R270"/>
 <pin name="VCCIO" x="5.08" y="7.62" visible="pad" length="middle" direction="pwr" rot="R270"/>
-<pin name="GND@0" x="-5.08" y="-7.62" visible="pad" length="middle" direction="pwr" rot="R90"/>
-<pin name="GND@2" x="5.08" y="-7.62" visible="pad" length="middle" direction="pwr" rot="R90"/>
+<text x="-0.635" y="-0.635" size="1.778" layer="95">&gt;NAME</text>
+<text x="1.905" y="-5.842" size="1.27" layer="95" rot="R90">GND</text>
+<text x="1.905" y="2.54" size="1.27" layer="95" rot="R90">VCCINT</text>
 <text x="-3.175" y="2.54" size="1.27" layer="95" rot="R90">VCCINT</text>
 <text x="6.985" y="2.54" size="1.27" layer="95" rot="R90">VCCIO</text>
 <text x="-3.175" y="-5.842" size="1.27" layer="95" rot="R90">GND</text>
@@ -986,7 +1093,7 @@ http://www.xilinx.com&lt;br&gt;
 <gate name="SUPPLY" symbol="SUPPLY" x="58.42" y="-2.54" addlevel="request"/>
 </gates>
 <devices>
-<device name="" package="S44">
+<device name="PLCC" package="S44">
 <connects>
 <connect gate="G$1" pin="FB01/02" pad="1"/>
 <connect gate="G$1" pin="FB01/05" pad="2"/>
@@ -1032,6 +1139,57 @@ http://www.xilinx.com&lt;br&gt;
 <connect gate="SUPPLY" pin="VCCINT@0" pad="21"/>
 <connect gate="SUPPLY" pin="VCCINT@1" pad="41"/>
 <connect gate="SUPPLY" pin="VCCIO" pad="32"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="VQFP" package="SQFP-S-10X10-44">
+<connects>
+<connect gate="G$1" pin="FB01/02" pad="39"/>
+<connect gate="G$1" pin="FB01/05" pad="40"/>
+<connect gate="G$1" pin="FB01/06" pad="41"/>
+<connect gate="G$1" pin="FB01/08" pad="42"/>
+<connect gate="G$1" pin="FB01/09" pad="43"/>
+<connect gate="G$1" pin="FB01/11" pad="44"/>
+<connect gate="G$1" pin="FB01/14" pad="1"/>
+<connect gate="G$1" pin="FB01/15" pad="2"/>
+<connect gate="G$1" pin="FB01/17" pad="3"/>
+<connect gate="G$1" pin="FB02/02" pad="29"/>
+<connect gate="G$1" pin="FB02/05" pad="30"/>
+<connect gate="G$1" pin="FB02/06" pad="31"/>
+<connect gate="G$1" pin="FB02/08" pad="32"/>
+<connect gate="G$1" pin="FB02/09" pad="33"/>
+<connect gate="G$1" pin="FB02/11" pad="34"/>
+<connect gate="G$1" pin="FB02/14" pad="36"/>
+<connect gate="G$1" pin="FB02/15" pad="37"/>
+<connect gate="G$1" pin="FB02/17" pad="38"/>
+<connect gate="G$1" pin="FB03/02" pad="5"/>
+<connect gate="G$1" pin="FB03/05" pad="6"/>
+<connect gate="G$1" pin="FB03/08" pad="7"/>
+<connect gate="G$1" pin="FB03/09" pad="8"/>
+<connect gate="G$1" pin="FB03/11" pad="12"/>
+<connect gate="G$1" pin="FB03/14" pad="13"/>
+<connect gate="G$1" pin="FB03/15" pad="14"/>
+<connect gate="G$1" pin="FB03/16" pad="18"/>
+<connect gate="G$1" pin="FB03/17" pad="16"/>
+<connect gate="G$1" pin="FB04/02" pad="19"/>
+<connect gate="G$1" pin="FB04/05" pad="20"/>
+<connect gate="G$1" pin="FB04/08" pad="21"/>
+<connect gate="G$1" pin="FB04/11" pad="22"/>
+<connect gate="G$1" pin="FB04/14" pad="23"/>
+<connect gate="G$1" pin="FB04/15" pad="27"/>
+<connect gate="G$1" pin="FB04/17" pad="28"/>
+<connect gate="G$1" pin="TCK" pad="11"/>
+<connect gate="G$1" pin="TDI" pad="9"/>
+<connect gate="G$1" pin="TDO" pad="24"/>
+<connect gate="G$1" pin="TMS" pad="10"/>
+<connect gate="SUPPLY" pin="GND@0" pad="4"/>
+<connect gate="SUPPLY" pin="GND@1" pad="17"/>
+<connect gate="SUPPLY" pin="GND@2" pad="25"/>
+<connect gate="SUPPLY" pin="VCCINT@0" pad="15"/>
+<connect gate="SUPPLY" pin="VCCINT@1" pad="35"/>
+<connect gate="SUPPLY" pin="VCCIO" pad="26"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -17342,7 +17500,7 @@ type I, package type TS</description>
 </classes>
 <parts>
 <part name="ST1" library="con-apple2" deviceset="A2-50PIN" device="SLOT1-3"/>
-<part name="IC4" library="xilinx-xc9" deviceset="XC9572_S44" device="" value="XC9572XL"/>
+<part name="IC4" library="xilinx-xc9" deviceset="XC9572_S44" device="PLCC" value="XC9572XL"/>
 <part name="IC1" library="74xx-eu" deviceset="74*245" device="N" technology="LS" value="74LS245N"/>
 <part name="IC2" library="v-reg" deviceset="LM317TL" device="" value="LM317"/>
 <part name="C2" library="rcl@1" deviceset="CPOL-EU" device="153CLV-0405" value="1u"/>
