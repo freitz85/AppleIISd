@@ -139,8 +139,15 @@ BEGIN
       wait until rising_edge(PHI0);
       NDEV_SEL <= '0';
       wait until falling_edge(PHI0);
+      assert (B="000") report "Address error" severity error;
+      assert (NG='0') report "NG error" severity error;
+      assert (NOE='1') report "NOE error" severity error;
+      assert (NWE='1') report "NWE error" severity error;
       NDEV_SEL <= '1';
       wait until rising_edge(PHI0);
+      assert (NG='1') report "NG error" severity error;
+      assert (NOE='1') report "NOE error" severity error;
+      assert (NWE='1') report "NWE error" severity error;
 
       -- C0nX access, write
       -- NG must be '0"
@@ -151,6 +158,10 @@ BEGIN
       wait until rising_edge(PHI0);
       NDEV_SEL <= '0';
       wait until falling_edge(PHI0);
+      assert (B="000") report "Address error" severity error;
+      assert (NG='0') report "NG error" severity error;
+      assert (NOE='1') report "NOE error" severity error;
+      assert (NWE='1') report "NWE error" severity error;
       NDEV_SEL <= '1';
       wait until rising_edge(PHI0);
       
@@ -163,6 +174,10 @@ BEGIN
       wait until rising_edge(PHI0);
       NIO_SEL <= '0';
       wait until falling_edge(PHI0);
+      assert (B="000") report "Address error" severity error;
+      assert (NG='0') report "NG error" severity error;
+      assert (NOE='0') report "NOE error" severity error;
+      assert (NWE='1') report "NWE error" severity error;
       NIO_SEL <= '1';
       wait until rising_edge(PHI0);
 
@@ -175,6 +190,10 @@ BEGIN
       wait until rising_edge(PHI0);
       NIO_SEL <= '0';
       wait until falling_edge(PHI0);
+      assert (B="000") report "Address error" severity error;
+      assert (NG='0') report "NG error" severity error;
+      assert (NOE='1') report "NOE error" severity error;
+      assert (NWE='0') report "NWE error" severity error;
       NIO_SEL <= '1';
       wait until rising_edge(PHI0);
 
@@ -188,6 +207,10 @@ BEGIN
       wait until rising_edge(PHI0);
       NIO_SEL <= '0';
       wait until falling_edge(PHI0);
+      assert (B="000") report "Address error" severity error;
+      assert (NG='0') report "NG error" severity error;
+      assert (NOE='1') report "NOE error" severity error;
+      assert (NWE='1') report "NWE error" severity error;
       NIO_SEL <= '1';
       wait until rising_edge(PHI0);
       
@@ -201,6 +224,10 @@ BEGIN
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
+      assert (B="001") report "Address error" severity error;
+      assert (NG='0') report "NG error" severity error;
+      assert (NOE='0') report "NOE error" severity error;
+      assert (NWE='1') report "NWE error" severity error;
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
       
@@ -212,6 +239,9 @@ BEGIN
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
+      assert (NG='0') report "NG error" severity error;
+      assert (NOE='1') report "NOE error" severity error;
+      assert (NWE='0') report "NWE error" severity error;
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
       
@@ -224,6 +254,10 @@ BEGIN
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
+      assert (B="010") report "Address error" severity error;
+      assert (NG='0') report "NG error" severity error;
+      assert (NOE='0') report "NOE error" severity error;
+      assert (NWE='1') report "NWE error" severity error;
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
       
@@ -235,6 +269,9 @@ BEGIN
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
+      assert (NG='0') report "NG error" severity error;
+      assert (NOE='1') report "NOE error" severity error;
+      assert (NWE='0') report "NWE error" severity error;
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
       
@@ -247,6 +284,10 @@ BEGIN
       wait until rising_edge(PHI0);
       NDEV_SEL <= '0';
       wait until falling_edge(PHI0);
+      assert (B="000") report "Address error" severity error;
+      assert (NG='0') report "NG error" severity error;
+      assert (NOE='1') report "NOE error" severity error;
+      assert (NWE='1') report "NWE error" severity error;
       NDEV_SEL <= '1';
       wait until rising_edge(PHI0);
       
@@ -258,6 +299,10 @@ BEGIN
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
+      assert (B="111") report "Address error" severity error;
+      assert (NG='1') report "NG error" severity error;
+      assert (NOE='1') report "NOE error" severity error;
+      assert (NWE='1') report "NWE error" severity error;
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
       
@@ -269,6 +314,10 @@ BEGIN
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
+      assert (B="001") report "Address error" severity error;
+      assert (NG='1') report "NG error" severity error;
+      assert (NOE='1') report "NOE error" severity error;
+      assert (NWE='1') report "NWE error" severity error;
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
 
@@ -281,6 +330,10 @@ BEGIN
       wait until rising_edge(PHI0);
       NIO_STB <= '0';
       wait until falling_edge(PHI0);
+      assert (B="001") report "Address error" severity error;
+      assert (NG='1') report "NG error" severity error;
+      assert (NOE='1') report "NOE error" severity error;
+      assert (NWE='1') report "NWE error" severity error;
       NIO_STB <= '1';
       wait until rising_edge(PHI0);
 
