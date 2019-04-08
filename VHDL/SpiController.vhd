@@ -11,25 +11,23 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity SpiController is
 Port (
-        data_in : in STD_LOGIC_VECTOR (7 downto 0);
-        data_out : out STD_LOGIC_VECTOR (7 downto 0);
-        is_read : in  STD_LOGIC;
-        nreset : in  STD_LOGIC;
-        addr : in  STD_LOGIC_VECTOR (1 downto 0);
-        phi0 : in  STD_LOGIC;
-        ndev_sel : in  STD_LOGIC;
-        clk : in  STD_LOGIC;
-        miso: in std_logic;
-        mosi : out  STD_LOGIC;
-        sclk : out  STD_LOGIC;
-        nsel : out  STD_LOGIC;
-        wp : in  STD_LOGIC;
-        card : in  STD_LOGIC;
-        pgm_en : out STD_LOGIC;
-        led : out  STD_LOGIC
+        BUS_DATA : in STD_LOGIC_VECTOR (7 downto 0);
+        SPI_DATA : out STD_LOGIC_VECTOR (7 downto 0);
+        IS_READ : in  STD_LOGIC;
+        NRESET : in  STD_LOGIC;
+        ADDR : in  STD_LOGIC_VECTOR (1 downto 0);
+        CLK_SLOW : in  STD_LOGIC;
+        CLK_FAST : in  STD_LOGIC;
+        NDEV_SEL : in  STD_LOGIC;
+        MISO: in std_logic;
+        MOSI : out  STD_LOGIC;
+        SCLK : out  STD_LOGIC;
+        
+        BSY : out STD_LOGIC;
+        TC : out STD_LOGIC;
+        FRX : in std_logic;
+        ECE : in std_logic
     );
-
-    constant DIV_WIDTH : integer := 3;
 
 end SpiController;
 
@@ -38,115 +36,109 @@ architecture Behavioral of SpiController is
     --------------------------
     -- internal state
     signal spidatain: std_logic_vector (7 downto 0);
-    signal spidataout: std_logic_vector (7 downto 0);
-    signal sdhc: std_logic;     -- is SDHC card
-    signal inited: std_logic;   -- card initialized
-    signal pgmen: std_logic;    -- enable EEPROM programming
     
-    -- spi register flags
-    signal tc: std_logic;       -- transmission complete; cleared on spi data read
-    signal bsy: std_logic;      -- SPI busy
-    signal frx: std_logic;      -- fast receive mode
-    signal ece: std_logic;      -- external clock enable; 0=phi2, 1=external clock
-    
-    signal divisor: std_logic_vector(DIV_WIDTH-1 downto 0);
-    signal slavesel: std_logic := '1';     -- slave select output (0=selected)
-    signal int_miso: std_logic;
     --------------------------
     -- helper signals
 
     -- shift engine
-    signal start_shifting: std_logic := '0';   -- shifting data
-    signal shifting2: std_logic := '0';    -- shifting data
-    signal shiftdone: std_logic;    -- shifting data done
-    signal shiftcnt: std_logic_vector(3 downto 0);          -- shift counter (5 bit)
+    signal s_start_shifting: std_logic := '0';   -- shifting data
+    signal s_shifting2: std_logic := '0';    -- shifting data
+    signal s_shiftdone: std_logic;    -- shifting data done
+    signal s_shiftcnt: std_logic_vector(3 downto 0);          -- shift counter (5 bit)
     
     -- spi clock
-    signal clksrc: std_logic;                                   -- clock source (phi2 or clk_7m)
-    -- TODO divcnt is not used at all??
-    --signal divcnt: std_logic_vector(DIV_WIDTH-1 downto 0);          -- divisor counter
-    signal shiftclk : std_logic;
+    signal s_clksrc: std_logic;                                   -- clock source (phi2 or clk_7m)
+    signal s_shiftclk : std_logic;
     
 begin    
-    led <= not (bsy or not slavesel);
-    bsy <= start_shifting or shifting2;
+    --------------------------
+    -- spiclk - spi clock generation
+    -- spiclk is still 2 times the freq. than SCLK
+    s_clksrc <= CLK_SLOW when (ECE = '0') else CLK_FAST;
     
-    process(start_shifting, shiftdone, shiftclk)
+    -- is a pulse signal to allow for divisor==0
+    s_shiftclk <= s_clksrc when (s_start_shifting or s_shifting2) = '1' else '0';
+    
+    
+    BSY <= s_start_shifting or s_shifting2;
+    SPI_DATA <= spidatain;
+    
+    process(s_start_shifting, s_shiftdone, s_shiftclk)
     begin
-        if (rising_edge(shiftclk)) then
-            if (shiftdone = '1') then
-                shifting2 <= '0';
+        if (rising_edge(s_shiftclk)) then
+            if (s_shiftdone = '1') then
+                s_shifting2 <= '0';
             else
-                shifting2 <= start_shifting;
+                s_shifting2 <= s_start_shifting;
             end if;
         end if; 
     end process;
 
-    process(shiftcnt, nreset, shiftclk) 
+    process(s_shiftcnt, NRESET, s_shiftclk) 
     begin
-        if (nreset = '0') then
-            shiftdone <= '0';
-        elsif (rising_edge(shiftclk)) then
-            if (shiftcnt = "1111") then
-                shiftdone <= '1';
+        if (NRESET = '0') then
+            s_shiftdone <= '0';
+        elsif (rising_edge(s_shiftclk)) then
+            if (s_shiftcnt = "1111") then
+                s_shiftdone <= '1';
             else
-                shiftdone <= '0';
+                s_shiftdone <= '0';
             end if;
         end if;
     end process;
     
-    process(nreset, shifting2, shiftcnt, shiftclk)
+    process(NRESET, s_shifting2, s_shiftcnt, s_shiftclk)
     begin
-        if (nreset = '0') then
-            shiftcnt <= (others => '0');
-        elsif (rising_edge(shiftclk)) then
-            if (shifting2 = '1') then
+        if (NRESET = '0') then
+            s_shiftcnt <= (others => '0');
+        elsif (rising_edge(s_shiftclk)) then
+            if (s_shifting2 = '1') then
                 -- count phase
-                shiftcnt <= shiftcnt + 1;               
+                s_shiftcnt <= s_shiftcnt + 1;               
             else
-                shiftcnt <= (others => '0');
+                s_shiftcnt <= (others => '0');
             end if;
         end if;
     end process;
 
-    inproc: process(nreset, shifting2, shiftcnt, shiftclk, spidatain, miso)
+    inproc: process(NRESET, s_shifting2, s_shiftcnt, s_shiftclk, spidatain, miso)
     begin
-        if (nreset = '0') then
+        if (NRESET = '0') then
             spidatain <= (others => '0');
-        elsif (rising_edge(shiftclk)) then
-            if (shifting2 = '1' and shiftcnt(0) = '1') then
+        elsif (rising_edge(s_shiftclk)) then
+            if (s_shifting2 = '1' and s_shiftcnt(0) = '1') then
                     -- shift in to input register
                     spidatain (7 downto 1) <= spidatain (6 downto 0);
-                    spidatain (0) <= int_miso;
+                    spidatain (0) <= MISO;
             end if;
         end if;
     end process;
 
-    outproc: process(nreset, shifting2, spidataout, shiftcnt, shiftclk)
+    outproc: process(NRESET, s_shifting2, BUS_DATA, s_shiftcnt, s_shiftclk)
     begin
-        if (nreset = '0') then
-            mosi <= '1';
-            sclk <= '1';
+        if (NRESET = '0') then
+            MOSI <= '1';
+            SCLK <= '1';
         else
             -- clock is sync'd
-            if (rising_edge(shiftclk)) then
-                if (shifting2='0' or shiftdone = '1') then
-                    mosi <= '1';
-                    sclk <= '1';
+            if (rising_edge(s_shiftclk)) then
+                if (s_shifting2='0' or s_shiftdone = '1') then
+                    MOSI <= '1';
+                    SCLK <= '1';
                 else
                     -- output data directly from output register
-                    case shiftcnt(3 downto 1) is
-                        when "000" => mosi <= spidataout(7);
-                        when "001" => mosi <= spidataout(6);
-                        when "010" => mosi <= spidataout(5);
-                        when "011" => mosi <= spidataout(4);
-                        when "100" => mosi <= spidataout(3);
-                        when "101" => mosi <= spidataout(2);
-                        when "110" => mosi <= spidataout(1);
-                        when "111" => mosi <= spidataout(0);
-                        when others => mosi <= '1';
+                    case s_shiftcnt(3 downto 1) is
+                        when "000" => MOSI <= BUS_DATA(7);
+                        when "001" => MOSI <= BUS_DATA(6);
+                        when "010" => MOSI <= BUS_DATA(5);
+                        when "011" => MOSI <= BUS_DATA(4);
+                        when "100" => MOSI <= BUS_DATA(3);
+                        when "101" => MOSI <= BUS_DATA(2);
+                        when "110" => MOSI <= BUS_DATA(1);
+                        when "111" => MOSI <= BUS_DATA(0);
+                        when others => MOSI <= '1';
                     end case;
-                    sclk <= shiftcnt(0);
+                    SCLK <= s_shiftcnt(0);
                 end if;
             end if;
         end if;
@@ -154,125 +146,24 @@ begin
 
 
     -- shift operation enable
-    shiften: process(nreset, ndev_sel, is_read, addr, frx, shiftdone)
+    shiften: process(NRESET, NDEV_SEL, IS_READ, ADDR, FRX, s_shiftdone)
     begin
         -- start shifting
-        if (nreset = '0' or shiftdone = '1') then
-            start_shifting <= '0';
-        elsif (rising_edge(ndev_sel) and addr="00" and (frx='1' or is_read='0')) then
-            -- access to register 00, either write (is_read=0) or fast receive bit set (frx)
+        if (NRESET = '0' or s_shiftdone = '1') then
+            s_start_shifting <= '0';
+        elsif (rising_edge(NDEV_SEL) and ADDR="00" and (FRX='1' or IS_READ='0')) then
+            -- access to register 00, either write (IS_READ=0) or fast receive bit set (frx)
             -- then both types of access (write but also read)
-            start_shifting <= '1';
-        end if;
-    end process;
-
-    --------------------------
-    -- spiclk - spi clock generation
-    -- spiclk is still 2 times the freq. than sclk
-    clksrc <= phi0 when (ece = '0') else clk;
-    
-    -- is a pulse signal to allow for divisor==0
-    --shiftclk <= clksrc when divcnt = "000000" else '0';
-    shiftclk <= clksrc when bsy = '1' else '0';
-    
---    clkgen: process(nreset, divisor, clksrc)
---    begin
---        if (nreset = '0') then
---            divcnt <= divisor;
---        elsif (falling_edge(clksrc)) then
---            if (shiftclk = '1') then
---                divcnt <= divisor;
---            else
---                divcnt <= divcnt - 1;
---            end if;
---        end if;
---    end process;
-    
-    --------------------------
-    -- interface section
-    -- inputs
-    int_miso <= (miso and not slavesel);
-        
-    -- outputs
-    nsel <= slavesel;
-    pgm_en <= pgmen;
-
-    tc_proc: process (ndev_sel, shiftdone) 
-    begin
-        if (shiftdone = '1') then
-            tc <= '1';
-        elsif (rising_edge(ndev_sel) and addr="00") then
-            tc <= '0';
+            s_start_shifting <= '1';
         end if;
     end process;
     
-    --------------------------
-    -- cpu register section
-    -- cpu read
-    cpu_read: process(addr, spidatain, tc, bsy, frx, pgmen,
-            ece, divisor, slavesel, wp, card, sdhc, inited)
+    tc_proc: process (NDEV_SEL, s_shiftdone) 
     begin
-        case addr is
-            when "00" =>        -- read SPI data in
-                data_out <= spidatain;
-            when "01" =>        -- read status register
-                data_out(0) <= pgmen;
-                data_out(1) <= '0';
-                data_out(2) <= ece;
-                data_out(3) <= '0';
-                data_out(4) <= frx;
-                data_out(5) <= bsy;
-                data_out(6) <= '0';
-                data_out(7) <= tc;
-            when "10" =>        -- read sclk divisor
-                data_out(DIV_WIDTH-1 downto 0) <= divisor;
-                data_out(7 downto 3) <= (others => '0');
-            when "11" =>        -- read slave select / slave interrupt state
-                data_out(0) <= slavesel;
-                data_out(3 downto 1) <= (others => '0');
-                data_out(4) <= sdhc;
-                data_out(5) <= wp;
-                data_out(6) <= card;
-                data_out(7) <= inited;
-            when others => 
-                data_out <= (others => '0');
-        end case;
-    end process;
-
-    -- cpu write 
-    cpu_write: process(nreset, ndev_sel, is_read, addr, data_in, card)
-    begin
-        if (nreset = '0') then
-            ece <= '0';
-            frx <= '0';
-            slavesel <= '1';
-            divisor <= (others => '0');
-            spidataout <= (others => '1');
-            sdhc <= '0';
-            inited <= '0';
-            pgmen <= '0';
-        elsif (card = '1') then
-            sdhc <= '0';
-            inited <= '0';
-        elsif (rising_edge(ndev_sel) and is_read = '0') then
-            case addr is
-                when "00" =>        -- write SPI data out (see other process above)
-                    spidataout <= data_in;
-                when "01" =>        -- write status register
-                    pgmen <= data_in(0);
-                    ece <= data_in(2);
-                    frx <= data_in(4);
-                    -- no bit 5 - 7
-                when "10" =>        -- write divisor
-                    divisor <= data_in(DIV_WIDTH-1 downto 0);
-                when "11" =>        -- write slave select / slave interrupt enable
-                    slavesel <= data_in(0);
-                    -- no bit 1 - 3
-                    sdhc <= data_in(4);
-                    -- no bit 5 - 6
-                    inited <= data_in(7);
-                when others =>
-            end case;
+        if (s_shiftdone = '1') then
+            TC <= '1';
+        elsif (rising_edge(NDEV_SEL) and ADDR="00") then
+            TC <= '0';
         end if;
     end process;
     

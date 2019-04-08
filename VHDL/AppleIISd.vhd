@@ -68,28 +68,58 @@ architecture Behavioral of AppleIISd is
     signal data_in : std_logic_vector (7 downto 0);
     signal data_out : std_logic_vector (7 downto 0);
     signal addr_low_int : std_logic_vector (1 downto 0);
+    signal s_spi_data_in : std_logic_vector(7 downto 0);
+    signal s_spi_data_out : std_logic_vector(7 downto 0);
+    signal s_bsy : std_logic;
+    signal s_tc : std_logic;
+    signal s_ece : std_logic;
+    signal s_frx : std_logic;
     
     signal data_en : std_logic;
     signal pgm_en : std_logic;
+
+component Registers is
+Port ( 
+        ADDR : in  STD_LOGIC_VECTOR (1 downto 0);
+        BUS_DATA_IN : in  STD_LOGIC_VECTOR (7 downto 0);
+        BUS_DATA_OUT : out  STD_LOGIC_VECTOR (7 downto 0);
+        SPI_DATA_IN : in  STD_LOGIC_VECTOR (7 downto 0);
+        SPI_DATA_OUT : out  STD_LOGIC_VECTOR (7 downto 0);
+
+        PGMEN : out STD_LOGIC;
+        ECE : out STD_LOGIC;
+        FRX : out STD_LOGIC;
+        SLAVESEL : out STD_LOGIC;
+        LED : out STD_LOGIC;
+                  
+        BSY : in STD_LOGIC;
+        TC : in STD_LOGIC;
+        WP : in STD_LOGIC;
+        CARD : in STD_LOGIC;
+        NRESET : in STD_LOGIC;
+        NDEV_SEL : in STD_LOGIC;
+        IS_READ : in STD_LOGIC
+   ); 
+end component;
         
 component SpiController is
 Port (
-        data_in : in std_logic_vector (7 downto 0);
-        data_out : out std_logic_vector (7 downto 0);
-        is_read : in  std_logic;
-        nreset : in  std_logic;
-        addr : in  std_logic_vector (1 downto 0);
-        phi0 : in  std_logic;
-        ndev_sel : in  std_logic;
-        clk : in  std_logic;
-        miso: in std_logic;
-        mosi : out  std_logic;
-        sclk : out  std_logic;
-        nsel : out  std_logic;
-        wp : in  std_logic;
-        card : in  std_logic;
-        led : out  std_logic;
-        pgm_en : out std_logic
+        BUS_DATA : in STD_LOGIC_VECTOR (7 downto 0);
+        SPI_DATA : out STD_LOGIC_VECTOR (7 downto 0);
+        IS_READ : in  STD_LOGIC;
+        NRESET : in  STD_LOGIC;
+        ADDR : in  STD_LOGIC_VECTOR (1 downto 0);
+        CLK_SLOW : in  STD_LOGIC;
+        NDEV_SEL : in  STD_LOGIC;
+        CLK_FAST : in  STD_LOGIC;
+        MISO: in std_logic;
+        MOSI : out  STD_LOGIC;
+        SCLK : out  STD_LOGIC;
+        
+        BSY : out STD_LOGIC;
+        TC : out STD_LOGIC;
+        FRX : in std_logic;
+        ECE : in std_logic
     );
 end component;
 
@@ -114,23 +144,42 @@ end component;
 
 
 begin
+    regs: Registers port map(
+        ADDR => addr_low_int,
+        BUS_DATA_IN => data_in,
+        BUS_DATA_OUT => data_out,
+        SPI_DATA_IN => s_spi_data_in,
+        SPI_DATA_OUT => s_spi_data_out,
+        PGMEN => pgm_en,
+        ECE => s_ece,
+        FRX => s_frx,
+        SLAVESEL => NSEL,
+        LED => LED,
+        BSY => s_bsy,
+        TC => s_tc,
+        WP => WP,
+        CARD => CARD,
+        NRESET => NRESET,
+        NDEV_SEL => NDEV_SEL,
+        IS_READ => RNW
+    );
+    
     spi: SpiController port map(
-        data_in => data_in,
-        data_out => data_out,
-        is_read => RNW,
-        nreset => NRESET,
-        addr => addr_low_int,
-        phi0 => PHI0,
-        ndev_sel => NDEV_SEL,
-        clk => CLK,
-        miso => MISO,
-        mosi => MOSI,
-        sclk => SCLK,
-        nsel => NSEL,
-        wp => WP,
-        card => CARD,
-        led => LED,
-        pgm_en => pgm_en
+        BUS_DATA => s_spi_data_out,
+        SPI_DATA => s_spi_data_in,
+        IS_READ => RNW,
+        NRESET => NRESET,
+        ADDR => addr_low_int,
+        CLK_SLOW => PHI0,
+        CLK_FAST => CLK,
+        NDEV_SEL => NDEV_SEL,
+        MISO => MISO,
+        MOSI => MOSI,
+        SCLK => SCLK,
+        BSY => s_bsy,
+        TC => s_tc,
+        FRX => s_frx,
+        ECE => s_ece
     );
     
     addDec: AddressDecoder port map(
