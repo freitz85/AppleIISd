@@ -28,9 +28,6 @@ Port (
         pgm_en : out STD_LOGIC;
         led : out  STD_LOGIC
     );
-
-    constant DIV_WIDTH : integer := 3;
-
 end SpiController;
 
 architecture Behavioral of SpiController is
@@ -49,7 +46,6 @@ architecture Behavioral of SpiController is
     signal frx: std_logic;      -- fast receive mode
     signal ece: std_logic;      -- external clock enable; 0=phi2, 1=external clock
     
-    signal divisor: std_logic_vector(DIV_WIDTH-1 downto 0);
     signal slavesel: std_logic := '1';     -- slave select output (0=selected)
     signal int_miso: std_logic;
     --------------------------
@@ -63,8 +59,6 @@ architecture Behavioral of SpiController is
     
     -- spi clock
     signal clksrc: std_logic;                                   -- clock source (phi2 or clk_7m)
-    -- TODO divcnt is not used at all??
-    --signal divcnt: std_logic_vector(DIV_WIDTH-1 downto 0);          -- divisor counter
     signal shiftclk : std_logic;
     
 begin    
@@ -172,21 +166,7 @@ begin
     clksrc <= phi0 when (ece = '0') else clk;
     
     -- is a pulse signal to allow for divisor==0
-    --shiftclk <= clksrc when divcnt = "000000" else '0';
     shiftclk <= clksrc when bsy = '1' else '0';
-    
---    clkgen: process(nreset, divisor, clksrc)
---    begin
---        if (nreset = '0') then
---            divcnt <= divisor;
---        elsif (falling_edge(clksrc)) then
---            if (shiftclk = '1') then
---                divcnt <= divisor;
---            else
---                divcnt <= divcnt - 1;
---            end if;
---        end if;
---    end process;
     
     --------------------------
     -- interface section
@@ -210,7 +190,7 @@ begin
     -- cpu register section
     -- cpu read
     cpu_read: process(addr, spidatain, tc, bsy, frx, pgmen,
-            ece, divisor, slavesel, wp, card, sdhc, inited)
+            ece, slavesel, wp, card, sdhc, inited)
     begin
         case addr is
             when "00" =>        -- read SPI data in
@@ -224,9 +204,7 @@ begin
                 data_out(5) <= bsy;
                 data_out(6) <= '0';
                 data_out(7) <= tc;
-            when "10" =>        -- read sclk divisor
-                data_out(DIV_WIDTH-1 downto 0) <= divisor;
-                data_out(7 downto 3) <= (others => '0');
+				-- no register 2
             when "11" =>        -- read slave select / slave interrupt state
                 data_out(0) <= slavesel;
                 data_out(3 downto 1) <= (others => '0');
@@ -246,7 +224,6 @@ begin
             ece <= '0';
             frx <= '0';
             slavesel <= '1';
-            divisor <= (others => '0');
             spidataout <= (others => '1');
             sdhc <= '0';
             inited <= '0';
@@ -263,9 +240,8 @@ begin
                     ece <= data_in(2);
                     frx <= data_in(4);
                     -- no bit 5 - 7
-                when "10" =>        -- write divisor
-                    divisor <= data_in(DIV_WIDTH-1 downto 0);
-                when "11" =>        -- write slave select / slave interrupt enable
+					 -- no register 2
+                when "11" =>        -- write slave select
                     slavesel <= data_in(0);
                     -- no bit 1 - 3
                     sdhc <= data_in(4);
