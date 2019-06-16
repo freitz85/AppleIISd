@@ -30,16 +30,32 @@
 ;
 ;*******************************
 
-SDCMD:      PHY
+SDCMD:      .IFPC02
+            PHY
+            .ELSE
+            TYA
+            PHA
+            .ENDIF
             LDY   #0
 @LOOP:      LDA   (CMDLO),Y
             STA   DATA,X
-@WAIT:      BIT   CTRL,X      ; TC is in N
+@WAIT:      .IFPC02
+            BIT   CTRL,X      ; TC is in N
             BPL   @WAIT
+            .ELSE
+            LDA   #TC
+            AND   CTRL,X
+            BNE   @WAIT
+            .ENDIF
             INY
             CPY   #6
             BCC   @LOOP
+            .IFPC02
             PLY
+            .ELSE
+            PLA
+            TAY
+            .ENDIF
             RTS
 
 
@@ -52,8 +68,14 @@ SDCMD:      PHY
 
 GETR1:      LDA   #DUMMY
             STA   DATA,X
-@WAIT:      BIT   CTRL,X
+@WAIT:      .IFPC02
+            BIT   CTRL,X      ; TC is in N
             BPL   @WAIT
+            .ELSE
+            LDA   #TC
+            AND   CTRL,X
+            BNE   @WAIT
+            .ENDIF
             LDA   DATA,X      ; get response
             BMI   GETR1       ; wait for MSB=0
             PHA
@@ -72,13 +94,24 @@ GETR1:      LDA   #DUMMY
 
 GETR3:      JSR   GETR1       ; get R1 first
             PHA               ; save R1
+            .IFPC02
             PHY               ; save Y
+            .ELSE
+            TYA
+            PHA
+            .ENDIF
             LDY   #04         ; load counter
             JMP   @WAIT       ; first byte is already there 
 @LOOP:      LDA   #DUMMY      ; send dummy
             STA   DATA,X
-@WAIT:      BIT   CTRL,X
+@WAIT:      .IFPC02
+            BIT   CTRL,X      ; TC is in N
             BPL   @WAIT
+            .ELSE
+            LDA   #TC
+            AND   CTRL,X
+            BNE   @WAIT
+            .ENDIF
             LDA   DATA,X
             PHA
             DEY
@@ -92,7 +125,12 @@ GETR3:      JSR   GETR1       ; get R1 first
             STA   R31,Y
             PLA
             STA   R30,Y       ; R30 is MSB
+            .IFPC02
             PLY               ; restore Y
+            .ELSE
+            PLA
+            TAY
+            .ENDIF
             LDA   #DUMMY
             STA   DATA,X      ; send another dummy
             PLA               ; restore R1
@@ -108,16 +146,29 @@ GETR3:      JSR   GETR1       ; get R1 first
 ;
 ;*******************************
 
-GETBLOCK:   PHX               ; save X
+GETBLOCK:   .IFPC02
+            PHX               ; save X
             PHY               ; save Y
+            .ELSE
+            TXA
+            PHA               ; save X
+            TYA
+            PHA               ; save y
+            .ENDIF
             LDX   SLOT        ; SLOT is now in X
             LDY   SLOT16
             LDA   BLOCKNUM    ; store block num
             STA   R33,X       ; in R30-R33
             LDA   BLOCKNUM+1
             STA   R32,X
+            .IFPC02
             STZ   R31,X
             STZ   R30,X
+            .ELSE
+            LDA   #0
+            STA   R31,X
+            STA   R30,X
+            .ENDIF
 
             TYA               ; get SLOT16
             EOR   DSNUMBER
@@ -129,7 +180,11 @@ GETBLOCK:   PHX               ; save X
 @DRIVE:     BIT   DSNUMBER    ; drive number
             BPL   @SDHC       ; D1
             LDA   R31,X       ; D2
+            .IFPC02
             INC   A
+            .ELSE
+            ADC   #1
+            .ENDIF
             STA   R31,X
 
 @SDHC:      LDA   #SDHC
@@ -144,20 +199,29 @@ GETBLOCK:   PHX               ; save X
             DEY
             BNE   @LOOP
   
- @END:      PLY               ; restore Y
+ @END:      .IFPC02
+            PLY               ; restore Y
             PLX               ; restore X
+            .ELSE
+            PLA
+            TAY               ; restore y
+            PLA
+            TAX               ; restore x
+            .ENDIF
             RTS
 
 
 ;*******************************
 ;
 ; Send SD command
+; X must contain SLOT16
 ; Cmd is in A
+;
+; Y is destroyed
 ;
 ;*******************************
 
-COMMAND:    PHY               ; save Y
-            LDY   SLOT
+COMMAND:    LDY   SLOT
             STA   DATA,X      ; send command
             LDA   R30,Y       ; get arg from R30 on
             STA   DATA,X
@@ -170,7 +234,6 @@ COMMAND:    PHY               ; save Y
             LDA   #DUMMY
             STA   DATA,X      ; dummy crc
             JSR   GETR1
-            PLY               ; restore Y
             RTS
 
 
@@ -186,7 +249,7 @@ COMMAND:    PHY               ; save Y
 
 CARDDET:    PHA
             LDA   #CD         ; 0: card in
-            BIT   SS,X        ; 1: card out
+            AND   SS,X        ; 1: card out
             CLC
             BEQ   @DONE       ; card is in
             SEC               ; card is out
@@ -206,7 +269,7 @@ CARDDET:    PHA
 
 WRPROT:     PHA
             LDA   #WP         ; 0: write enabled
-            BIT   SS,X        ; 1: write disabled
+            AND   SS,X        ; 1: write disabled
             CLC
             BEQ   @DONE
             SEC

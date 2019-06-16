@@ -55,6 +55,7 @@ SS          :=    DATA+3
 DUMMY       =     $FF
 FRX         =     $10         ; CTRL register
 ECE         =     $04
+TC          =     $80
 SS0         =     $01         ; SS register
 SDHC        =     $10
 WP          =     $20

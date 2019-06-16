@@ -89,9 +89,16 @@
             BPL   @INIT       ; and skip boot if pressed
 
 @NEXTSLOT:  LDA   CURSLOT     ; skip boot when no card
+            .IFPC02
             DEC   A
             STA   CMDHI       ; use CMDHI/LO as pointer
             STZ   CMDLO
+            .ELSE
+            SBC   #1
+            STA   CMDHI
+            LDA   #0
+            STA   CMDLO
+            .ENDIF
             JMP   (CMDLO)
 
 @INIT:      JSR   INIT
@@ -107,16 +114,29 @@
 ; load disk blocks 0 and 1 to $800 and $A00
 @BOOT:      LDA   #$08        ; load to $800
             STA   BUFFER+1    ; buffer hi
+            .IFPC02
             STZ   BUFFER      ; buffer lo
             STZ   BLOCKNUM+1  ; block hi
             STZ   BLOCKNUM    ; block lo
+            .ELSE
+            LDA   #0
+            STA   BUFFER
+            STA   BLOCKNUM+1
+            STA   BLOCKNUM
+            .ENDIF
             JSR   READ
             BCS   @NEXTSLOT   ; load not successful 
 
             LDA   #$0A
             STA   BUFFER+1    ; buffer hi
+            .IFPC02
             STZ   BUFFER      ; buffer lo
             STZ   BLOCKNUM+1  ; block hi
+            .ELSE
+            LDA   #0
+            STA   BUFFER
+            STA   BLOCKNUM+1
+            .ENDIF
             LDA   #$01
             STA   BLOCKNUM    ; block lo
             JSR   READ
@@ -135,7 +155,12 @@ DRIVER:     CLC               ; ProDOS entry
             SEC               ; Smartport entry
 
 @PRODOS:    PHP               ; transfer P to X
+            .IFPC02
             PLX
+            .ELSE
+            PLA
+            TAX
+            .ENDIF
             LDY   #PDZPSIZE-1 ; save zeropage area for ProDOS
 @SAVEZP:    LDA   PDZPAREA,Y
             PHA
@@ -162,14 +187,16 @@ DRIVER:     CLC               ; ProDOS entry
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
             BIT   $CFFF
+            JMP   DRIVEREXT
 
-            JSR   CARDDET
+            .segment "EXTROM"
+DRIVEREXT:  JSR   CARDDET
             BCC   @INITED
             LDA   #ERR_OFFLINE; no card inserted
-            BRA   @END
+            BCS   @END
 
 @INITED:    LDA   #INITED     ; check for init
-            BIT   SS,X
+            AND   SS,X
             BNE   @DISP
             JSR   INIT
             BCS   @END        ; Init failed
@@ -180,7 +207,8 @@ DRIVER:     CLC               ; ProDOS entry
             BCS   @SMARTPORT  ; Smartport dispatcher
             JSR   PRODOS      ; ProDOS dispatcher
 
-@END:       PHX
+@END:       .IFPC02
+            PHX
             LDX   SLOT        ; X holds $0s
             STA   R30,X       ; save A
             PLA
@@ -190,6 +218,21 @@ DRIVER:     CLC               ; ProDOS entry
             PHP
             PLA
             STA   R33,X       ; save P
+            .ELSE
+            PHP
+            PHA
+            TXA
+            PHA
+            LDX   SLOT
+            PLA
+            STA   R31,X       ; save X
+            TYA
+            STA   R32,X       ; save Y
+            PLA
+            STA   R30,X       ; save A
+            PLA
+            STA   R33,X       ; save P
+            .ENDIF
             
             LDY   #0
 @RESTZP:    PLA               ; restore zeropage area
@@ -198,6 +241,7 @@ DRIVER:     CLC               ; ProDOS entry
             CPY   #PDZPSIZE
             BCC   @RESTZP
             
+            .IFPC02
             LDA   R33,X       ; get retval
             PHA
             LDA   R32,X
@@ -208,11 +252,25 @@ DRIVER:     CLC               ; ProDOS entry
             PLX                ; restore X
             PLY                ; restore Y
             PLP                ; restore P
+            .ELSE
+            LDA   R33,X
+            PHA
+            LDA   R30,X
+            PHA
+            LDA   R32,X
+            PHA
+            LDA   R31,X
+            TAX                ; restore X
+            PLA
+            TAY                ; restore Y
+            PLA                ; restore A
+            PLP                ; restore P
+            .ENDIF
             RTS
 
 @SMARTPORT: CLC
             JSR   SMARTPORT
-            BRA   @END
+            JMP   @END
 
 
 ;*******************************
@@ -227,7 +285,6 @@ DRIVER:     CLC               ; ProDOS entry
 ;
 ;*******************************
 
-            .segment "EXTROM"
 INIT:       LDA   #$03        ; set SPI mode 3
             STA   CTRL,X
             LDA   SS,X
@@ -239,7 +296,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             LDA   #DUMMY
 
 @LOOP:      STA   DATA,X
-@WAIT:      BIT   CTRL,X
+@WAIT:      AND   CTRL,X
             BPL   @WAIT
             DEY
             BNE   @LOOP       ; do 10 times
@@ -368,7 +425,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             RTS
 
 
-TEXT:       .asciiz " Apple][Sd v1.2.1 (c)2018 Florian Reitz "
+TEXT:       .asciiz " Apple][Sd v1.2.2 (c)2019 Florian Reitz "
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95

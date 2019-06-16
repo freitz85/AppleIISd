@@ -84,7 +84,7 @@ int main()
                 cprintf("\r\nFlashing EXTROM:  ");
                 if(writeChip(buffer + 256, pExtRom, fileSize - 256))
                 {
-                    cprintf("\r\n\r\nFlashing finished!\n");
+                    cprintf("\r\n\r\n\aFlashing finished!\n");
                 }
                 else
                 {

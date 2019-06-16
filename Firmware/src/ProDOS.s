@@ -152,7 +152,7 @@ READ:       JSR   GETBLOCK    ; calc block address
 
 @ERROR:     SEC               ; an error occured
             LDA   #ERR_IOERR
-            BRA   @DONE
+            BCS   @DONE
 
 
 ;*******************************
@@ -228,8 +228,8 @@ WRITE:      JSR   WRPROT
 
 @IOERROR:   SEC               ; an error occured
             LDA   #ERR_IOERR
-            BRA   @DONE
+            BCS   @DONE
 
 @WPERROR:   SEC
             LDA   #ERR_NOWRITE
-            BRA   @DONE
+            BCS   @DONE

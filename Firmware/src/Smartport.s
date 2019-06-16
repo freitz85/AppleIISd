@@ -70,7 +70,12 @@ SMARTPORT:  LDY   #SMZPSIZE-1   ; save zeropage area for Smarport
             CPX   #$09+1        ; command too large
             BCS   @END
 
+            .IFPC02
             LDA   (SMPARAMLIST) ; parameter count
+            .ELSE
+            LDY   #0
+            LDA   (SMPARAMLIST),Y
+            .ENDIF
             CMP   REQPARAMCOUNT,X
             BNE   @COUNTMISMATCH
 
@@ -82,7 +87,15 @@ SMARTPORT:  LDY   #SMZPSIZE-1   ; save zeropage area for Smarport
             TXA                 ; SMCMD
             ASL   A             ; shift for use of word addresses
             TAX
+            .IFPC02
             JSR   @JMPSPCOMMAND ; Y holds SLOT
+            .ELSE
+            LDA   SPDISPATCH+1,X
+            PHA
+            LDA   SPDISPATCH,X
+            PHA
+            RTS                 ; jump to cmd offset
+            .ENDIF
             BCS   @END          ; jump on error
             LDA   #NO_ERR
 
@@ -102,10 +115,12 @@ SMARTPORT:  LDY   #SMZPSIZE-1   ; save zeropage area for Smarport
 
 @COUNTMISMATCH:
             LDA   #ERR_BADPCNT
-            BRA   @END
-            
+            BNE   @END
+         
+            .IFPC02   
 @JMPSPCOMMAND:                  ; use offset from cmd*2
             JMP   (SPDISPATCH,X)
+            .ENDIF
             
 
 
@@ -124,7 +139,12 @@ SMSTATUS:   JSR   GETCSLIST
 
 ; TODO support partitions based on card size
 @STATUS00:  LDA   #4            ; support 4 partitions
+            .IFPC02
             STA   (SMCMDLIST)
+            .ELSE
+            LDY   #0
+            STA   (SMCMDLIST),Y
+            .ENDIF
 
             LDY   #7
 @LOOP00:    LDA   STATUS00DATA-1,Y
@@ -146,7 +166,12 @@ SMSTATUS:   JSR   GETCSLIST
             RTS
 
 @GETDCB:    LDA   #1            ; return 'empty' DCB, one byte
+            .IFPC02
             STA   (SMCMDLIST)
+            .ELSE
+            LDY   #0
+            STA   (SMCMDLIST),Y
+            .ENDIF
             TAY
             LDA   #NO_ERR
             STA   (SMCMDLIST),Y
@@ -162,7 +187,12 @@ SMSTATUS:   JSR   GETCSLIST
 @WRPROT:    JSR   WRPROT
             BCC   @STATUSBYTE   
             ORA   #$04          ; SD card write-protected
-@STATUSBYTE:STA  (SMCMDLIST)
+@STATUSBYTE:.IFPC02
+            STA  (SMCMDLIST)
+            .ELSE
+            LDY   #0
+            STA   (SMCMDLIST),Y
+            .ENDIF
 
             LDY   #1            ; block count, always $00FFFF
             LDA   #$FF
@@ -278,18 +308,18 @@ TRANSLATE:  LDA   DRVNUM,Y
             BEQ   @UNIT3
             CMP   #4
             BEQ   @UNIT4
-            BRA   @BADUNIT      ; only 4 partitions are supported
+            BNE   @BADUNIT      ; only 4 partitions are supported
 
 @UNIT1:     LDA   SLOT16        ; this slot
-            BRA   @STORE
+            BNE   @STORE
 @UNIT2:     LDA   SLOT16
             ORA   #$80          ; drive 1
-            BRA   @STORE
+            BNE   @STORE
 @UNIT3:     LDA   SLOT16
-            DEC   A             ; phantom slot
-            BRA   @STORE
+            SBC   #1             ; phantom slot
+            BNE   @STORE
 @UNIT4:     LDA   SLOT16
-            DEC   A             ; phantom slot
+            SBC   #1             ; phantom slot
             ORA   #$80          ; drive 1
 
 @STORE:     STA   DSNUMBER      ; store in ProDOS variable
