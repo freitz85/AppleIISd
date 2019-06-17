@@ -85,6 +85,49 @@ LDA $C0C0
 ```
 
 
+## Registers
+The control registers of the *AppleIISd* are mapped to the usual I/O space at **$C0n0 - $C0n3**, where n is slot+8. All registers and bits are read/write, except where noted.
+
+| Address | Function        | Default value
+| $C0n0   | DATA            | -
+| $C0n1   | **0:** PGMEN    | 0
+            **1:** -        | 0
+			**2:** ECE      | 0
+			**3:** -        | 0
+			**4:** FRX      | 0
+			**5:** BSY (R)  | 0
+			**6:** -        | 0
+			**7:** TC (R)   | 0
+| $C0n2   | unused          | $00
+| $C0n3   | **0:** /SS      | 1
+            **1:** -        | 0
+            **2:** -        | 0
+            **3:** -        | 0
+            **4:** SDHC     | 0
+            **5:** WP (R)  	| -
+            **6:** CD (R)	| -
+            **7:** INIT		| 0
+
+**DATA** SPI data register - Is used for both input and output. When the register is written to, the controller will output the byte on the SPI bus. When it is read from, it reflects the data that was received over the SPI bus.
+
+**ECE** External Clock Enable - This bit enables the the external clock input to the SPI controller. In the *AppleIISd*, this effectively switches the SPI clock between 500kHz (ECE = 0) and 3.5MHz (ECE = 1).
+
+**FRX** Fast Receive mode - When set to 1, fast receive mode triggers shifting upon reading or writing the SPI Data register. When set to 0, shifting is only triggered by writing the SPI data register.
+
+**BSY** Busy - This bit is 1 as long as data is shifted out on the SPI bus. *BSY* is read-only.
+
+**TC** Transfer Complete - This flag is set when the last bit has been shifted out onto the SPI bus and is cleared when *SPI data* is read.
+
+**/SS** Slave select - Write 0 to this bit to select the SD card.
+
+**SDHC** This bit is used by the initialization routine in firmware to signalize when a SDHC card was found. Do not write to manually.
+
+**WP** Write Protect - This read-only bit is 0 when writing to the card is enabled by the switch on the card.
+
+**CD** Card Detect - This read-only bit is 0 when a card is inserted.
+
+**INIT** Initialized - This bit is set to 1 when the SD card has been initialized by the firmware. Do not write manually.
+
 ## TODOs
 * Much more testing
 * SRAM option (may never work, though)
