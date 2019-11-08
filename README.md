@@ -11,6 +11,7 @@ The assembler sources are written for CC65. The [schematics](AppleIISd.pdf) are 
 * works with ProDOS and GS/OS
 * up to 128MB storage space (4x 65535 blocks)
 * ProDOS and Smartport driver in ROM
+* Firmware update from ProDOS
 * Auto boot
 * Access LED
 * Card detect and write protect sensing
@@ -88,25 +89,12 @@ LDA $C0C0
 ## Registers
 The control registers of the *AppleIISd* are mapped to the usual I/O space at **$C0n0 - $C0n3**, where n is slot+8. All registers and bits are read/write, except where noted.
 
-| Address | Function        | Default value
-| $C0n0   | DATA            | -
-| $C0n1   | **0:** PGMEN    | 0
-            **1:** -        | 0
-			**2:** ECE      | 0
-			**3:** -        | 0
-			**4:** FRX      | 0
-			**5:** BSY (R)  | 0
-			**6:** -        | 0
-			**7:** TC (R)   | 0
-| $C0n2   | unused          | $00
-| $C0n3   | **0:** /SS      | 1
-            **1:** -        | 0
-            **2:** -        | 0
-            **3:** -        | 0
-            **4:** SDHC     | 0
-            **5:** WP (R)  	| -
-            **6:** CD (R)	| -
-            **7:** INIT		| 0
+| Address | Function        | Default value |
+| ------- | --------------- | ------------- |
+| $C0n0   | DATA            | - |
+| $C0n1   | **0:** PGMEN<br>**1:** -<br>**2:** ECE<br>**3:** -<br>**4:** FRX<br>**5:** BSY (R)<br>**6:** -<br>**7:** TC (R) | 0<br>0<br>0<br>0<br>0<br>0<br>0<br>0<br> |
+| $C0n2   | unused          | $00 |
+| $C0n3   | **0:** /SS<br>**1:** -<br>**2:** -<br>**3:** -<br>**4:** SDHC<br>**5:** WP (R)<br>**6:** CD (R)<br>**7:** INIT | 1<br>0<br>0<br>0<br>0<br>-<br>-<br>0 |
 
 **DATA** SPI data register - Is used for both input and output. When the register is written to, the controller will output the byte on the SPI bus. When it is read from, it reflects the data that was received over the SPI bus.
 
@@ -130,12 +118,12 @@ The control registers of the *AppleIISd* are mapped to the usual I/O space at **
 
 ## TODOs
 * Much more testing
-* SRAM option (may never work, though)
 * Enable more than 4 volumes under GS/OS
-* Use 28 pin socket to support other EPROMS than 2716 and 2732
+* Support for 6502 CPUs
 
 ## Known Bugs
 * Does not work with some Z80 cards present
+* Programs not startable from partitions 3 and 4 under ProDOS
 
 
 ![Front_Img](Images/Card%20Front.jpg)
