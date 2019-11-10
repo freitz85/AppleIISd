@@ -1,10 +1,10 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2
+; Version 1.3
 ; Helper functions
 ;
-; (c) Florian Reitz, 2017 - 2018
+; (c) Florian Reitz, 2017 - 2019
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -102,9 +102,12 @@ GETR3:      JSR   GETR1       ; get R1 first
 ;*******************************
 ;
 ; Calculate block address
-; Unit number is in $43 DSSS0000
+; Unit number is in $43 DSSS0000 / DSSS00DD
 ; Block no is in $46-47
 ; Address is in R30-R33
+;
+; Starting ProDOS 2.5a5 the unit number
+; has been enhanced to DSSS00DD
 ;
 ;*******************************
 
@@ -116,21 +119,35 @@ GETBLOCK:   PHX               ; save X
             STA   R33,X       ; in R30-R33
             LDA   BLOCKNUM+1
             STA   R32,X
-            STZ   R31,X
             STZ   R30,X
 
-            TYA               ; get SLOT16
+.if 1
+            LDA   DSNUMBER    ; calculate drive number
+            ASL   A
+            AND   #$07
+            ADC   #$01
+            STA   R31,X
+.else
+            LDA   DSNUMBER
+            AND   #$03        ; mask extended drive bits (bits 0-1)
+            STA   R31,X
+            BIT   DSNUMBER    ; check old drive number (bit 7)
+            BPL   @PHANTOM
+            INC   A           ; increase by one
+            STA   R31,X
+.endif
+.if 0
+@PHANTOM:   TYA               ; get SLOT16
             EOR   DSNUMBER
             AND   #$70        ; check only slot bits
-            BEQ   @DRIVE      ; it is our slot
-            LDA   #2          ; it is a phantom slot
+            BEQ   @SDHC       ; it is our slot
+            LDA   R31,X       ; it is a phantom slot, multiply by 16
+            ASL   A
+            ASL   A
+            ASL   A
+            ASL   A
             STA   R31,X
-
-@DRIVE:     BIT   DSNUMBER    ; drive number
-            BPL   @SDHC       ; D1
-            LDA   R31,X       ; D2
-            INC   A
-            STA   R31,X
+.endif
 
 @SDHC:      LDA   #SDHC
             AND   SS,Y        ; if card is SDHC,
@@ -144,7 +161,7 @@ GETBLOCK:   PHX               ; save X
             DEY
             BNE   @LOOP
   
- @END:      PLY               ; restore Y
+@END:       PLY               ; restore Y
             PLX               ; restore X
             RTS
 

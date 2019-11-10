@@ -1,10 +1,10 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2
+; Version 1.3
 ; Defines
 ;
-; (c) Florian Reitz, 2017 - 2018
+; (c) Florian Reitz, 2017 - 2019
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -61,7 +61,7 @@ WP          =     $20
 CD          =     $40
 INITED      =     $80
 
-SMDRIVERVER =     $120B       ; Version 1.2 Beta
+SMDRIVERVER =     $130B       ; Version 1.3 Beta
 
 ; Error codes
 NO_ERR          =     $00

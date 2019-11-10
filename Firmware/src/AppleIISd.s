@@ -1,10 +1,10 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2.1
+; Version 1.3
 ; Main source
 ;
-; (c) Florian Reitz, 2017 - 2018
+; (c) Florian Reitz, 2017 - 2019
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -368,7 +368,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             RTS
 
 
-TEXT:       .asciiz " Apple][Sd v1.2.1 (c)2018 Florian Reitz "
+TEXT:       .asciiz " Apple][Sd v1.3 (c)2019 Florian Reitz "
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95
