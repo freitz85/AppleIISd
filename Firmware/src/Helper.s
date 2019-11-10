@@ -45,7 +45,7 @@ SDCMD:      .IFPC02
             .ELSE
             LDA   #TC
             AND   CTRL,X
-            BNE   @WAIT
+            BEQ   @WAIT
             .ENDIF
             INY
             CPY   #6
@@ -74,7 +74,7 @@ GETR1:      LDA   #DUMMY
             .ELSE
             LDA   #TC
             AND   CTRL,X
-            BNE   @WAIT
+            BEQ   @WAIT
             .ENDIF
             LDA   DATA,X      ; get response
             BMI   GETR1       ; wait for MSB=0
@@ -110,7 +110,7 @@ GETR3:      JSR   GETR1       ; get R1 first
             .ELSE
             LDA   #TC
             AND   CTRL,X
-            BNE   @WAIT
+            BEQ   @WAIT
             .ENDIF
             LDA   DATA,X
             PHA
