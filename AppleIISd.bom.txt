@@ -1,12 +1,14 @@
-Qty Value           Device            Package         Parts                          Description                                        
-1                   LEDSQR2X5         LED2X5          LED1                           LED                                                
-1   100k            GE08R             SIL9            RN1                            SIL RESISTOR                                       
-8   100n            C-EUC0603K        C0603K          C1, C2, C4, C5, C6, C7, C8, C9 CAPACITOR, European symbol                         
+Qty Value           Device            Package         Parts                          Description                                             
+1                   LEDSQR2X5         LED2X5          LED1                           LED                                                     
+1                   MA03-1            MA03-1          SV1                            PIN HEADER                                              
+1                   MA06-1            MA06-1          SV2                            PIN HEADER                                              
+1   100k            GE08R             SIL9            RN1                            SIL RESISTOR                                            
+8   100n            C-EUC0603K        C0603K          C1, C2, C4, C5, C6, C7, C8, C9 CAPACITOR, European symbol                              
 1   104H-TDA0-R     104H-TDA0-R       104H-TDA0-R     U$2                            SD Card Socket
-3   10n             C-EUC0603K        C0603K          C10, C11, C12                  CAPACITOR, European symbol                         
-2   10u/16V         CPOL-EUA/3216-18R A/3216-18R      C3, C13                        POLARIZED CAPACITOR, European symbol               
-1   28C64ASO        28C64ASO          SO28W           IC3                            CMOS EEPROM                                        
-1   470             R-EU_R0603        R0603           R4                             RESISTOR, European symbol                          
-1   74LS245N        74LS245N          DIL20           IC1                            Octal BUS TRANSCEIVER, 3-state                     
-1   LM1117DTX-3.3   LM1117DTX-3.3     TO252           IC2                            
-1   XC9572XL        XC9572_S44VQFP    SQFP-S-10X10-44 IC4                                                                               
+3   10n             C-EUC0603K        C0603K          C10, C11, C12                  CAPACITOR, European symbol                              
+2   10u/16V         CPOL-EUA/3216-18R A/3216-18R      C3, C13                        POLARIZED CAPACITOR, European symbol                    
+1   28C64ASO        28C64ASO          SO28W           IC3                            CMOS EEPROM                                             
+1   470             R-EU_R0603        R0603           R4                             RESISTOR, European symbol                               
+1   74LS245N        74LS245N          DIL20           IC1                            Octal BUS TRANSCEIVER, 3-state                          
+1   LM1117DTX-3.3   LM1117DTX-3.3     TO252           IC2                                                                                    
+1   XC9572XL        XC9572_S44VQFP    SQFP-S-10X10-44 IC4                                                                                    
