@@ -5,7 +5,7 @@ The **AppleIISd** is a SD card based replaced for the ProFile harddrive. In cont
 
 A Xilinx CPLD is used as a SPI controller and translates, together with the ROM driver, SD card data to/from the Apple IIe. The VHDL source is based on [SPI65/B](http://www.6502.org/users/andre/spi65b) by André Fachat.
 
-The assembler sources are written for CC65. The [schematics](AppleIISd.pdf) are available as PDF.
+The assembler sources are written for CC65. The [schematics](Binary/AppleIISd.pdf) are available as PDF.
 
 ## Features
 * works with ProDOS and GS/OS
@@ -27,6 +27,20 @@ The AppleIISd requires an enhanced IIe or IIgs computer. The ROM code uses some 
 * Apple IIe enhanced, 64k, Prodos 1.9
 
 When a 2732 type ROM is used, the binary image has to be programmed at offset 0x800, because A11 is always high for compatibility with 2716 type ROMs.
+
+## Binary distribution
+The following files in [Binary/](Binary) have been provided to eliminate the need to compile assembler or VHDL sources.
+
+| File | Purpose |
+| ---- | ------- |
+| AppleIISd_xx44.jed | CPLD bitfiles for PC44 and VQ44 formfactors |
+| AppleIIDs.bin | 2k Firmware binary for EPROM |
+| AppleIISd.hex | Same as above in INTEL-HEX format |
+| AppleIISd.bom.txt | BOM for the board |
+| AppleIISd.pdf | Schematic and layout |
+| Flasher.bin | Flasher program ProDOS binary |
+| Flasher.dsk | Complete ProDOS disk image with Flasher.bin and AppleIISd.bin |
+| Gerber_Vx.x.zip | Gerber files for different hw revisions |
 
 ## Smartport drive remapping
 The AppleIISd features Smartport drivers in ROM to provide more than two drives in both GS/OS and ProDOS.
