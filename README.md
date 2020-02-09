@@ -5,12 +5,13 @@ The **AppleIISd** is a SD card based replaced for the ProFile harddrive. In cont
 
 A Xilinx CPLD is used as a SPI controller and translates, together with the ROM driver, SD card data to/from the Apple IIe. The VHDL source is based on [SPI65/B](http://www.6502.org/users/andre/spi65b) by André Fachat.
 
-The assembler sources are written for CC65. The [schematics](AppleIISd.pdf) are available as PDF.
+The assembler sources are written for CC65. The [schematics](Binary/AppleIISd.pdf) are available as PDF.
 
 ## Features
 * works with ProDOS and GS/OS
 * up to 128MB storage space (4x 65535 blocks)
 * ProDOS and Smartport driver in ROM
+* Firmware update from ProDOS
 * Auto boot
 * Access LED
 * Card detect and write protect sensing
@@ -26,6 +27,20 @@ The AppleIISd requires an enhanced IIe or IIgs computer. The ROM code uses some 
 * Apple IIe enhanced, 64k, Prodos 1.9
 
 When a 2732 type ROM is used, the binary image has to be programmed at offset 0x800, because A11 is always high for compatibility with 2716 type ROMs.
+
+## Binary distribution
+The following files in [Binary/](Binary) have been provided to eliminate the need to compile assembler or VHDL sources.
+
+| File | Purpose |
+| ---- | ------- |
+| AppleIISd_xx44.jed | CPLD bitfiles for PC44 and VQ44 formfactors |
+| AppleIIDs.bin | 2k Firmware binary for EPROM |
+| AppleIISd.hex | Same as above in INTEL-HEX format |
+| AppleIISd.bom.txt | BOM for the board |
+| AppleIISd.pdf | Schematic and layout |
+| Flasher.bin | Flasher program ProDOS binary |
+| Flasher.dsk | Complete ProDOS disk image with Flasher.bin and AppleIISd.bin |
+| Gerber_Vx.x.zip | Gerber files for different hw revisions |
 
 ## Smartport drive remapping
 The AppleIISd features Smartport drivers in ROM to provide more than two drives in both GS/OS and ProDOS.
@@ -85,14 +100,45 @@ LDA $C0C0
 ```
 
 
+## Registers
+The control registers of the *AppleIISd* are mapped to the usual I/O space at **$C0n0 - $C0n3**, where n is slot+8. All registers and bits are read/write, except where noted.
+
+| Address | Function        | Default value |
+| ------- | --------------- | ------------- |
+| $C0n0   | DATA            | - |
+| $C0n1   | **0:** PGMEN<br>**1:** -<br>**2:** ECE<br>**3:** -<br>**4:** FRX<br>**5:** BSY (R)<br>**6:** -<br>**7:** TC (R) | 0<br>0<br>0<br>0<br>0<br>0<br>0<br>0<br> |
+| $C0n2   | unused          | $00 |
+| $C0n3   | **0:** /SS<br>**1:** -<br>**2:** -<br>**3:** -<br>**4:** SDHC<br>**5:** WP (R)<br>**6:** CD (R)<br>**7:** INIT | 1<br>0<br>0<br>0<br>0<br>-<br>-<br>0 |
+
+**DATA** SPI data register - Is used for both input and output. When the register is written to, the controller will output the byte on the SPI bus. When it is read from, it reflects the data that was received over the SPI bus.
+
+**ECE** External Clock Enable - This bit enables the the external clock input to the SPI controller. In the *AppleIISd*, this effectively switches the SPI clock between 500kHz (ECE = 0) and 3.5MHz (ECE = 1).
+
+**FRX** Fast Receive mode - When set to 1, fast receive mode triggers shifting upon reading or writing the SPI Data register. When set to 0, shifting is only triggered by writing the SPI data register.
+
+**BSY** Busy - This bit is 1 as long as data is shifted out on the SPI bus. *BSY* is read-only.
+
+**TC** Transfer Complete - This flag is set when the last bit has been shifted out onto the SPI bus and is cleared when *SPI data* is read.
+
+**/SS** Slave select - Write 0 to this bit to select the SD card.
+
+**SDHC** This bit is used by the initialization routine in firmware to signalize when a SDHC card was found. Do not write to manually.
+
+**WP** Write Protect - This read-only bit is 0 when writing to the card is enabled by the switch on the card.
+
+**CD** Card Detect - This read-only bit is 0 when a card is inserted.
+
+**INIT** Initialized - This bit is set to 1 when the SD card has been initialized by the firmware. Do not write manually.
+
 ## TODOs
 * Much more testing
-* SRAM option (may never work, though)
 * Enable more than 4 volumes under GS/OS
-* Use 28 pin socket to support other EPROMS than 2716 and 2732
+* Support for 6502 CPUs
 
 ## Known Bugs
 * Does not work with some Z80 cards present
+* Programs not startable from partitions 3 and 4 under ProDOS
 
 
+![Front_Img_Smd](Images/Card%20Front%20SMD.jpg)
 ![Front_Img](Images/Card%20Front.jpg)
