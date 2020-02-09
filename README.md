@@ -140,4 +140,5 @@ The control registers of the *AppleIISd* are mapped to the usual I/O space at **
 * Programs not startable from partitions 3 and 4 under ProDOS
 
 
+![Front_Img_Smd](Images/Card%20Front%20SMD.jpg)
 ![Front_Img](Images/Card%20Front.jpg)
