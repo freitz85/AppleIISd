@@ -134,6 +134,8 @@ boolean writeChip(const uint8* pSource, uint8* pDest, uint16 length)
 {
     uint32 i;
     uint8 data = 0;
+    uint8 readData;
+    volatile uint8* pDestination = pDest;
 
     for(i=0; i<length; i++)
     {
@@ -143,19 +145,25 @@ boolean writeChip(const uint8* pSource, uint8* pDest, uint16 length)
             data = pSource[i];
         }
 
-        *pDest = data;
-
-        // use print as writecycle
+        *pDestination = data;
         printStatus((i * 100u / length) + 1);
 
-        if(*pDest != data)
+        // wait for write cycle
+        do
+        {
+            readData = *pDestination;
+        }
+        while((readData & 0x80) != (data & 0x80));
+
+        if(readData != data)
         {
             // verification not successful
-            cprintf("\r\n\r\n!!! Flashing failed at %p !!!\r\n", pDest);
+            cprintf("\r\n\r\n!!! Flashing failed at %p !!!\r\n", pDestination);
+            cprintf("Was 0x%02hhX, should be 0x%02hhX\r\n", readData, data);
             return FALSE;
         }
 
-        pDest++;
+        pDestination++;
     }
 
     return TRUE;
@@ -170,11 +178,6 @@ void printStatus(uint8 percentage)
 
     cprintf("% 3hhu%% %c", percentage, cState);
     gotox(x);
-
-    while(wait < 0xff)
-    {
-        wait++;
-    }
 
     state++;
     if(state == STATE_LAST)
