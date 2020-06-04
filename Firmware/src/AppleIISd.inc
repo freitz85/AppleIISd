@@ -1,10 +1,10 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2
+; Version 1.2.2
 ; Defines
 ;
-; (c) Florian Reitz, 2017 - 2018
+; (c) Florian Reitz, 2017 - 2020
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -44,7 +44,6 @@ DRVNUM      :=    $0678
 CURSLOT     :=    $07F8       ; $Cs
 
 ; Rom equates
-KNOWNRTS    :=    $FF58
 OAPPLE      :=    $C061       ; open apple key
 DATA        :=    $C080
 CTRL        :=    DATA+1

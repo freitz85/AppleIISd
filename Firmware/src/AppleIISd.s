@@ -57,9 +57,8 @@
             LDX   #$3C        ; is a disk controller
 
             SEI               ; find slot
-            LDA   #$60        ; opcode for RTS
-            STA   SLOT
-            JSR   SLOT
+            BIT   $CFFF
+            JSR   KNOWNRTS
             TSX
             LDA   $0100,X
             CLI
@@ -72,7 +71,6 @@
             ASL   A
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
-            BIT   $CFFF
 
             LDY   #0          ; display copyright message
 @DRAW:      LDA   TEXT,Y
@@ -144,9 +142,8 @@ DRIVER:     CLC               ; ProDOS entry
 
 ; Has this to be done every time this gets called or only on boot???
             SEI
-            LDA   #$60        ; opcode for RTS
-            STA   SLOT
-            JSR   SLOT
+            BIT   $CFFF
+            JSR   KNOWNRTS
             TSX
             LDA   $0100,X
             CLI
@@ -160,7 +157,6 @@ DRIVER:     CLC               ; ProDOS entry
             ASL   A
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
-            BIT   $CFFF
 
             JSR   CARDDET
             BCC   @INITED
@@ -358,7 +354,7 @@ INIT:       STZ   CTRL,X      ; reset SPI controller
             ORA   #SS0
             STA   SS,X
             TYA               ; retval in A
-            RTS
+KNOWNRTS:   RTS
 
 
 TEXT:       .asciiz " Apple][Sd v1.2.2 (c)2020 Florian Reitz"
