@@ -48,7 +48,6 @@ KNOWNRTS    :=    $FF58
 OAPPLE      :=    $C061       ; open apple key
 DATA        :=    $C080
 CTRL        :=    DATA+1
-DIV         :=    DATA+2
 SS          :=    DATA+3
 
 ; Constants

@@ -1,10 +1,10 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2.1
+; Version 1.2.2
 ; Main source
 ;
-; (c) Florian Reitz, 2017 - 2018
+; (c) Florian Reitz, 2017 - 2020
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -53,7 +53,8 @@
             LDX   #$20
             LDX   #$00
             LDX   #$03
-            LDX   #$00        ; is Smartport controller
+            ;LDX   #$00        ; is Smartport controller
+            LDX   #$3C        ; is a disk controller
 
             SEI               ; find slot
             LDA   #$60        ; opcode for RTS
@@ -65,7 +66,6 @@
             STA   CURSLOT     ; $Cs
             AND   #$0F
             STA   SLOT        ; $0s
-            TAY               ; Y holds now SLOT
             ASL   A
             ASL   A
             ASL   A
@@ -95,7 +95,6 @@
             JMP   (CMDLO)
 
 @INIT:      JSR   INIT
-            CMP   #NO_ERR
             BNE   @NEXTSLOT   ; init not successful
 
 ;*******************************
@@ -228,13 +227,9 @@ DRIVER:     CLC               ; ProDOS entry
 ;*******************************
 
             .segment "EXTROM"
-INIT:       LDA   #$03        ; set SPI mode 3
-            STA   CTRL,X
-            LDA   SS,X
-            ORA   #SS0        ; set CS high
+INIT:       STZ   CTRL,X      ; reset SPI controller
+            LDA   #SS0        ; set CS high
             STA   SS,X
-            LDA   #7          ; set 400 kHz
-            STA   DIV,X
             LDY   #10
             LDA   #DUMMY
 
@@ -362,13 +357,13 @@ INIT:       LDA   #$03        ; set SPI mode 3
 @END1:      LDA   SS,X        ; set CS high
             ORA   #SS0
             STA   SS,X
-            LDA   #0          ; set div to 2
-            STA   DIV,X
             TYA               ; retval in A
             RTS
 
 
-TEXT:       .asciiz " Apple][Sd v1.2.1 (c)2018 Florian Reitz "
+TEXT:       .asciiz " Apple][Sd v1.2.2 (c)2020 Florian Reitz"
+            .assert(*-TEXT)=40, error, "TEXT must be 40 bytes long"
+
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95

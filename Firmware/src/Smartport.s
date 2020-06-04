@@ -95,8 +95,10 @@ SMARTPORT:  LDY   #SMZPSIZE-1   ; save zeropage area for Smarport
             BCC   @RESTZP
 
             TXA
+;warum feste anzahl an bytes für return wert?
             LDY   #2            ; highbyte of # bytes transferred
             LDX   #0            ; low byte of # bytes transferred
+;warum wird mit #1 verglichen?
             CMP   #1            ; C=1 if A != NO_ERR
             RTS
 
