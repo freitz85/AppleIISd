@@ -11,12 +11,15 @@
 ;
 ;*******************************
 
+.export INIT
+
 .import PRODOS
 .import SMARTPORT
 .import GETR1
 .import GETR3
 .import SDCMD
 .import CARDDET
+.import INITED
 .import READ
 
 .include "AppleIISd.inc"
@@ -158,14 +161,8 @@ DRIVER:     CLC               ; ProDOS entry
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
 
-            JSR   CARDDET
-            BCC   @INITED
-            LDA   #ERR_OFFLINE; no card inserted
-            BRA   @END
-
-@INITED:    LDA   #INITED     ; check for init
-            BIT   SS,X
-            BNE   @DISP
+            JSR   INITED      ; check for init
+            BCC   @DISP
             JSR   INIT
             BCS   @END        ; Init failed
 
@@ -339,7 +336,7 @@ INIT:       STZ   CTRL,X      ; reset SPI controller
             BNE   @IOERROR    ; error!
 
 @END:       LDA   SS,X
-            ORA   #INITED     ; initialized
+            ORA   #CARD_INIT  ; initialized
             STA   SS,X
             LDA   CTRL,X
             ORA   #ECE        ; enable 7MHz

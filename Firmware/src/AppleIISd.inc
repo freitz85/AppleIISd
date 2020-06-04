@@ -57,7 +57,7 @@ SS0         =     $01         ; SS register
 SDHC        =     $10
 WP          =     $20
 CD          =     $40
-INITED      =     $80
+CARD_INIT   =     $80
 
 SMDRIVERVER =     $120B       ; Version 1.2 Beta
 
