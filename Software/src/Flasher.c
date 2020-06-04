@@ -28,9 +28,11 @@ uint8 buffer[2048] = { 0 };
 
 int main()
 {
-    int retval = 0;
+    int retval = 1;
     FILE* pFile;
     char slotNum;
+    boolean erase = FALSE;
+    uint16 fileSize = 0;
 
     APPLE_II_SD_T* pAIISD = (APPLE_II_SD_T*)SLOT_IO_START;
     uint8* pSlotRom = SLOT_ROM_START;
@@ -39,7 +41,7 @@ int main()
     videomode(VIDEOMODE_40COL);
     clrscr();
     cprintf("AppleIISd firmware flasher\r\n");
-    cprintf("(c) 2019 Florian Reitz\r\n\r\n");
+    cprintf("(c) 2019-2020 Florian Reitz\r\n\r\n");
     
     // ask for slot
     cursor(1);      // enable blinking cursor
@@ -47,6 +49,18 @@ int main()
     cscanf("%c", &slotNum);
     slotNum -= 0x30;
     cursor(0);      // disable blinking cursor
+
+    if(slotNum == 0)
+    {
+        // erase device
+        erase = TRUE;
+        // ask for slot
+        cursor(1);      // enable blinking cursor
+        cprintf("Erase device in slot number (1-7): ");
+        cscanf("%c", &slotNum);
+        slotNum -= 0x30;
+        cursor(0);      // disable blinking cursor
+    }
 
     // check if slot is valid
     if((slotNum < 1) || (slotNum > 7))
@@ -59,56 +73,57 @@ int main()
     ((uint8*)pAIISD) += slotNum << 4;
     pSlotRom += slotNum << 8;
 
-    // open file
-    pFile = fopen(BIN_FILE_NAME, "rb");
-    if(pFile)
+    if(erase)
     {
-        // read buffer
-        uint16 fileSize = fread(buffer, 1, sizeof(buffer), pFile);
-        fclose(pFile);
-        pFile = NULL;
-
-        if(fileSize == 2048)
-        {
-            // enable write
-            pAIISD->status.pgmen = 1;
-
-            // clear 0xCFFF
-            *CFFF = 0;
-
-            // write to SLOTROM
-            cprintf("\r\n\r\nFlashing SLOTROM: ");
-            if(writeChip(buffer, pSlotRom, 256))
-            {
-                // write to EXTROM
-                cprintf("\r\nFlashing EXTROM:  ");
-                if(writeChip(buffer + 256, pExtRom, fileSize - 256))
-                {
-                    cprintf("\r\n\r\nFlashing finished!\n");
-                }
-                else
-                {
-                    retval = 1;
-                }
-            }
-            else
-            {
-                retval = 1;
-            }
-
-            // disable write
-            pAIISD->status.pgmen = 0;
-        }
-        else
-        {
-            cprintf("\r\nWrong file size: %d\r\n", fileSize);
-            retval = 1;
-        }
+        // buffer is already filled with 0
+        fileSize = 2048;
     }
     else
     {
-        cprintf("\r\nCan't open %s file\r\n", BIN_FILE_NAME);
-        retval = 1;
+        // open file
+        pFile = fopen(BIN_FILE_NAME, "rb");
+        if(pFile)
+        {
+            // read buffer
+            fileSize = fread(buffer, 1, sizeof(buffer), pFile);
+            fclose(pFile);
+            pFile = NULL;
+
+            if(fileSize != 2048)
+            {
+                cprintf("\r\nWrong file size: %d\r\n", fileSize);
+            }
+        }
+        else
+        {
+            cprintf("\r\nCan't open %s file\r\n", BIN_FILE_NAME);
+            fileSize = 0;
+        }
+    }
+
+    if(fileSize == 2048)
+    {
+        // enable write
+        pAIISD->status.pgmen = 1;
+
+        // clear 0xCFFF
+        *CFFF = 0;
+
+        // write to SLOTROM
+        cprintf("\r\n\r\nFlashing SLOTROM: ");
+        if(writeChip(buffer, pSlotRom, 256))
+        {
+            // write to EXTROM
+            cprintf("\r\nFlashing EXTROM:  ");
+            if(writeChip(buffer + 256, pExtRom, fileSize - 256))
+            {
+                cprintf("\r\n\r\nFlashing finished!\n");
+                retval = 0;
+            }
+        }
+
+        // disable write
+        pAIISD->status.pgmen = 0;
     }
 
     cgetc();
