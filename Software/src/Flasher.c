@@ -5,6 +5,8 @@
 #include <conio.h>
 #include <apple2enh.h>
 
+// Binary can't be larger than 2k
+#define BUFFER_SIZE     2048
 #define BIN_FILE_NAME   "AppleIISd.bin"
 
 typedef enum
@@ -14,17 +16,16 @@ typedef enum
     STATE_2,     // hyphen
     STATE_3,     // backslash
 
-    STATE_LAST          // don't use
+    STATE_LAST   // don't use
 } STATE_CURSOR_T;
 
 const char state_char[STATE_LAST] = { '|', '/', '-', '\\' };
+uint8 buffer[BUFFER_SIZE] = { 0 };
 
 
-boolean writeChip(const uint8* pSource, uint8* pDest, uint16 length);
+boolean writeChip(const uint8* pSource, volatile uint8* pDest, uint16 length);
 void printStatus(uint8 percentage);
 
-// Binary can't be larger than 2k
-uint8 buffer[2048] = { 0 };
 
 int main()
 {
@@ -35,8 +36,7 @@ int main()
     uint16 fileSize = 0;
 
     APPLE_II_SD_T* pAIISD = (APPLE_II_SD_T*)SLOT_IO_START;
-    uint8* pSlotRom = SLOT_ROM_START;
-    uint8* pExtRom = EXT_ROM_START;
+    volatile uint8* pSlotRom = SLOT_ROM_START;
 
     videomode(VIDEOMODE_40COL);
     clrscr();
@@ -76,7 +76,7 @@ int main()
     if(erase)
     {
         // buffer is already filled with 0
-        fileSize = 2048;
+        fileSize = BUFFER_SIZE;
     }
     else
     {
@@ -89,7 +89,7 @@ int main()
             fclose(pFile);
             pFile = NULL;
 
-            if(fileSize != 2048)
+            if(fileSize != BUFFER_SIZE)
             {
                 cprintf("\r\nWrong file size: %d\r\n", fileSize);
             }
@@ -101,7 +101,7 @@ int main()
         }
     }
 
-    if(fileSize == 2048)
+    if(fileSize == BUFFER_SIZE)
     {
         // enable write
         pAIISD->status.pgmen = 1;
@@ -115,7 +115,7 @@ int main()
         {
             // write to EXTROM
             cprintf("\r\nFlashing EXTROM:  ");
-            if(writeChip(buffer + 256, pExtRom, fileSize - 256))
+            if(writeChip(buffer + 256, EXT_ROM_START, fileSize - 256))
             {
                 cprintf("\r\n\r\nFlashing finished!\n");
                 retval = 0;
@@ -130,12 +130,11 @@ int main()
     return retval;
 }
 
-boolean writeChip(const uint8* pSource, uint8* pDest, uint16 length)
+boolean writeChip(const uint8* pSource, volatile uint8* pDest, uint16 length)
 {
     uint32 i;
-    uint8 data = 0;
-    uint8 readData;
-    volatile uint8* pDestination = pDest;
+    volatile uint8 data = 0;
+    volatile uint8 readData;
 
     for(i=0; i<length; i++)
     {
@@ -145,25 +144,25 @@ boolean writeChip(const uint8* pSource, uint8* pDest, uint16 length)
             data = pSource[i];
         }
 
-        *pDestination = data;
+        *pDest = data;
         printStatus((i * 100u / length) + 1);
 
         // wait for write cycle
         do
         {
-            readData = *pDestination;
+            readData = *pDest;
         }
         while((readData & 0x80) != (data & 0x80));
 
         if(readData != data)
         {
             // verification not successful
-            cprintf("\r\n\r\n!!! Flashing failed at %p !!!\r\n", pDestination);
+            cprintf("\r\n\r\n!!! Flashing failed at %p !!!\r\n", pDest);
             cprintf("Was 0x%02hhX, should be 0x%02hhX\r\n", readData, data);
             return FALSE;
         }
 
-        pDestination++;
+        pDest++;
     }
 
     return TRUE;
