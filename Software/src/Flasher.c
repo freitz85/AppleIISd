@@ -23,8 +23,9 @@ const char state_char[STATE_LAST] = { '|', '/', '-', '\\' };
 uint8 buffer[BUFFER_SIZE] = { 0 };
 
 
-boolean writeChip(const uint8* pSource, volatile uint8* pDest, uint16 length);
-void printStatus(uint8 percentage);
+static void writeChip(const uint8* pSource, volatile uint8* pDest, uint16 length);
+static boolean verifyChip(const uint8* pSource, volatile uint8* pDest, uint16 length);
+static void printStatus(uint8 percentage);
 
 
 int main()
@@ -111,11 +112,15 @@ int main()
 
         // write to SLOTROM
         cprintf("\r\n\r\nFlashing SLOTROM: ");
-        if(writeChip(buffer, pSlotRom, 256))
+        writeChip(buffer, pSlotRom, 256);
+        cprintf("\r\n\r\nVerifying SLOTROM: ");
+        if(verifyChip(buffer, pSlotRom, 256))
         {
             // write to EXTROM
             cprintf("\r\nFlashing EXTROM:  ");
-            if(writeChip(buffer + 256, EXT_ROM_START, fileSize - 256))
+            writeChip(buffer + 256, EXT_ROM_START, fileSize - 256);
+            cprintf("\r\nVerifying EXTROM:  ");
+            if(verifyChip(buffer + 256, EXT_ROM_START, fileSize - 256))
             {
                 cprintf("\r\n\r\nFlashing finished!\n");
                 retval = 0;
@@ -130,7 +135,7 @@ int main()
     return retval;
 }
 
-boolean writeChip(const uint8* pSource, volatile uint8* pDest, uint16 length)
+static void writeChip(const uint8* pSource, volatile uint8* pDest, uint16 length)
 {
     uint32 i;
     volatile uint8 data = 0;
@@ -154,11 +159,30 @@ boolean writeChip(const uint8* pSource, volatile uint8* pDest, uint16 length)
         }
         while((readData & 0x80) != (data & 0x80));
 
-        if(readData != data)
+        pDest++;
+    }
+}
+
+static boolean verifyChip(const uint8* pSource, volatile uint8* pDest, uint16 length)
+{
+    uint32 i;
+    volatile uint8 data = 0;
+
+    for(i=0; i<length; i++)
+    {
+        // set 0 if no source
+        if(pSource)
+        {
+            data = pSource[i];
+        }
+
+        printStatus((i * 100u / length) + 1);
+
+        if(*pDest != data)
         {
             // verification not successful
-            cprintf("\r\n\r\n!!! Flashing failed at %p !!!\r\n", pDest);
-            cprintf("Was 0x%02hhX, should be 0x%02hhX\r\n", readData, data);
+            cprintf("\r\n\r\n!!! Verification failed at %p !!!\r\n", pDest);
+            cprintf("Was 0x%02hhX, should be 0x%02hhX\r\n", *pDest, data);
             return FALSE;
         }
 
@@ -168,7 +192,7 @@ boolean writeChip(const uint8* pSource, volatile uint8* pDest, uint16 length)
     return TRUE;
 }
 
-void printStatus(uint8 percentage)
+static void printStatus(uint8 percentage)
 {
     static STATE_CURSOR_T state = STATE_0;
     uint8 wait = 0;
