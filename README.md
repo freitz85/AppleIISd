@@ -112,6 +112,8 @@ The control registers of the *AppleIISd* are mapped to the usual I/O space at **
 
 **DATA** SPI data register - Is used for both input and output. When the register is written to, the controller will output the byte on the SPI bus. When it is read from, it reflects the data that was received over the SPI bus.
 
+**PGMEN** Program Enable - Enable programing of the internal firmware eeprom. Should be reset immediately after writing to the device.
+
 **ECE** External Clock Enable - This bit enables the the external clock input to the SPI controller. In the *AppleIISd*, this effectively switches the SPI clock between 500kHz (ECE = 0) and 3.5MHz (ECE = 1).
 
 **FRX** Fast Receive mode - When set to 1, fast receive mode triggers shifting upon reading or writing the SPI Data register. When set to 0, shifting is only triggered by writing the SPI data register.
