@@ -38,6 +38,7 @@ int main()
 
     APPLE_II_SD_T* pAIISD = (APPLE_II_SD_T*)SLOT_IO_START;
     volatile uint8* pSlotRom = SLOT_ROM_START;
+    volatile uint8 dummy;
 
     videomode(VIDEOMODE_40COL);
     clrscr();
@@ -107,19 +108,26 @@ int main()
         // enable write
         pAIISD->status.pgmen = 1;
 
-        // clear 0xCFFF
-        *CFFF = 0;
-
         // write to SLOTROM
         cprintf("\r\n\r\nFlashing SLOTROM: ");
         writeChip(buffer, pSlotRom, 256);
+
         cprintf("\r\nVerifying SLOTROM: ");
         if(verifyChip(buffer, pSlotRom, 256))
         {
-            // write to EXTROM
+            // write to EXT_ROM
             cprintf("\r\n\r\nFlashing EXTROM:  ");
+
+            // clear CFFF and dummy read to enable correct EXT_ROM
+        	dummy = *CFFF;
+            dummy = *pSlotRom;
+
             writeChip(buffer + 256, EXT_ROM_START, fileSize - 256);
             cprintf("\r\nVerifying EXTROM:  ");
+
+        	dummy = *CFFF;
+            dummy = *pSlotRom;
+
             if(verifyChip(buffer + 256, EXT_ROM_START, fileSize - 256))
             {
                 cprintf("\r\n\r\nFlashing finished!\n");
