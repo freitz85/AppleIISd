@@ -1,10 +1,10 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2
+; Version 1.2.2
 ; ProDOS functions
 ;
-; (c) Florian Reitz, 2017 - 2018
+; (c) Florian Reitz, 2017 - 2020
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -19,6 +19,9 @@
 .import COMMAND
 .import SDCMD
 .import GETBLOCK
+.import CARDDET
+.import INITED
+.import INIT
 .import WRPROT
 .import GETR1
 .import GETR3
@@ -67,6 +70,7 @@ PRODOS:     LDA   DCMD        ; get command
 ; C Clear - No error
 ;   Set   - Error
 ; A $00   - No error
+;   $28   - No card inserted
 ;   $2B   - Card write protected
 ; X       - Blocks avail (low byte)
 ; Y       - Blocks avail (high byte)
@@ -74,7 +78,12 @@ PRODOS:     LDA   DCMD        ; get command
 ;*******************************
 
 STATUS:     LDA   #NO_ERR     ; Thanks for this one, Antoine!
-            JSR   WRPROT
+            JSR   CARDDET
+            BCC   @WRPROT
+            LDA   #ERR_NODRIVE; no card inserted
+            BNE   @DONE
+
+@WRPROT:    JSR   WRPROT
             BCC   @DONE
             LDA   #ERR_NOWRITE; card write protected
 
@@ -94,10 +103,20 @@ STATUS:     LDA   #NO_ERR     ; Thanks for this one, Antoine!
 ;   Set   - Error
 ; A $00   - No error
 ;   $27   - Bad block number
+;   $28   - No card inserted
 ;
 ;*******************************
 
-READ:       JSR   GETBLOCK    ; calc block address
+READ:       JSR   CARDDET     ; check for card
+            BCS   @NDERROR    ; no card
+
+            JSR   INITED      ; check for initialization
+            BCC   @GETBLOCK
+
+            JSR   INIT        ; initialize card
+            BCS   @NDERROR    ; init failed
+
+@GETBLOCK:  JSR   GETBLOCK    ; calc block address
 
             LDA   SS,X        ; enable /CS
             AND   #<~SS0
@@ -105,7 +124,7 @@ READ:       JSR   GETBLOCK    ; calc block address
             LDA   #$51        ; send CMD17
             JSR   COMMAND     ; send command
             CMP   #0
-            BNE   @ERROR      ; check for error
+            BNE   @IOERROR    ; check for error
 
 @GETTOK:    LDA   #DUMMY      ; get data token
             STA   DATA,X
@@ -150,8 +169,12 @@ READ:       JSR   GETBLOCK    ; calc block address
             PLP
             RTS
 
-@ERROR:     SEC               ; an error occured
+@IOERROR:   SEC               ; an error occured
             LDA   #ERR_IOERR
+            BRA   @DONE
+
+@NDERROR:   SEC               ; an error occured
+            LDA   #ERR_NODRIVE
             BRA   @DONE
 
 

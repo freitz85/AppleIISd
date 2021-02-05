@@ -1,23 +1,25 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2
+; Version 1.2.2
 ; Helper functions
 ;
-; (c) Florian Reitz, 2017 - 2018
+; (c) Florian Reitz, 2017 - 2020
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
 ;
 ;*******************************
             
-.export COMMAND
 .export SDCMD
-.export GETBLOCK
-.export CARDDET
-.export WRPROT
 .export GETR1
 .export GETR3
+.export GETBLOCK
+.export COMMAND
+.export CARDDET
+.export WRPROT
+.export INITED
+
 
 .include "AppleIISd.inc"
 .segment "EXTROM"
@@ -209,6 +211,26 @@ WRPROT:     PHA
             BIT   SS,X        ; 1: write disabled
             CLC
             BEQ   @DONE
+            SEC
+@DONE:      PLA
+            RTS
+
+
+;*******************************
+;
+; Check if card is initialized
+; X must contain SLOT16
+;
+; C Clear - card initialized
+;   Set   - card not initialized
+;
+;*******************************
+
+INITED:     PHA
+            LDA   #CARD_INIT  ; 0: card not initialized
+            BIT   SS,X        ; 1: card initialized
+            CLC
+            BNE   @DONE
             SEC
 @DONE:      PLA
             RTS

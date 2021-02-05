@@ -11,12 +11,15 @@
 ;
 ;*******************************
 
+.export INIT
+
 .import PRODOS
 .import SMARTPORT
 .import GETR1
 .import GETR3
 .import SDCMD
 .import CARDDET
+.import INITED
 .import READ
 
 .include "AppleIISd.inc"
@@ -54,25 +57,23 @@
             LDX   #$00
             LDX   #$03
             LDX   #$00        ; is Smartport controller
+            ;LDX   #$3C        ; is a disk controller
 
             SEI               ; find slot
-            LDA   #$60        ; opcode for RTS
-            STA   SLOT
-            JSR   SLOT
+            BIT   $CFFF
+            JSR   KNOWNRTS
             TSX
             LDA   $0100,X
             CLI
             STA   CURSLOT     ; $Cs
             AND   #$0F
             STA   SLOT        ; $0s
-            TAY               ; Y holds now SLOT
             ASL   A
             ASL   A
             ASL   A
             ASL   A
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
-            BIT   $CFFF
 
             LDY   #0          ; display copyright message
 @DRAW:      LDA   TEXT,Y
@@ -95,7 +96,6 @@
             JMP   (CMDLO)
 
 @INIT:      JSR   INIT
-            CMP   #NO_ERR
             BNE   @NEXTSLOT   ; init not successful
 
 ;*******************************
@@ -145,9 +145,8 @@ DRIVER:     CLC               ; ProDOS entry
 
 ; Has this to be done every time this gets called or only on boot???
             SEI
-            LDA   #$60        ; opcode for RTS
-            STA   SLOT
-            JSR   SLOT
+            BIT   $CFFF
+            JSR   KNOWNRTS
             TSX
             LDA   $0100,X
             CLI
@@ -161,16 +160,9 @@ DRIVER:     CLC               ; ProDOS entry
             ASL   A
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
-            BIT   $CFFF
 
-            JSR   CARDDET
-            BCC   @INITED
-            LDA   #ERR_OFFLINE; no card inserted
-            BRA   @END
-
-@INITED:    LDA   #INITED     ; check for init
-            BIT   SS,X
-            BNE   @DISP
+            JSR   INITED      ; check for init
+            BCC   @DISP
             JSR   INIT
             BCS   @END        ; Init failed
 
@@ -344,7 +336,7 @@ INIT:       STZ   CTRL,X      ; reset SPI controller
             BNE   @IOERROR    ; error!
 
 @END:       LDA   SS,X
-            ORA   #INITED     ; initialized
+            ORA   #CARD_INIT  ; initialized
             STA   SS,X
             LDA   CTRL,X
             ORA   #ECE        ; enable 7MHz
@@ -359,7 +351,7 @@ INIT:       STZ   CTRL,X      ; reset SPI controller
             ORA   #SS0
             STA   SS,X
             TYA               ; retval in A
-            RTS
+KNOWNRTS:   RTS
 
 
 TEXT:       .asciiz " Apple][Sd v1.2.2 (c)2020 Florian Reitz"
