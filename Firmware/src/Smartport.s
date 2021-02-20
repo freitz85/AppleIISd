@@ -1,10 +1,10 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2
+; Version 1.2.2
 ; Smartport functions
 ;
-; (c) Florian Reitz, 2017 - 2018
+; (c) Florian Reitz, 2017 - 2021
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT

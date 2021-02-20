@@ -4,7 +4,7 @@
 ; Version 1.2.2
 ; Main source
 ;
-; (c) Florian Reitz, 2017 - 2020
+; (c) Florian Reitz, 2017 - 2021
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -354,7 +354,7 @@ INIT:       STZ   CTRL,X      ; reset SPI controller
 KNOWNRTS:   RTS
 
 
-TEXT:       .asciiz " Apple][Sd v1.2.2 (c)2020 Florian Reitz"
+TEXT:       .asciiz " Apple][Sd v1.2.2 (c)2021 Florian Reitz"
             .assert(*-TEXT)=40, error, "TEXT must be 40 bytes long"
 
 

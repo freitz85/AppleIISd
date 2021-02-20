@@ -36,7 +36,7 @@ int main()
     boolean erase = FALSE;
     uint16 fileSize = 0;
 
-    APPLE_II_SD_T* pAIISD = (APPLE_II_SD_T*)SLOT_IO_START;
+    APPLE_II_SD_T* pAIISD;
     volatile uint8* pSlotRom = SLOT_ROM_START;
     volatile uint8 dummy;
 
@@ -71,8 +71,8 @@ int main()
         cgetc();
         return 1;   // failure
     }
-
-    ((uint8*)pAIISD) += slotNum << 4;
+    
+    pAIISD = (APPLE_II_SD_T*)(SLOT_IO_START + (slotNum << 4));
     pSlotRom += slotNum << 8;
 
     if(erase)
