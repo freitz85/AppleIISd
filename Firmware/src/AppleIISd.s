@@ -1,15 +1,17 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2.1
+; Version 1.2.3
 ; Main source
 ;
-; (c) Florian Reitz, 2017 - 2018
+; (c) Florian Reitz, 2017 - 2021
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
 ;
 ;*******************************
+
+.export INIT
 
 .import PRODOS
 .import SMARTPORT
@@ -17,6 +19,7 @@
 .import GETR3
 .import SDCMD
 .import CARDDET
+.import INITED
 .import READ
 
 .include "AppleIISd.inc"
@@ -54,25 +57,23 @@
             LDX   #$00
             LDX   #$03
             LDX   #$00        ; is Smartport controller
+            ;LDX   #$3C        ; is a disk controller
 
             SEI               ; find slot
-            LDA   #$60        ; opcode for RTS
-            STA   SLOT
-            JSR   SLOT
+            BIT   $CFFF
+            JSR   KNOWNRTS
             TSX
             LDA   $0100,X
             CLI
             STA   CURSLOT     ; $Cs
             AND   #$0F
             STA   SLOT        ; $0s
-            TAY               ; Y holds now SLOT
             ASL   A
             ASL   A
             ASL   A
             ASL   A
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
-            BIT   $CFFF
 
             LDY   #0          ; display copyright message
 @DRAW:      LDA   TEXT,Y
@@ -102,7 +103,6 @@
             JMP   (CMDLO)
 
 @INIT:      JSR   INIT
-            CMP   #NO_ERR
             BNE   @NEXTSLOT   ; init not successful
 
 ;*******************************
@@ -170,9 +170,8 @@ DRIVER:     CLC               ; ProDOS entry
 
 ; Has this to be done every time this gets called or only on boot???
             SEI
-            LDA   #$60        ; opcode for RTS
-            STA   SLOT
-            JSR   SLOT
+            BIT   $CFFF
+            JSR   KNOWNRTS
             TSX
             LDA   $0100,X
             CLI
@@ -186,18 +185,9 @@ DRIVER:     CLC               ; ProDOS entry
             ASL   A
             STA   SLOT16      ; $s0
             TAX               ; X holds now SLOT16
-            BIT   $CFFF
-            JMP   DRIVEREXT
 
-            .segment "EXTROM"
-DRIVEREXT:  JSR   CARDDET
-            BCC   @INITED
-            LDA   #ERR_OFFLINE; no card inserted
-            BCS   @END
-
-@INITED:    LDA   #INITED     ; check for init
-            AND   SS,X
-            BNE   @DISP
+            JSR   INITED      ; check for init
+            BCC   @DISP
             JSR   INIT
             BCS   @END        ; Init failed
 
@@ -285,13 +275,16 @@ DRIVEREXT:  JSR   CARDDET
 ;
 ;*******************************
 
-INIT:       LDA   #$03        ; set SPI mode 3
-            STA   CTRL,X
-            LDA   SS,X
-            ORA   #SS0        ; set CS high
+            .segment "EXTROM"
+INIT:       
+			.IFPC02
+			STZ   CTRL,X      ; reset SPI controller
+			.ELSE
+			LDA	  #0
+			STA   CTRL,X
+			.ENDIF
+            LDA   #SS0        ; set CS high
             STA   SS,X
-            LDA   #7          ; set 400 kHz
-            STA   DIV,X
             LDY   #10
             LDA   #DUMMY
 
@@ -405,7 +398,7 @@ INIT:       LDA   #$03        ; set SPI mode 3
             BNE   @IOERROR    ; error!
 
 @END:       LDA   SS,X
-            ORA   #INITED     ; initialized
+            ORA   #CARD_INIT  ; initialized
             STA   SS,X
             LDA   CTRL,X
             ORA   #ECE        ; enable 7MHz
@@ -419,13 +412,13 @@ INIT:       LDA   #$03        ; set SPI mode 3
 @END1:      LDA   SS,X        ; set CS high
             ORA   #SS0
             STA   SS,X
-            LDA   #0          ; set div to 2
-            STA   DIV,X
             TYA               ; retval in A
-            RTS
+KNOWNRTS:   RTS
 
 
-TEXT:       .asciiz " Apple][Sd v1.2.2 (c)2019 Florian Reitz "
+TEXT:       .asciiz " Apple][Sd v1.2.3 (c)2021 Florian Reitz"
+            .assert(*-TEXT)=40, error, "TEXT must be 40 bytes long"
+
 
 CMD0:       .byt $40, $00, $00
             .byt $00, $00, $95

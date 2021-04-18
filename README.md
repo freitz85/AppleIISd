@@ -26,15 +26,13 @@ The AppleIISd requires an enhanced IIe or IIgs computer. The ROM code uses some 
 * Apple IIe enhanced, 128k, Prodos 1.9
 * Apple IIe enhanced, 64k, Prodos 1.9
 
-When a 2732 type ROM is used, the binary image has to be programmed at offset 0x800, because A11 is always high for compatibility with 2716 type ROMs.
-
 ## Binary distribution
 The following files in [Binary/](Binary) have been provided to eliminate the need to compile assembler or VHDL sources.
 
 | File | Purpose |
 | ---- | ------- |
 | AppleIISd_xx44.jed | CPLD bitfiles for PC44 and VQ44 formfactors |
-| AppleIIDs.bin | 2k Firmware binary for EPROM |
+| AppleIISd.bin | 2k Firmware binary for EPROM |
 | AppleIISd.hex | Same as above in INTEL-HEX format |
 | AppleIISd.bom.txt | BOM for the board |
 | AppleIISd.pdf | Schematic and layout |
@@ -112,6 +110,8 @@ The control registers of the *AppleIISd* are mapped to the usual I/O space at **
 
 **DATA** SPI data register - Is used for both input and output. When the register is written to, the controller will output the byte on the SPI bus. When it is read from, it reflects the data that was received over the SPI bus.
 
+**PGMEN** Program Enable - Enable programing of the internal firmware eeprom. Should be reset immediately after writing to the device.
+
 **ECE** External Clock Enable - This bit enables the the external clock input to the SPI controller. In the *AppleIISd*, this effectively switches the SPI clock between 500kHz (ECE = 0) and 3.5MHz (ECE = 1).
 
 **FRX** Fast Receive mode - When set to 1, fast receive mode triggers shifting upon reading or writing the SPI Data register. When set to 0, shifting is only triggered by writing the SPI data register.
@@ -134,9 +134,9 @@ The control registers of the *AppleIISd* are mapped to the usual I/O space at **
 * Much more testing
 * Enable more than 4 volumes under GS/OS
 * Support for 6502 CPUs
+* Support for CP/M
 
 ## Known Bugs
-* Does not work with some Z80 cards present
 * Programs not startable from partitions 3 and 4 under ProDOS
 
 

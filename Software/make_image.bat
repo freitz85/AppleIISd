@@ -1,3 +1,5 @@
+make clean
 make
-java -jar AppleCommander-ac-1.5.0.jar -d flasher.dsk %~n1
-java -jar AppleCommander-ac-1.5.0.jar -as flasher.dsk %~n1 < %1
+java -jar ..\Binary\AppleCommander-ac-1.5.0.jar -d ..\Binary\Flasher.dsk flasher
+java -jar ..\Binary\AppleCommander-ac-1.5.0.jar -as ..\Binary\Flasher.dsk flasher < Flasher.bin
+copy Flasher.bin ..\Binary

@@ -6,16 +6,20 @@ typedef unsigned short  uint16;
 typedef unsigned long   uint32;
 typedef unsigned char   boolean;
 
+#ifndef TRUE
 #define TRUE    1
+#endif
+#ifndef FALSE
 #define FALSE   0
+#endif
 
-#define SLOT_IO_START   (uint8*)0xC080
-#define SLOT_ROM_START  (uint8*)0xC000
-#define EXT_ROM_START   (uint8*)0xC800
+#define SLOT_IO_START   (volatile uint8*)0xC080
+#define SLOT_ROM_START  (volatile uint8*)0xC000
+#define EXT_ROM_START   (volatile uint8*)0xC800
 
-#define CFFF            (uint8*)0xCFFF
+#define CFFF            (volatile uint8*)0xCFFF
 
-typedef struct
+typedef volatile struct
 {
     // data register 
     // +0
@@ -40,12 +44,9 @@ typedef struct
         uint8 status;
     } status;
 
-    // clock divisor register
+    // clock divisor register, unused
     // +2
-    union
-    {
-        unsigned clkDiv : 2;
-    };
+    uint8 clkDiv;
 
     // slave select and card state register
     // +3
@@ -56,8 +57,8 @@ typedef struct
             unsigned slaveSel : 1;
             unsigned : 3;
             unsigned sdhc : 1;
-            unsigned wp : 1;
-            unsigned card : 1;
+            const unsigned wp : 1;
+            const unsigned card : 1;
             unsigned inited : 1;
         };
 

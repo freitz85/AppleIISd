@@ -1,10 +1,10 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2
+; Version 1.2.2
 ; Defines
 ;
-; (c) Florian Reitz, 2017 - 2018
+; (c) Florian Reitz, 2017 - 2021
 ;
 ; X register usually contains SLOT16
 ; Y register is used for counting or SLOT
@@ -44,11 +44,9 @@ DRVNUM      :=    $0678
 CURSLOT     :=    $07F8       ; $Cs
 
 ; Rom equates
-KNOWNRTS    :=    $FF58
 OAPPLE      :=    $C061       ; open apple key
 DATA        :=    $C080
 CTRL        :=    DATA+1
-DIV         :=    DATA+2
 SS          :=    DATA+3
 
 ; Constants
@@ -60,7 +58,7 @@ SS0         =     $01         ; SS register
 SDHC        =     $10
 WP          =     $20
 CD          =     $40
-INITED      =     $80
+CARD_INIT   =     $80
 
 SMDRIVERVER =     $120B       ; Version 1.2 Beta
 
