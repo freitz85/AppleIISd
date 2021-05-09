@@ -41,14 +41,9 @@ SDCMD:      .IFPC02
             LDY   #0
 @LOOP:      LDA   (CMDLO),Y
             STA   DATA,X
-@WAIT:      .IFPC02
-            BIT   CTRL,X      ; TC is in N
+@WAIT:      LDA   CTRL,X      ; TC is in N
             BPL   @WAIT
-            .ELSE
-            LDA   #TC
-            AND   CTRL,X
-            BEQ   @WAIT
-            .ENDIF
+
             INY
             CPY   #6
             BCC   @LOOP
@@ -70,14 +65,9 @@ SDCMD:      .IFPC02
 
 GETR1:      LDA   #DUMMY
             STA   DATA,X
-@WAIT:      .IFPC02
-            BIT   CTRL,X      ; TC is in N
+@WAIT:      LDA   CTRL,X      ; TC is in N
             BPL   @WAIT
-            .ELSE
-            LDA   #TC
-            AND   CTRL,X
-            BEQ   @WAIT
-            .ENDIF
+            
             LDA   DATA,X      ; get response
             BMI   GETR1       ; wait for MSB=0
             PHA
@@ -106,14 +96,9 @@ GETR3:      JSR   GETR1       ; get R1 first
             JMP   @WAIT       ; first byte is already there 
 @LOOP:      LDA   #DUMMY      ; send dummy
             STA   DATA,X
-@WAIT:      .IFPC02
-            BIT   CTRL,X      ; TC is in N
+@WAIT:      LDA   CTRL,X      ; TC is in N
             BPL   @WAIT
-            .ELSE
-            LDA   #TC
-            AND   CTRL,X
-            BEQ   @WAIT
-            .ENDIF
+
             LDA   DATA,X
             PHA
             DEY

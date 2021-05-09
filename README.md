@@ -1,4 +1,5 @@
 # AppleIISd
+
 SD card based ProFile replacement for enhanced Apple IIe and IIgs computers
 
 The **AppleIISd** is a SD card based replaced for the ProFile harddrive. In contrast to other SD card based devices, this card does not replace a Disk II drive. Data is saved directly onto the SD card, not via images on a FAT system, like on other cards. The SD card is accessable with [CiderPress](http://a2ciderpress.com/).
@@ -8,6 +9,7 @@ A Xilinx CPLD is used as a SPI controller and translates, together with the ROM 
 The assembler sources are written for CC65. The [schematics](Binary/AppleIISd.pdf) are available as PDF.
 
 ## Features
+
 * works with ProDOS and GS/OS
 * up to 128MB storage space (4x 65535 blocks)
 * ProDOS and Smartport driver in ROM
@@ -18,7 +20,9 @@ The assembler sources are written for CC65. The [schematics](Binary/AppleIISd.pd
 * Skip boot when Open-Apple key is pressed
 
 ## Requirements
+
 The AppleIISd requires an enhanced IIe or IIgs computer. The ROM code uses some 65c02 opcodes and will therefore not work on a II, II+ or unenhanced IIe. It has been tested in the following combinations:
+
 * Apple IIgs Rom 01, GS/OS 6.0.4
 * Apple IIgs Rom 01, Prodos 2.4.1
 * Apple IIgs Rom 01, Prodos 1.9
@@ -27,6 +31,7 @@ The AppleIISd requires an enhanced IIe or IIgs computer. The ROM code uses some 
 * Apple IIe enhanced, 64k, Prodos 1.9
 
 ## Binary distribution
+
 The following files in [Binary/](Binary) have been provided to eliminate the need to compile assembler or VHDL sources.
 
 | File | Purpose |
@@ -41,6 +46,7 @@ The following files in [Binary/](Binary) have been provided to eliminate the nee
 | Gerber_Vx.x.zip | Gerber files for different hw revisions |
 
 ## Smartport drive remapping
+
 The AppleIISd features Smartport drivers in ROM to provide more than two drives in both GS/OS and ProDOS.
 
 As ProDOS supports only two drives per slot, additional drives on a Smartport device are mapped to 'phantom slots'. Version prior to version 2 supported only the remapping of drives when the card was in slot 5. Starting with version 2, the remapping seems to work on all slots. The following list shows the assignments as slot/drive, when no other devices are attached:
@@ -56,15 +62,19 @@ As ProDOS supports only two drives per slot, additional drives on a Smartport de
 When more devices are connected, things get a little confusing ;-)
 
 ## Building the sources
+
 Be sure to have the newest version of CC65 (V2.16) and some kind of Make instaled, then type one of the following comands:
-```
+
+```bash
 make                            # generate binaries
 make OPTIONS=mapfile,listing    # generate mapfile and listing, too
 make clean                      # delete binaries
 ```
+
 Alternatively use the VisualStudio solution.
 
 ## Timing
+
 The clock of the SPI bus *SCK* may be derived from either *Phi0* or the *7M* clock. Additionally, the divisor may be 2 to 8.
 
 The following measurements were taken with the divisor set to 2, resulting in *fSCK* of 500kHz and 3.5MHz. Reading of a byte requires that a dummy byte is sent on the bus, before the answer can be read. Therefore the measurement is the time between sending the byte and receiving the answer. The measurement for reading of a whole 512 byte block includes the SD card commands to do so.
@@ -78,7 +88,7 @@ This shows that the required to read a single byte can be reduced significantly 
 
 The time for reading a 512 byte block could *only* be halved, but there are for sure opportunities for optimization in the code surrounding the reading.
 
-```
+```asm
 * single byte @ 500kHz
 LDA #$FF
 STA $C0C0
@@ -97,8 +107,8 @@ STA $C0C0
 LDA $C0C0
 ```
 
-
 ## Registers
+
 The control registers of the *AppleIISd* are mapped to the usual I/O space at **$C0n0 - $C0n3**, where n is slot+8. All registers and bits are read/write, except where noted.
 
 | Address | Function        | Default value |
@@ -131,14 +141,15 @@ The control registers of the *AppleIISd* are mapped to the usual I/O space at **
 **INIT** Initialized - This bit is set to 1 when the SD card has been initialized by the firmware. Do not write manually.
 
 ## TODOs
+
 * Much more testing
 * Enable more than 4 volumes under GS/OS
 * Support for 6502 CPUs
 * Support for CP/M
 
 ## Known Bugs
-* Programs not startable from partitions 3 and 4 under ProDOS
 
+* Programs not startable from partitions 3 and 4 under ProDOS
 
 ![Front_Img_Smd](Images/Card%20Front%20SMD.jpg)
 ![Front_Img](Images/Card%20Front.jpg)

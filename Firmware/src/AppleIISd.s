@@ -90,13 +90,11 @@
             BPL   @INIT       ; and skip boot if pressed
 
 @NEXTSLOT:  LDA   CURSLOT     ; skip boot when no card
-            .IFPC02
-            DEC   A
+            SBC   #1
             STA   CMDHI       ; use CMDHI/LO as pointer
+            .IFPC02
             STZ   CMDLO
             .ELSE
-            SBC   #1
-            STA   CMDHI
             LDA   #0
             STA   CMDLO
             .ENDIF
@@ -286,11 +284,11 @@ INIT:
             LDA   #SS0        ; set CS high
             STA   SS,X
             LDY   #10
-            LDA   #DUMMY
 
-@LOOP:      STA   DATA,X
-@WAIT:      AND   CTRL,X
-            BPL   @WAIT
+@LOOP:      LDA   #DUMMY
+            STA   DATA,X
+@WAIT:      LDA   CTRL,X
+            BPL   @WAIT       ; wait for TC (bit 7) to get high
             DEY
             BNE   @LOOP       ; do 10 times
             LDA   SS,X
