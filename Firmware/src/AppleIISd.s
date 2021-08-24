@@ -110,6 +110,8 @@
             STZ   BUFFER      ; buffer lo
             STZ   BLOCKNUM+1  ; block hi
             STZ   BLOCKNUM    ; block lo
+            LDA   SLOT16
+            STA   DSNUMBER    ; set to current slot
             JSR   READ
             BCS   @NEXTSLOT   ; load not successful 
 
