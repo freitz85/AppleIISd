@@ -1,7 +1,7 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2.2
+; Version 1.2.3
 ; Helper functions
 ;
 ; (c) Florian Reitz, 2017 - 2021
@@ -36,7 +36,7 @@ SDCMD:      PHY
             LDY   #0
 @LOOP:      LDA   (CMDLO),Y
             STA   DATA,X
-@WAIT:      BIT   CTRL,X      ; TC is in N
+@WAIT:      LDA   CTRL,X      ; TC is in N
             BPL   @WAIT
             INY
             CPY   #6
@@ -54,7 +54,7 @@ SDCMD:      PHY
 
 GETR1:      LDA   #DUMMY
             STA   DATA,X
-@WAIT:      BIT   CTRL,X
+@WAIT:      LDA   CTRL,X
             BPL   @WAIT
             LDA   DATA,X      ; get response
             BMI   GETR1       ; wait for MSB=0
@@ -79,7 +79,7 @@ GETR3:      JSR   GETR1       ; get R1 first
             JMP   @WAIT       ; first byte is already there 
 @LOOP:      LDA   #DUMMY      ; send dummy
             STA   DATA,X
-@WAIT:      BIT   CTRL,X
+@WAIT:      LDA   CTRL,X
             BPL   @WAIT
             LDA   DATA,X
             PHA
@@ -128,7 +128,7 @@ GETBLOCK:   PHX               ; save X
             LDA   #2          ; it is a phantom slot
             STA   R31,X
 
-@DRIVE:     BIT   DSNUMBER    ; drive number
+@DRIVE:     LDA   DSNUMBER    ; drive number
             BPL   @SDHC       ; D1
             LDA   R31,X       ; D2
             INC   A

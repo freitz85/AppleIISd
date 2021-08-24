@@ -1,7 +1,7 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2.2
+; Version 1.2.3
 ; Smartport functions
 ;
 ; (c) Florian Reitz, 2017 - 2021
@@ -95,7 +95,7 @@ SMARTPORT:  LDY   #SMZPSIZE-1   ; save zeropage area for Smarport
             BCC   @RESTZP
 
             TXA
-;warum feste anzahl an bytes für return wert?
+;warum feste anzahl an bytes fï¿½r return wert?
             LDY   #2            ; highbyte of # bytes transferred
             LDX   #0            ; low byte of # bytes transferred
 ;warum wird mit #1 verglichen?

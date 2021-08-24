@@ -1,7 +1,7 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2.2
+; Version 1.2.3
 ; Defines
 ;
 ; (c) Florian Reitz, 2017 - 2021

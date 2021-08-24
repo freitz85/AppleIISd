@@ -1,7 +1,7 @@
 ;*******************************
 ;
 ; Apple][Sd Firmware
-; Version 1.2.2
+; Version 1.2.3
 ; Main source
 ;
 ; (c) Florian Reitz, 2017 - 2021
@@ -86,7 +86,7 @@
             LDA   #197      
             JSR   $FCA8       ; wait for 100 ms
 
-@OAPPLE:    BIT   OAPPLE      ; check for OA key
+@OAPPLE:    LDA   OAPPLE      ; check for OA key
             BPL   @INIT       ; and skip boot if pressed
 
 @NEXTSLOT:  LDA   CURSLOT     ; skip boot when no card
