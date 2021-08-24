@@ -224,10 +224,10 @@ INIT:       STZ   CTRL,X      ; reset SPI controller
             LDA   #SS0        ; set CS high
             STA   SS,X
             LDY   #10
-            LDA   #DUMMY
 
-@LOOP:      STA   DATA,X
-@WAIT:      BIT   CTRL,X
+@LOOP:      LDA   #DUMMY
+            STA   DATA,X
+@WAIT:      LDA   CTRL,X      ; wait for TC (bit 7) to get high
             BPL   @WAIT
             DEY
             BNE   @LOOP       ; do 10 times
